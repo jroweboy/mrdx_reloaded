@@ -63,7 +63,10 @@ public class Mod : ModBase // <= Do not Remove.
     private static float _originalVolume = -1.0f;
 
     private const nint Mr1MusicOffset = 0xE4C428;
-    private const nint Mr2MusicOffset = 0x1D481D0;
+    // The instruction that the volume is initialized with originally
+    private const nint Mr2MusicLoadOffset = 0x166A60;
+    // The location that the volume is copied to when creating the audio render class
+    private const nint Mr2MusicRunOffset = 0x1D481D0;
     // For MR2DX the value is loaded from the code every time it seems (?)
     private const nint Mr2SfxOffset = 0x1677DF;
     // Additional offset for default volume that can potentially get called when triggering the same audio rapidly
@@ -97,7 +100,9 @@ public class Mod : ModBase // <= Do not Remove.
         else
         {
             _isMr2Dx = true;
-            _musicVolumeAddress = baseAddress + Mr2MusicOffset;
+            // Write once to the music volume load address
+            Memory.Instance.SafeWrite(baseAddress + Mr2MusicLoadOffset, ClampVolume(_configuration.MusicVolume));
+            _musicVolumeAddress = baseAddress + Mr2MusicRunOffset;
             _sfxVolumeAddress = baseAddress + Mr2SfxOffset;
             _sfxVolumeMr2Address = baseAddress + Mr2DefaultSfxOffset;
             var deviceEnumerator = new MMDeviceEnumerator(Guid.NewGuid());
