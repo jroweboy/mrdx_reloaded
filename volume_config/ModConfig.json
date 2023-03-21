@@ -1,0 +1,40 @@
+{
+  "ModId": "mrdx.audio.volume_config",
+  "ModName": "Volume Control",
+  "ModAuthor": "fadillzzz",
+  "ModVersion": "1.0.0",
+  "ModDescription": "Adds volume control sliders for MR1DX and MR2DX",
+  "ModDll": "volume_config.dll",
+  "ModIcon": "Preview.png",
+  "ModR2RManagedDll32": "x86/volume_config.dll",
+  "ModR2RManagedDll64": "x64/volume_config.dll",
+  "ModNativeDll32": "",
+  "ModNativeDll64": "",
+  "Tags": [
+    "Music",
+    "Sound Effect"
+  ],
+  "CanUnload": null,
+  "HasExports": null,
+  "IsLibrary": false,
+  "ReleaseMetadataFileName": "mrdx.audio.volume_config.ReleaseMetadata.json",
+  "PluginData": {
+    "GitHubRelease": {
+      "UserName": "jroweboy",
+      "RepositoryName": "mrdx_reloaded",
+      "UseReleaseTag": true,
+      "AssetFileName": "Mod.zip"
+    }
+  },
+  "IsUniversalMod": false,
+  "ModDependencies": [
+    "reloaded.sharedlib.hooks",
+    "Reloaded.Memory.SigScan.ReloadedII"
+  ],
+  "OptionalDependencies": [],
+  "SupportedAppId": [
+    "mf.exe",
+    "mf2.exe"
+  ],
+  "ProjectUrl": "https://github.com/jroweboy/mrdx_reloaded"
+}

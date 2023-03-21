@@ -1,0 +1,15 @@
+﻿
+# Set Working Directory
+Split-Path $MyInvocation.MyCommand.Path | Push-Location
+[Environment]::CurrentDirectory = $PWD
+
+./Publish.ps1 -ProjectPath "volume_config/volume_config.csproj" `
+              -PackageName "mrdx.audio.volume_config" `
+			  -ReadmePath ./volume_config/README.md `
+              -PublishOutputDir "Publish/ToUpload/volume_config" `
+              -MakeDelta true -UseGitHubDelta true `
+              -MetadataFileName "mrdx.audio.volume_config.ReleaseMetadata.json" `
+              -GitHubUserName jroweboy -GitHubRepoName mrdx_reloaded -GitHubFallbackPattern volume_config.zip -GitHubInheritVersionFromTag false `
+			  @args
+
+Pop-Location
