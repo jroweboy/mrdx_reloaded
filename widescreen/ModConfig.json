@@ -1,9 +1,9 @@
 {
-  "ModId": "mrdx.audio.widescreen",
+  "ModId": "mrdx.graphics.widescreen",
   "ModName": "Widescreen",
   "ModAuthor": "fadillzzz",
   "ModVersion": "1.0.0",
-  "ModDescription": "Adds volume control sliders for MR1DX and MR2DX",
+  "ModDescription": "Changes the render window to draw in widescreen",
   "ModDll": "widescreen.dll",
   "ModIcon": "Preview.png",
   "ModR2RManagedDll32": "x86/widescreen.dll",
@@ -11,12 +11,13 @@
   "ModNativeDll32": "",
   "ModNativeDll64": "",
   "Tags": [
-    "Graphic"
+    "Graphics",
+    "GUI/HUD"
   ],
   "CanUnload": null,
   "HasExports": null,
   "IsLibrary": false,
-  "ReleaseMetadataFileName": "mrdx.audio.widescreen.ReleaseMetadata.json",
+  "ReleaseMetadataFileName": "mrdx.graphics.widescreen.ReleaseMetadata.json",
   "PluginData": {
     "GitHubRelease": {
       "UserName": "jroweboy",

@@ -5,6 +5,7 @@ namespace widescreen.Configuration;
 
 public class Config : Configurable<Config>
 {
+    
 }
 
 /// <summary>

@@ -12,4 +12,13 @@ Split-Path $MyInvocation.MyCommand.Path | Push-Location
               -GitHubUserName jroweboy -GitHubRepoName mrdx_reloaded -GitHubFallbackPattern volume_config.zip -GitHubInheritVersionFromTag false `
 			  @args
 
+./Publish.ps1 -ProjectPath "widescreen/widescreen.csproj" `
+              -PackageName "mrdx.graphics.widescreen" `
+			  -ReadmePath ./widescreen/README.md `
+              -PublishOutputDir "Publish/ToUpload/volume_config" `
+              -MakeDelta true -UseGitHubDelta true `
+              -MetadataFileName "mrdx.audio.volume_config.ReleaseMetadata.json" `
+              -GitHubUserName jroweboy -GitHubRepoName mrdx_reloaded -GitHubFallbackPattern volume_config.zip -GitHubInheritVersionFromTag false `
+			  @args
+
 Pop-Location
