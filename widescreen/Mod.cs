@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Drawing;
 using System.Runtime.InteropServices;
 using Reloaded.Hooks.ReloadedII.Interfaces;
 using Reloaded.Memory.Sources;
@@ -74,10 +75,26 @@ public class Mod : ModBase // <= Do not Remove.
         var baseAddress = thisProcess.MainModule!.BaseAddress;
         
         var memory = Memory.Instance;
-        GetWindowRect(thisProcess.MainWindowHandle, out var rct);
-        memory.SafeWrite(baseAddress + Mr2WidthOffset, (float)(rct.Right - rct.Left));
-        memory.SafeWrite(baseAddress + Mr2HeightOffset, (float)(rct.Top - rct.Bottom));
-        
+        var originalWidth = 320.0f;
+        var originalAspectRatio = ConvertAspectRatio(Config.AspectRatioEnum.Force_4_3);
+        var newAspectRatio = ConvertAspectRatio(_configuration.AspectRatio);
+        var rescaledWidth = originalWidth * newAspectRatio / originalAspectRatio;
+        memory.SafeWrite(baseAddress + Mr2WidthOffset, rescaledWidth);
+        // memory.SafeWrite(baseAddress + Mr2HeightOffset, 1080.0f);
+    }
+    
+    private static float ConvertAspectRatio(Config.AspectRatioEnum val)
+    {
+        switch (val)
+        {
+            default:
+            case Config.AspectRatioEnum.Auto:
+                return 16.0f / 9; 
+            case Config.AspectRatioEnum.Force_4_3:
+                return 4.0f / 3;
+            case Config.AspectRatioEnum.Force_16_9:
+                return 16.0f / 9;
+        }
     }
 
     #region Standard Overrides
