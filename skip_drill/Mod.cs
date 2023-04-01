@@ -44,6 +44,8 @@ namespace SkipDrillAnim
 
         private const int trainingIsDoneOffset = 0xC4EE0;
 
+        private const int skipButton = 0x10; // 0x10 == Triangle button
+
         private static nint baseAddress;
 
         private IHook<IsTrainingDone> _hook;
@@ -72,7 +74,7 @@ namespace SkipDrillAnim
         private unsafe static bool ShouldSkipTraining([In] int self)
         {
             int* inputPtr = (int *) (baseAddress + userInputOffset);
-            return *inputPtr == 0x10; // 0x10 == Triangle button
+            return (*inputPtr & skipButton) != 0;
         }
 
         [Function(CallingConventions.MicrosoftThiscall)]
