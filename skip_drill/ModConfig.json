@@ -1,0 +1,21 @@
+{
+  "ModId": "mr2dx.qol.skip_drill",
+  "ModName": "Skip Drill Animation",
+  "ModAuthor": "fadillzzz",
+  "ModVersion": "1.0.0",
+  "ModDescription": "Skip drill animation in MR2DX",
+  "ModDll": "skip_drill.dll",
+  "ModIcon": "Preview.png",
+  "ModR2RManagedDll32": "x86/skip_drill.dll",
+  "ModR2RManagedDll64": "x64/skip_drill.dll",
+  "ModNativeDll32": "",
+  "ModNativeDll64": "",
+  "IsLibrary": false,
+  "ReleaseMetadataFileName": "SkipDrillAnim.ReleaseMetadata.json",
+  "PluginData": {},
+  "IsUniversalMod": false,
+  "ModDependencies": [ "reloaded.sharedlib.hooks" ],
+  "OptionalDependencies": [],
+  "SupportedAppId": [],
+  "ProjectUrl": ""
+}
