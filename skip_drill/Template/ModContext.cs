@@ -1,4 +1,5 @@
 ﻿using Reloaded.Mod.Interfaces;
+using SkipDrillAnim.Configuration;
 using IReloadedHooks = Reloaded.Hooks.ReloadedII.Interfaces.IReloadedHooks;
 
 namespace SkipDrillAnim.Template
@@ -23,6 +24,11 @@ namespace SkipDrillAnim.Template
         /// </summary>
         public ILogger Logger { get; set; } = null!;
 
+        /// <summary>
+        /// Provides access to this mod's configuration.
+        /// </summary>
+        public Config Configuration { get; set; } = null!;
+        
         /// <summary>
         /// Configuration of this mod.
         /// </summary>

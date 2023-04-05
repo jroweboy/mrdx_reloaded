@@ -6,6 +6,8 @@
 using Reloaded.Hooks.ReloadedII.Interfaces;
 using Reloaded.Mod.Interfaces;
 using Reloaded.Mod.Interfaces.Internal;
+using SkipDrillAnim.Configuration;
+using SkipDrillAnim.Template.Configuration;
 
 namespace SkipDrillAnim.Template
 {
@@ -38,6 +40,11 @@ namespace SkipDrillAnim.Template
         /// Encapsulates your mod logic.
         /// </summary>
         private ModBase _mod = new Mod();
+        
+        /// <summary>
+        /// Stores the contents of your mod's configuration. Automatically updated by template.
+        /// </summary>
+        private Config _configuration = null!;
 
         /// <summary>
         /// Entry point for your mod.
@@ -49,6 +56,13 @@ namespace SkipDrillAnim.Template
             _logger = (ILogger)_modLoader.GetLogger();
             _modLoader.GetController<IReloadedHooks>()?.TryGetTarget(out _hooks!);
 
+            // Your config file is in Config.json.
+            // Need a different name, format or more configurations? Modify the `Configurator`.
+            // If you do not want a config, remove Configuration folder and Config class.
+            var configurator = new Configurator(_modLoader.GetModConfigDirectory(_modConfig.ModId));
+            _configuration = configurator.GetConfiguration<Config>(0);
+            _configuration.ConfigurationUpdated += OnConfigurationUpdated;
+            
             // Please put your mod code in the class below,
             // use this class for only interfacing with mod loader.
             _mod = new Mod(new ModContext()
@@ -57,6 +71,7 @@ namespace SkipDrillAnim.Template
                 Hooks = _hooks,
                 ModLoader = _modLoader,
                 ModConfig = _modConfig,
+                Configuration = _configuration,
                 Owner = this,
             });
         }
@@ -73,5 +88,17 @@ namespace SkipDrillAnim.Template
 
         /* Automatically called by the mod loader when the mod is about to be unloaded. */
         public Action Disposing => () => _mod.Disposing();
+        
+        private void OnConfigurationUpdated(IConfigurable obj)
+        {
+            /*
+                This is executed when the configuration file gets 
+                updated by the user at runtime.
+            */
+
+            // Replace configuration with new.
+            _configuration = (Config)obj;
+            _mod.ConfigurationUpdated(_configuration);
+        }
     }
 }
