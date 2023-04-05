@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.33502.453
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "volume_config", "volume_config\volume_config.csproj", "{0BCA8B62-5924-4915-A475-7B04C43904B7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MRDX.Audio.VolumeConfig", "MRDX.Audio.VolumeConfig\MRDX.Audio.VolumeConfig.csproj", "{0BCA8B62-5924-4915-A475-7B04C43904B7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "widescreen", "widescreen\widescreen.csproj", "{A7D407CF-1C10-4FD9-9958-DABE0680D52B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MRDX.Graphics.Widescreen", "MRDX.Graphics.Widescreen\MRDX.Graphics.Widescreen.csproj", "{A7D407CF-1C10-4FD9-9958-DABE0680D52B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "skip_drill", "skip_drill\skip_drill.csproj", "{574C8E2D-3121-4CF1-88FF-C10E3233FE29}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MRDX.Qol.SkipDrillAnim", "MRDX.Qol.SkipDrillAnim\MRDX.Qol.SkipDrillAnim.csproj", "{574C8E2D-3121-4CF1-88FF-C10E3233FE29}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

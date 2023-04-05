@@ -1,0 +1,36 @@
+{
+  "ModId": "MRDX.Qol.SkipDrillAnim",
+  "ModName": "Skip Drill Animation",
+  "ModAuthor": "fadillzzz",
+  "ModVersion": "1.0.0",
+  "ModDescription": "Skip drill animation in MR2DX",
+  "ModDll": "MRDX.Qol.SkipDrillAnim.dll",
+  "ModIcon": "Preview.png",
+  "ModR2RManagedDll32": "x86/MRDX.Qol.SkipDrillAnim.dll",
+  "ModR2RManagedDll64": "x64/MRDX.Qol.SkipDrillAnim.dll",
+  "ModNativeDll32": "",
+  "ModNativeDll64": "",
+  "Tags": [],
+  "CanUnload": false,
+  "HasExports": false,
+  "IsLibrary": false,
+  "ReleaseMetadataFileName": "MRDX.Qol.SkipDrillAnim.ReleaseMetadata.json",
+  "PluginData": {
+    "GitHubRelease": {
+      "UserName": "jroweboy",
+      "RepositoryName": "mrdx_reloaded",
+      "UseReleaseTag": false,
+      "AssetFileName": "Mod.zip"
+    }
+  },
+  "IsUniversalMod": false,
+  "ModDependencies": [
+    "Reloaded.Memory.SigScan.ReloadedII",
+    "reloaded.sharedlib.hooks"
+  ],
+  "OptionalDependencies": [],
+  "SupportedAppId": [
+    "mf2.exe"
+  ],
+  "ProjectUrl": "https://github.com/jroweboy/mrdx_reloaded"
+}

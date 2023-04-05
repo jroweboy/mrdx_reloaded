@@ -162,13 +162,13 @@ param (
     $UseScriptDirectory=$True,
 
     ## => User Config <= ## 
-    $ProjectPath = "volume_config.csproj",
-    $PackageName = "volume_config",
+    $ProjectPath = "",
+    $PackageName = "",
     $PublishOutputDir = "Publish/ToUpload",
 
     ## => User: Delta Config
     # Pick one and configure settings below.
-    $MetadataFileName = "Sewer56.Update.ReleaseMetadata.json",
+    $MetadataFileName = "",
     $UseGitHubDelta = $False, # GitHub Releases
     $UseGameBananaDelta = $False,
     $UseNuGetDelta = $False,
@@ -180,8 +180,8 @@ param (
 
     $GameBananaItemId = 333681, # From mod page URL.
 
-    $NuGetPackageId = "volume_config",
-    $NuGetFeedUrl = "http://packages.sewer56.moe:5000/v3/index.json",
+    $NuGetPackageId = "",
+    $NuGetFeedUrl = "",
     $NuGetAllowUnlisted = $False,
 
     ## => User: Publish Config

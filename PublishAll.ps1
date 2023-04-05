@@ -3,22 +3,31 @@
 Split-Path $MyInvocation.MyCommand.Path | Push-Location
 [Environment]::CurrentDirectory = $PWD
 
-./Publish.ps1 -ProjectPath "volume_config/volume_config.csproj" `
-              -PackageName "mrdx.audio.volume_config" `
-			  -ReadmePath ./volume_config/README.md `
-              -PublishOutputDir "Publish/ToUpload/volume_config" `
+./Publish.ps1 -ProjectPath "MRDX.Audio.VolumeConfig/MRDX.Audio.VolumeConfig.csproj" `
+              -PackageName "MRDX.Audio.VolumeConfig" `
+			  -ReadmePath ./MRDX.Audio.VolumeConfig/README.md `
+              -PublishOutputDir "Publish/ToUpload/MRDX.Audio.VolumeConfig" `
               -MakeDelta false -UseGitHubDelta false `
-              -MetadataFileName "mrdx.audio.volume_config.ReleaseMetadata.json" `
+              -MetadataFileName "MRDX.Audio.VolumeConfig.ReleaseMetadata.json" `
               -GitHubUserName jroweboy -GitHubRepoName mrdx_reloaded -GitHubFallbackPattern volume_config.zip -GitHubInheritVersionFromTag false `
 			  @args
 
-./Publish.ps1 -ProjectPath "widescreen/widescreen.csproj" `
-              -PackageName "mrdx.graphics.widescreen" `
-			  -ReadmePath ./widescreen/README.md `
-              -PublishOutputDir "Publish/ToUpload/widescreen" `
+./Publish.ps1 -ProjectPath "MRDX.Graphics.Widescreen/MRDX.Graphics.Widescreen.csproj" `
+              -PackageName "MRDX.Graphics.Widescreen" `
+			  -ReadmePath ./MRDX.Graphics.Widescreen/README.md `
+              -PublishOutputDir "Publish/ToUpload/MRDX.Graphics.Widescreen" `
               -MakeDelta false -UseGitHubDelta false `
-              -MetadataFileName "mrdx.graphics.widescreen.ReleaseMetadata.json" `
+              -MetadataFileName "MRDX.Graphics.Widescreen.ReleaseMetadata.json" `
               -GitHubUserName jroweboy -GitHubRepoName mrdx_reloaded -GitHubFallbackPattern widescreen.zip -GitHubInheritVersionFromTag false `
+			  @args
+
+./Publish.ps1 -ProjectPath "MRDX.Qol.SkipDrillAnim/MRDX.Qol.SkipDrillAnim.csproj" `
+              -PackageName "MRDX.Qol.SkipDrillAnim" `
+			  -ReadmePath ./MRDX.Qol.SkipDrillAnim/README.md `
+              -PublishOutputDir "Publish/ToUpload/MRDX.Qol.SkipDrillAnim" `
+              -MakeDelta false -UseGitHubDelta false `
+              -MetadataFileName "MR2DX.Qol.SkipDrillAnim.ReleaseMetadata.json" `
+              -GitHubUserName jroweboy -GitHubRepoName mrdx_reloaded -GitHubFallbackPattern skip_drill.zip -GitHubInheritVersionFromTag false `
 			  @args
 
 Pop-Location
