@@ -46,7 +46,8 @@ public class Mod : ModBase // <= Do not Remove.
     private const string ShouldSkipTrainingSignature = "33 C0 39 41 ?? 0F 95 C0";
     // private const nuint TrainingIsDoneOffset = 0xC4EE0;
 
-    private const int SkipButton = 0x10; // 0x10 == Triangle button
+    private const int SkipButton = 0x10; // Triangle button
+    private const int AltSkipButton = 0x40; // X button / Back button
 
     private static bool _isAutoSkipEnabled;
 
@@ -88,7 +89,7 @@ public class Mod : ModBase // <= Do not Remove.
         if (_isAutoSkipEnabled)
             return true;
         Memory.Instance.Read<int>(_inputPtr, out var input);
-        return (input & SkipButton) != 0;
+        return (input & (SkipButton | AltSkipButton)) != 0;
     }
 
     [Function(CallingConventions.MicrosoftThiscall)]
