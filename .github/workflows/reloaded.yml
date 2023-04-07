@@ -12,7 +12,8 @@
 #   - Upload to Reloaded NuGet Repository (if GitHub Secret RELOADED_NUGET_KEY is specified) 
 
 name: Build and Publish Reloaded Mod
-
+permissions:
+  contents: write
 on:
   push:
     branches: [ main ]
@@ -62,8 +63,6 @@ jobs:
     - name: Upload Latest Prerelease to GitHub Releases
       uses: softprops/action-gh-release@v1
       with:
-        permissions:
-          contents: write
         # Overwrite the previous prerelease tag
         prerelease: true
         tag_name: prerelease
