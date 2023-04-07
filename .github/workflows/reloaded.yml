@@ -24,6 +24,7 @@ on:
 
 env:
   PUBLISH_PATH_GLOB: ./Publish/ToUpload/**/Generic/*
+  RELOADEDIIMODS: .
 
 jobs:
   build:
