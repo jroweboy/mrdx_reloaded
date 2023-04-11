@@ -9,7 +9,7 @@ Split-Path $MyInvocation.MyCommand.Path | Push-Location
               -PublishOutputDir "Publish/ToUpload/MRDX.Audio.VolumeConfig" `
               -MakeDelta true -UseGitHubDelta true `
               -MetadataFileName "MRDX.Audio.VolumeConfig.ReleaseMetadata.json" `
-              -GitHubUserName jroweboy -GitHubRepoName mrdx_reloaded -GitHubInheritVersionFromTag false `
+              -GitHubUserName jroweboy -GitHubRepoName mrdx_reloaded -GitHubFallbackPattern mod.zip -GitHubInheritVersionFromTag false `
 			  @args
 
 ./Publish.ps1 -ProjectPath "MRDX.Base.Mod/MRDX.Base.Mod.csproj" `
@@ -18,7 +18,7 @@ Split-Path $MyInvocation.MyCommand.Path | Push-Location
               -PublishOutputDir "Publish/ToUpload/MRDX.Base.Mod" `
               -MakeDelta true -UseGitHubDelta true `
               -MetadataFileName "MRDX.Base.Mod.ReleaseMetadata.json" `
-              -GitHubUserName jroweboy -GitHubRepoName mrdx_reloaded -GitHubInheritVersionFromTag false `
+              -GitHubUserName jroweboy -GitHubRepoName mrdx_reloaded -GitHubFallbackPattern mod.zip -GitHubInheritVersionFromTag false `
 			  @args
 
 ./Publish.ps1 -ProjectPath "MRDX.Base.ExtractDataBin/MRDX.Base.ExtractDataBin.csproj" `
@@ -27,7 +27,7 @@ Split-Path $MyInvocation.MyCommand.Path | Push-Location
               -PublishOutputDir "Publish/ToUpload/MRDX.Base.ExtractDataBin" `
               -MakeDelta true -UseGitHubDelta true `
               -MetadataFileName "MRDX.Base.ExtractDataBin.ReleaseMetadata.json" `
-              -GitHubUserName jroweboy -GitHubRepoName mrdx_reloaded -GitHubInheritVersionFromTag false `
+              -GitHubUserName jroweboy -GitHubRepoName mrdx_reloaded -GitHubFallbackPattern mod.zip -GitHubInheritVersionFromTag false `
 			  @args
 
 ./Publish.ps1 -ProjectPath "MRDX.Game.HardMode/MRDX.Game.HardMode.csproj" `
@@ -36,7 +36,7 @@ Split-Path $MyInvocation.MyCommand.Path | Push-Location
               -PublishOutputDir "Publish/ToUpload/MRDX.Game.HardMode" `
               -MakeDelta true -UseGitHubDelta true `
               -MetadataFileName "MRDX.Game.HardMode.ReleaseMetadata.json" `
-              -GitHubUserName jroweboy -GitHubRepoName mrdx_reloaded -GitHubInheritVersionFromTag false `
+              -GitHubUserName jroweboy -GitHubRepoName mrdx_reloaded -GitHubFallbackPattern mod.zip -GitHubInheritVersionFromTag false `
 			  @args
 
 ./Publish.ps1 -ProjectPath "MRDX.Graphics.Widescreen/MRDX.Graphics.Widescreen.csproj" `
@@ -45,7 +45,7 @@ Split-Path $MyInvocation.MyCommand.Path | Push-Location
               -PublishOutputDir "Publish/ToUpload/MRDX.Graphics.Widescreen" `
               -MakeDelta true -UseGitHubDelta true `
               -MetadataFileName "MRDX.Graphics.Widescreen.ReleaseMetadata.json" `
-              -GitHubUserName jroweboy -GitHubRepoName mrdx_reloaded -GitHubInheritVersionFromTag false `
+              -GitHubUserName jroweboy -GitHubRepoName mrdx_reloaded -GitHubFallbackPattern mod.zip -GitHubInheritVersionFromTag false `
 			  @args
 
 ./Publish.ps1 -ProjectPath "MRDX.Qol.FastForward/MRDX.Qol.FastForward.csproj" `
@@ -54,7 +54,7 @@ Split-Path $MyInvocation.MyCommand.Path | Push-Location
               -PublishOutputDir "Publish/ToUpload/MRDX.Qol.FastForward" `
               -MakeDelta true -UseGitHubDelta true `
               -MetadataFileName "MR2DX.Qol.SkipDrillAnim.FastForward.json" `
-              -GitHubUserName jroweboy -GitHubRepoName mrdx_reloaded -GitHubInheritVersionFromTag false `
+              -GitHubUserName jroweboy -GitHubRepoName mrdx_reloaded -GitHubFallbackPattern mod.zip -GitHubInheritVersionFromTag false `
 			  @args
 
 ./Publish.ps1 -ProjectPath "MRDX.Qol.SkipDrillAnim/MRDX.Qol.SkipDrillAnim.csproj" `
@@ -63,7 +63,7 @@ Split-Path $MyInvocation.MyCommand.Path | Push-Location
               -PublishOutputDir "Publish/ToUpload/MRDX.Qol.SkipDrillAnim" `
               -MakeDelta true -UseGitHubDelta true `
               -MetadataFileName "MR2DX.Qol.SkipDrillAnim.ReleaseMetadata.json" `
-              -GitHubUserName jroweboy -GitHubRepoName mrdx_reloaded -GitHubInheritVersionFromTag false `
+              -GitHubUserName jroweboy -GitHubRepoName mrdx_reloaded -GitHubFallbackPattern mod.zip -GitHubInheritVersionFromTag false `
 			  @args
 
 Pop-Location
