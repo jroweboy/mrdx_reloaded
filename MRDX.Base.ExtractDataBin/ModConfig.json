@@ -12,7 +12,14 @@
   "ModNativeDll64": "",
   "IsLibrary": true,
   "ReleaseMetadataFileName": "MRDX.Base.ExtractDataBin.ReleaseMetadata.json",
-  "PluginData": {},
+  "PluginData": {
+    "GitHubRelease": {
+      "UserName": "jroweboy",
+      "RepositoryName": "mrdx_reloaded",
+      "UseReleaseTag": false,
+      "AssetFileName": "Mod.zip"
+    }
+  },
   "IsUniversalMod": false,
   "ModDependencies": [
     "reloaded.sharedlib.hooks"

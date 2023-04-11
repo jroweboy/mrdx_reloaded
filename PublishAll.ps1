@@ -3,6 +3,7 @@
 Split-Path $MyInvocation.MyCommand.Path | Push-Location
 [Environment]::CurrentDirectory = $PWD
 
+echo "Publishing MRDX.Audio.VolumeConfig"
 ./Publish.ps1 -ProjectPath "MRDX.Audio.VolumeConfig/MRDX.Audio.VolumeConfig.csproj" `
               -PackageName "MRDX.Audio.VolumeConfig" `
 			  -ReadmePath ./MRDX.Audio.VolumeConfig/README.md `
@@ -12,6 +13,7 @@ Split-Path $MyInvocation.MyCommand.Path | Push-Location
               -GitHubUserName jroweboy -GitHubRepoName mrdx_reloaded -GitHubFallbackPattern mod.zip -GitHubInheritVersionFromTag false `
 			  @args
 
+echo "Publishing MRDX.Base.Mod"
 ./Publish.ps1 -ProjectPath "MRDX.Base.Mod/MRDX.Base.Mod.csproj" `
               -PackageName "MRDX.Base.Mod" `
 			  -ReadmePath ./MRDX.Base.Mod/README.md `
@@ -21,6 +23,7 @@ Split-Path $MyInvocation.MyCommand.Path | Push-Location
               -GitHubUserName jroweboy -GitHubRepoName mrdx_reloaded -GitHubFallbackPattern mod.zip -GitHubInheritVersionFromTag false `
 			  @args
 
+echo "Publishing MRDX.Base.ExtractDataBin"
 ./Publish.ps1 -ProjectPath "MRDX.Base.ExtractDataBin/MRDX.Base.ExtractDataBin.csproj" `
               -PackageName "MRDX.Base.ExtractDataBin" `
 			  -ReadmePath ./MRDX.Base.ExtractDataBin/README.md `
@@ -30,6 +33,7 @@ Split-Path $MyInvocation.MyCommand.Path | Push-Location
               -GitHubUserName jroweboy -GitHubRepoName mrdx_reloaded -GitHubFallbackPattern mod.zip -GitHubInheritVersionFromTag false `
 			  @args
 
+echo "Publishing MRDX.Game.HardMode"
 ./Publish.ps1 -ProjectPath "MRDX.Game.HardMode/MRDX.Game.HardMode.csproj" `
               -PackageName "MRDX.Game.HardMode" `
 			  -ReadmePath ./MRDX.Game.HardMode/README.md `
@@ -39,6 +43,7 @@ Split-Path $MyInvocation.MyCommand.Path | Push-Location
               -GitHubUserName jroweboy -GitHubRepoName mrdx_reloaded -GitHubFallbackPattern mod.zip -GitHubInheritVersionFromTag false `
 			  @args
 
+echo "Publishing MRDX.Graphics.Widescreen"
 ./Publish.ps1 -ProjectPath "MRDX.Graphics.Widescreen/MRDX.Graphics.Widescreen.csproj" `
               -PackageName "MRDX.Graphics.Widescreen" `
 			  -ReadmePath ./MRDX.Graphics.Widescreen/README.md `
@@ -48,22 +53,26 @@ Split-Path $MyInvocation.MyCommand.Path | Push-Location
               -GitHubUserName jroweboy -GitHubRepoName mrdx_reloaded -GitHubFallbackPattern mod.zip -GitHubInheritVersionFromTag false `
 			  @args
 
+echo "Publishing MRDX.Qol.FastForward"
 ./Publish.ps1 -ProjectPath "MRDX.Qol.FastForward/MRDX.Qol.FastForward.csproj" `
               -PackageName "MRDX.Qol.FastForward" `
 			  -ReadmePath ./MRDX.Qol.FastForward/README.md `
               -PublishOutputDir "Publish/ToUpload/MRDX.Qol.FastForward" `
               -MakeDelta true -UseGitHubDelta true `
-              -MetadataFileName "MR2DX.Qol.SkipDrillAnim.FastForward.json" `
+              -MetadataFileName "MRDX.Qol.FastForward.ReleaseMetadata.json" `
               -GitHubUserName jroweboy -GitHubRepoName mrdx_reloaded -GitHubFallbackPattern mod.zip -GitHubInheritVersionFromTag false `
 			  @args
 
+echo "Publishing MRDX.Qol.SkipDrillAnim"
 ./Publish.ps1 -ProjectPath "MRDX.Qol.SkipDrillAnim/MRDX.Qol.SkipDrillAnim.csproj" `
               -PackageName "MRDX.Qol.SkipDrillAnim" `
 			  -ReadmePath ./MRDX.Qol.SkipDrillAnim/README.md `
               -PublishOutputDir "Publish/ToUpload/MRDX.Qol.SkipDrillAnim" `
               -MakeDelta true -UseGitHubDelta true `
-              -MetadataFileName "MR2DX.Qol.SkipDrillAnim.ReleaseMetadata.json" `
+              -MetadataFileName "MRDX.Qol.SkipDrillAnim.ReleaseMetadata.json" `
               -GitHubUserName jroweboy -GitHubRepoName mrdx_reloaded -GitHubFallbackPattern mod.zip -GitHubInheritVersionFromTag false `
 			  @args
+
+echo "Publishing Complete"
 
 Pop-Location
