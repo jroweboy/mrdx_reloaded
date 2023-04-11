@@ -15,23 +15,26 @@
              If you set this to true, trimming will be enabled when you publish the mod.
              Test trimming with: `BuildLinked.ps1` in PowerShell. -->
         <ReloadedILLink>false</ReloadedILLink>
+        <Version>1.1.0</Version>
+        <AssemblyVersion>1.1.0</AssemblyVersion>
+        <FileVersion>1.1.0</FileVersion>
     </PropertyGroup>
 
     <ItemGroup>
-        <ReloadedLinkRoots Include="MRDX.Qol.SkipDrillAnim"/>
+        <ReloadedLinkRoots Include="MRDX.Qol.SkipDrillAnim" />
         <!-- Add assemblies to be trimmed. You might need to add their dependencies too!  -->
         <!-- <ReloadedLinkAssemblies Include="Reloaded.Memory" /> -->
     </ItemGroup>
 
-    <Import Project="Reloaded.Trimming.targets"/>
-    <Import Project="Reloaded.Checks.targets"/>
+    <Import Project="Reloaded.Trimming.targets" />
+    <Import Project="Reloaded.Checks.targets" />
 
     <ItemGroup>
-        <None Remove="ModConfig.json"/>
-        <None Remove="Publish.ps1"/>
-        <None Remove="BuildLinked.ps1"/>
-        <None Remove="Reloaded.Trimming.targets"/>
-        <None Remove="Reloaded.Checks.targets"/>
+        <None Remove="ModConfig.json" />
+        <None Remove="Publish.ps1" />
+        <None Remove="BuildLinked.ps1" />
+        <None Remove="Reloaded.Trimming.targets" />
+        <None Remove="Reloaded.Checks.targets" />
     </ItemGroup>
 
     <ItemGroup>
@@ -44,12 +47,12 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Reloaded.Mod.Interfaces" Version="2.3.0" ExcludeAssets="runtime"/>
-        <PackageReference Include="Reloaded.SharedLib.Hooks" Version="1.9.0"/>
+        <PackageReference Include="Reloaded.Mod.Interfaces" Version="2.3.0" ExcludeAssets="runtime" />
+        <PackageReference Include="Reloaded.SharedLib.Hooks" Version="1.9.0" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\MRDX.Base.Mod.Interfaces\MRDX.Base.Mod.Interfaces.csproj"/>
+        <ProjectReference Include="..\MRDX.Base.Mod.Interfaces\MRDX.Base.Mod.Interfaces.csproj" />
     </ItemGroup>
 
 </Project>

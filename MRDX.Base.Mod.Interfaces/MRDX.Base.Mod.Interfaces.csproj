@@ -2,13 +2,14 @@
 
     <PropertyGroup>
         <Nullable>enable</Nullable>
-        <AssemblyVersion></AssemblyVersion>
+        <AssemblyVersion>1.0.0</AssemblyVersion>
         <TargetFramework>net7.0-windows</TargetFramework>
+        <FileVersion>1.0.0</FileVersion>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Reloaded.Mod.Interfaces" Version="2.3.0"/>
-        <PackageReference Include="Reloaded.SharedLib.Hooks" Version="1.9.0"/>
+        <PackageReference Include="Reloaded.Mod.Interfaces" Version="2.3.0" />
+        <PackageReference Include="Reloaded.SharedLib.Hooks" Version="1.9.0" />
     </ItemGroup>
 
 </Project>
