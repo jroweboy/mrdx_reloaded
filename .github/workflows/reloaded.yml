@@ -25,9 +25,11 @@ on:
 
 env:
   PUBLISH_PATH_GLOB: ./Publish/ToUpload/**/Generic/*
-  PUBLISH_NUGET_GLOB: ./Publish/ToUpload/
+  PUBLISH_NUGET_PATH: ./Publish/ToUpload/
   NUGET_URL: http://packages.sewer56.moe:5000/v3/index.json
   RELOADEDIIMODS: .
+  IS_RELEASE: ${{ startsWith(github.ref, 'refs/tags/') }}
+  RELEASE_TAG: ${{ github.ref_name }}
 
 jobs:
   build:
@@ -60,7 +62,8 @@ jobs:
         name: GitHub Release
         # A file, directory or wildcard pattern that describes what to upload
         path: |
-          ${{ env.PUBLISH_PATH }}
+          ${{ env.PUBLISH_PATH_GLOB }}
+          ./mrdx_reloaded.r2pack
 
     - name: Upload Latest Prerelease to GitHub Releases
       uses: softprops/action-gh-release@v1
