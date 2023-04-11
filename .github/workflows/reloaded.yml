@@ -2,14 +2,14 @@
 # by Sewer56
 
 # Produces: 
-#   - Build to Upload to GameBanana
+#   - does NOT Build to Upload to GameBanana (yet)
 #   - Build to Upload to GitHub
 #   - Build to Upload to NuGet
 #   - Changelog
 
 # When pushing a tag
 #   - Upload to GitHub Releases
-#   - Upload to Reloaded NuGet Repository (if GitHub Secret RELOADED_NUGET_KEY is specified) 
+#   - Upload to Reloaded NuGet Repository
 
 name: Build and Publish Reloaded Mod
 permissions:
@@ -25,6 +25,8 @@ on:
 
 env:
   PUBLISH_PATH_GLOB: ./Publish/ToUpload/**/Generic/*
+  PUBLISH_NUGET_GLOB: ./Publish/ToUpload/
+  NUGET_URL: http://packages.sewer56.moe:5000/v3/index.json
   RELOADEDIIMODS: .
 
 jobs:
@@ -72,3 +74,21 @@ jobs:
         files: |
           ${{ env.PUBLISH_PATH_GLOB }}
           ./mrdx_reloaded.r2pack
+
+    - name: Push to NuGet (on Tag)
+      env:
+        NUGET_KEY: ${{ secrets.RELOADED_NUGET_KEY }}
+      if: env.IS_RELEASE == 'true'
+      run: |
+        if ([string]::IsNullOrEmpty("$env:NUGET_KEY"))
+        {
+            Write-Host "NuGet Repository Key (GitHub Secrets -> RELOADED_NUGET_KEY) Not Specified. Skipping."
+            return
+        }
+        
+        $items = Get-ChildItem -Recurse "$env:PUBLISH_NUGET_PATH" -Include *.nupkg
+        Foreach ($item in $items)
+        {
+            Write-Host "Pushing $item"
+            dotnet nuget push "$item" -k "$env:NUGET_KEY" -s "$env:NUGET_URL" --skip-duplicate
+        }
