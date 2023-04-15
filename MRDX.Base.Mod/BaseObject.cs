@@ -24,10 +24,10 @@ public static class Base
 
 public class BaseObject<TParent> where TParent : class
 {
-    private readonly long _baseAddress;
     private readonly Memory _memory;
 
     private readonly IDictionary<string, IList<int>> _offsetMapping = new Dictionary<string, IList<int>>();
+    public readonly long BaseAddress;
 
     protected BaseObject(int baseOffset = 0)
     {
@@ -42,7 +42,9 @@ public class BaseObject<TParent> where TParent : class
                 break;
             }
 
-        _baseAddress = Base.ExeBaseAddress + baseOffset;
+        // Where the objects tend to be in the "RAM" for the steam release
+        var ramOffset = Base.Region == Region.Japan ? 0x002CA504 : 0x002DEC6C;
+        BaseAddress = Base.ExeBaseAddress + ramOffset + baseOffset;
 
         // Build a mapping of game / region and fieldname => offset
         // For each property in the class, check for any offsets for our current Game/Region
@@ -50,7 +52,7 @@ public class BaseObject<TParent> where TParent : class
             // If we find an offset for this region, then we can store the mapping in dictionary
         foreach (var off in prop.GetCustomAttributes().OfType<BaseOffsetAttribute>())
         {
-            if (off.Game != Base.Game || off.Region != Base.Region)
+            if ((off.Game & Base.Game) == 0 || (off.Region & Base.Region) == 0)
                 continue;
             // Store the offsets for this region in the 
             if (!_offsetMapping.TryGetValue(prop.Name, out var list))
@@ -123,35 +125,58 @@ public class BaseObject<TParent> where TParent : class
 
     protected T ReadOffset<T>(int offset) where T : unmanaged
     {
-        _memory.Read<T>((nuint)(_baseAddress + offset), out var value);
+        _memory.Read<T>((nuint)(BaseAddress + offset), out var value);
         return value;
     }
 
     protected void WriteOffset<T>(T val, int offset) where T : unmanaged
     {
-        _memory.Write((nuint)(_baseAddress + offset), ref val);
+        _memory.Write((nuint)(BaseAddress + offset), ref val);
     }
 
     protected void SafeWriteOffset<T>(T val, int offset) where T : unmanaged
     {
-        _memory.SafeWrite((nuint)(_baseAddress + offset), ref val);
+        _memory.SafeWrite((nuint)(BaseAddress + offset), ref val);
     }
 
     protected string ReadStrOffset(int offset, int length)
     {
-        ushort[] arr = new ushort[length];
-        _memory.Read((nuint)(_baseAddress + offset), out arr, false);
+        _memory.ReadRaw((nuint)(BaseAddress + offset), out var rawBytes, length * 2);
+        // Strings are a variable length byte/ushort combination. If the first byte is 0xb0 <= x <= 0xb6 then
+        // its a multi byte string and we read an extra number.
+        // 0xff is a terminator byte for the string.
+
         var sb = new StringBuilder();
-        foreach (var a in arr!) sb.Append(CharMap.Forward.TryGetValue(a, out var s) ? s : '?');
+        for (var i = 0; i < length * 2; i++)
+        {
+            var b = rawBytes[i];
+            if (b == 0xff) break;
+            var o = b is >= 0xb0 and <= 0xb6 ? (ushort)((b << 8) | rawBytes[i++]) : b;
+            sb.Append(CharMap.Forward.TryGetValue(o, out var s) ? s : '?');
+        }
+
         return sb.ToString();
     }
 
     protected void WriteStrOffset(string val, int offset)
     {
+        // TODO implement this
         var arr = new ushort[val.Length];
         var q = CharMap.Reverse['?'];
         for (var i = 0; i < val.Length; i++) arr[i] = CharMap.Reverse.TryGetValue(val[i], out var s) ? s : q;
-        _memory.Write((nuint)(_baseAddress + offset), arr, false);
+        _memory.Write((nuint)(BaseAddress + offset), arr, true);
+    }
+
+
+    public static int Get(string propName)
+    {
+        return GetOffset<TParent>(propName);
+    }
+
+    public static int GetOffset<T>(string propName)
+    {
+        return typeof(T).GetProperty(propName)!.GetCustomAttributes<BaseOffsetAttribute>()
+            .First(attr => (attr.Game & Base.Game) != 0 && (attr.Region & Base.Region) != 0).Offset;
     }
 }
 

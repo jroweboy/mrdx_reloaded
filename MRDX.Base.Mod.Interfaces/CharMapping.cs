@@ -1257,5 +1257,5 @@ public static class CharMap
     };
 
     public static readonly Dictionary<char, ushort> Reverse =
-        Forward.ToDictionary(x => x.Value, x => x.Key);
+        Forward.GroupBy(x => x.Value).ToDictionary(x => x.Key, x => x.First().Key);
 }

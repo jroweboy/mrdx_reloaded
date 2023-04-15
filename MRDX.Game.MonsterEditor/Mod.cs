@@ -1,14 +1,15 @@
-﻿using MRDX.Base.Mod.Interfaces;
-using MRDX.Base.Mod.Template;
-using Reloaded.Hooks.Definitions;
+﻿using Avalonia;
+using MRDX.Game.MonsterEditor.Configuration;
+using MRDX.Game.MonsterEditor.Template;
+using Reloaded.Hooks.ReloadedII.Interfaces;
 using Reloaded.Mod.Interfaces;
 
-namespace MRDX.Base.Mod;
+namespace MRDX.Game.MonsterEditor;
 
 /// <summary>
 ///     Your mod logic goes here.
 /// </summary>
-public class Mod : ModBase, IExports // <= Do not Remove.
+public class Mod : ModBase // <= Do not Remove.
 {
     /// <summary>
     ///     Provides access to the Reloaded.Hooks API.
@@ -36,18 +37,28 @@ public class Mod : ModBase, IExports // <= Do not Remove.
     /// </summary>
     private readonly IMod _owner;
 
+    private readonly Task _uithread;
+
+    /// <summary>
+    ///     Provides access to this mod's configuration.
+    /// </summary>
+    private Config _configuration;
+
     public Mod(ModContext context)
     {
         _modLoader = context.ModLoader;
         _hooks = context.Hooks;
         _logger = context.Logger;
         _owner = context.Owner;
+        _configuration = context.Configuration;
         _modConfig = context.ModConfig;
 
-        _modLoader.AddOrReplaceController<IHooks>(_owner, new Hooks(context));
-        _modLoader.AddOrReplaceController<IController>(_owner, new Controller(context));
-        _modLoader.AddOrReplaceController<IGame>(_owner, new Game(context));
-        _modLoader.AddOrReplaceController<IGameClient>(_owner, new GameClient());
+        _uithread = new Task(() =>
+        {
+            Program.BuildAvaloniaApp()
+                .StartWithClassicDesktopLifetime(Array.Empty<string>());
+        });
+        _uithread.Start();
     }
 
     #region For Exports, Serialization etc.
@@ -60,8 +71,13 @@ public class Mod : ModBase, IExports // <= Do not Remove.
 
     #endregion
 
-    public Type[] GetTypes()
+    #region Standard Overrides
+
+    public override void ConfigurationUpdated(Config configuration)
     {
-        return new[] { typeof(IController) };
+        _configuration = configuration;
+        _logger.WriteLine($"[{_modConfig.ModId}] Config Updated: Applying");
     }
+
+    #endregion
 }

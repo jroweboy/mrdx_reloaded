@@ -1,15 +1,19 @@
-﻿namespace MRDX.Base.Mod.Interfaces;
+﻿using System;
 
+namespace MRDX.Base.Mod.Interfaces;
+
+[Flags]
 public enum BaseGame
 {
-    Mr1,
-    Mr2
+    Mr1 = 1 << 0,
+    Mr2 = 1 << 1
 }
 
+[Flags]
 public enum Region
 {
-    Us,
-    Japan
+    Us = 1 << 0,
+    Japan = 1 << 1
 }
 
 public enum OverlayDrawMode

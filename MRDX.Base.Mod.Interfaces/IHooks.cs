@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Reloaded.Hooks.Definitions;
 using Reloaded.Hooks.Definitions.X86;
+using CallingConventions = Reloaded.Hooks.Definitions.X86.CallingConventions;
 
 namespace MRDX.Base.Mod.Interfaces;
 
@@ -13,7 +16,7 @@ public delegate void RegisterUserInput();
 
 // Called during training to see if the training animation is complete. Return true to exit training early.
 [HookDef(BaseGame.Mr2, Region.Us, "33 C0 39 41 ?? 0F 95 C0")]
-[Function(CallingConventions.MicrosoftThiscall)]
+[Function(CallingConventions.Fastcall)]
 public delegate bool IsTrainingDone(nint self);
 
 // Called before the game creates the custom client overlay. Passing in 5 to the original function skips drawing the overlay
@@ -43,9 +46,15 @@ public delegate int PlayFmv(nint self, nint unk);
 [Function(CallingConventions.MicrosoftThiscall)]
 public delegate nint StopFmv(nint self, byte shouldDestroy);
 
+[HookDef(BaseGame.Mr2, Region.Us, "51 83 3D ?? ?? ?? ?? 00 75 ??")]
+[Function(CallingConventions.Stdcall)]
+public delegate int FrameStart();
+
 public interface IHooks
 {
-    Task<IHook<T>?> AddHook<T>(T func);
+    Task<IHook<T>> AddHook<T>(T func);
+
+    Task<T> CreateWrapper<T>() where T : Delegate;
 }
 
 [AttributeUsage(AttributeTargets.Delegate | AttributeTargets.Event, AllowMultiple = true)]
@@ -58,7 +67,27 @@ public class HookDefAttribute : Attribute
         Signature = signature;
     }
 
-    public BaseGame Game { get; private set; }
-    public Region Region { get; private set; }
-    public string Signature { get; private set; }
+    public BaseGame Game { get; }
+    public Region Region { get; }
+    public string Signature { get; }
+}
+
+public static class Utils
+{
+    /// <summary>
+    ///     Use reflection to find the appropriate signature for this memory location
+    /// </summary>
+    /// <param name="game"></param>
+    /// <param name="region"></param>
+    /// <typeparam name="T">Delegate or the type that you want to get the hookdef from</typeparam>
+    /// <returns>Signature string for this location</returns>
+    /// <exception cref="Exception">If no hookdef attribute can be found.</exception>
+    public static string GetSignature<T>(BaseGame game, Region region)
+    {
+        foreach (var attr in typeof(T).GetCustomAttributes().OfType<HookDefAttribute>())
+            if ((attr.Game & game) != 0 && (attr.Region & region) != 0)
+                return attr.Signature;
+        throw new Exception(
+            $"Unable to find signature for Hook func {typeof(T)} with Game {game} and Region {region}\n   Make sure you define a hook signature!");
+    }
 }
