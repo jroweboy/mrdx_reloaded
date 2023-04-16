@@ -1,4 +1,5 @@
-﻿using MRDX.Base.Mod.Interfaces;
+﻿using System.Diagnostics;
+using MRDX.Base.Mod.Interfaces;
 using MRDX.Qol.SkipDrillAnim.Template;
 using Reloaded.Hooks.Definitions;
 using Reloaded.Mod.Interfaces;
@@ -41,9 +42,11 @@ public class Mod : ModBase // <= Do not Remove.
     private IHook<IsTrainingDone>? _hook;
 
     private bool _isAutoSkipEnabled;
+    private bool _toggleStartButton;
 
     public Mod(ModContext context)
     {
+        Debugger.Launch();
         _modLoader = context.ModLoader;
         _hooks = context.Hooks;
         _logger = context.Logger;
@@ -54,6 +57,8 @@ public class Mod : ModBase // <= Do not Remove.
         _modLoader.GetController<IHooks>().TryGetTarget(out var hooks);
         hooks!.AddHook<IsTrainingDone>(ShouldSkipTraining).ContinueWith(result => _hook = result.Result?.Activate());
         _input = _modLoader.GetController<IController>();
+        _input.TryGetTarget(out var controller);
+        controller!.PostProcessInput += MyCodeThatEditsInput;
     }
 
 
@@ -80,5 +85,15 @@ public class Mod : ModBase // <= Do not Remove.
         if (!_input.TryGetTarget(out var controller))
             return false;
         return (controller.Current.Buttons & (ButtonFlags.Circle | ButtonFlags.Triangle)) != 0;
+    }
+
+    private void MyCodeThatEditsInput(ref IInput inputs)
+    {
+        if ((inputs.Buttons & ButtonFlags.Cross) == 0) return;
+        if (_toggleStartButton)
+            inputs.Buttons |= ButtonFlags.Cross;
+        else
+            inputs.Buttons &= ~ButtonFlags.Cross;
+        _toggleStartButton = !_toggleStartButton;
     }
 }

@@ -14,7 +14,6 @@ public class Game : BaseObject<Game>, IGame
 
     public Game(ModContext context)
     {
-        Debugger.Launch();
         _logger = context.Logger;
         context.ModLoader.GetController<IHooks>().TryGetTarget(out var hooks);
         hooks!.AddHook<FrameStart>(FrameStartImpl).ContinueWith(result => _hook = result.Result.Activate());

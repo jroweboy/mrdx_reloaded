@@ -2,6 +2,9 @@
 
 namespace MRDX.Base.Mod;
 
+// Where the objects tend to be in the "RAM" for the steam release
+[BaseOffset(BaseGame.Mr2, Region.Japan, 0x002CA504)]
+[BaseOffset(BaseGame.Mr2, Region.Us, 0x002DEC6C)]
 public class Monster : BaseObject<Monster>, IMonster
 {
     public Monster(int offset) : base(offset)

@@ -42,9 +42,7 @@ public class BaseObject<TParent> where TParent : class
                 break;
             }
 
-        // Where the objects tend to be in the "RAM" for the steam release
-        var ramOffset = Base.Region == Region.Japan ? 0x002CA504 : 0x002DEC6C;
-        BaseAddress = Base.ExeBaseAddress + ramOffset + baseOffset;
+        BaseAddress = Base.ExeBaseAddress + baseOffset;
 
         // Build a mapping of game / region and fieldname => offset
         // For each property in the class, check for any offsets for our current Game/Region
