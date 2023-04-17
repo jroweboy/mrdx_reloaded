@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using MRDX.Base.Mod.Interfaces;
+﻿using MRDX.Base.Mod.Interfaces;
 using MRDX.Base.Mod.Template;
 using Reloaded.Hooks.Definitions;
 using Reloaded.Mod.Interfaces;
@@ -27,9 +26,16 @@ public class Game : BaseObject<Game>, IGame
 
     private int FrameStartImpl()
     {
+        UpdateMonster();
+        CheckForSceneChange();
+        return _hook!.OriginalFunction.Invoke();
+    }
+
+    private void UpdateMonster()
+    {
         // Read all of the current monsters data and look for differences.
         var newCache = new MonsterCache(Monster);
-        if (_cache == newCache) return _hook!.OriginalFunction.Invoke();
+        if (_cache == newCache) return;
 
         // Monster stat changed so send a new event
         StatFlags flags = 0;
@@ -47,7 +53,10 @@ public class Game : BaseObject<Game>, IGame
         });
 
         _cache = newCache;
-        return _hook!.OriginalFunction.Invoke();
+    }
+
+    private void CheckForSceneChange()
+    {
     }
 }
 
