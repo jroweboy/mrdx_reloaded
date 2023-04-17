@@ -15,9 +15,9 @@
              If you set this to true, trimming will be enabled when you publish the mod.
              Test trimming with: `BuildLinked.ps1` in PowerShell. -->
         <ReloadedILLink>false</ReloadedILLink>
-        <Version>1.1.0</Version>
-        <AssemblyVersion>1.1.0</AssemblyVersion>
-        <FileVersion>1.1.0</FileVersion>
+        <Version>1.1.1</Version>
+        <AssemblyVersion>1.1.1</AssemblyVersion>
+        <FileVersion>1.1.1</FileVersion>
     </PropertyGroup>
 
     <ItemGroup>
@@ -47,6 +47,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="Reloaded.Memory" Version="8.1.0" />
         <PackageReference Include="Reloaded.Mod.Interfaces" Version="2.3.0" ExcludeAssets="runtime" />
         <PackageReference Include="Reloaded.SharedLib.Hooks" Version="1.9.0" />
     </ItemGroup>
