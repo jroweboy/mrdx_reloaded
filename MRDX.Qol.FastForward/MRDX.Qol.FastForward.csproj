@@ -17,6 +17,7 @@
         <!-- Use a default version for development -->
         <Version Condition="'$(Version)' == ''">9.9.9.9</Version>
         <AssemblyVersion Condition="'$(AssemblyVersion)' == ''">9.9.9.9</AssemblyVersion>
+        <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
     </PropertyGroup>
 
     <ItemGroup>

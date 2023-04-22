@@ -29,6 +29,7 @@ foreach ($Project in $AllProjects)
 {
     $ProjectName = $Project[0]
     $ProjectVersion = $Project[1]
+    (Get-Content "$ProjectName/ModConfig.template.json").replace("{{ MOD_VERSION }}", "$ProjectVersion") | Set-Content "$ProjectName/ModConfig.json"
     Write-Output "Publishing $ProjectName"
     ./Publish.ps1 -ProjectPath "$ProjectName/$ProjectName.csproj" `
           -PackageName "$ProjectName" `
