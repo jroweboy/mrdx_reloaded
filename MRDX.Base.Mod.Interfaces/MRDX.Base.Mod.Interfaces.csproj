@@ -1,10 +1,13 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk" TreatAsLocalProperty="Version;AssemblyVersion">
 
     <PropertyGroup>
         <Nullable>enable</Nullable>
-        <AssemblyVersion>1.0.0</AssemblyVersion>
         <TargetFramework>net7.0-windows</TargetFramework>
-        <FileVersion>1.0.0</FileVersion>
+        <!-- Use a default version for development -->
+        <Version Condition="'$(BaseModInterfacesVersion)' == ''">9.9.9.9</Version>
+        <Version Condition="'$(BaseModInterfacesVersion)' != ''">$(BaseModInterfacesVersion)</Version>
+        <AssemblyVersion Condition="'$(BaseModInterfacesVersion)' == ''">9.9.9.9</AssemblyVersion>
+        <AssemblyVersion Condition="'$(BaseModInterfacesVersion)' != ''">$(BaseModInterfacesVersion)</AssemblyVersion>
     </PropertyGroup>
 
     <ItemGroup>

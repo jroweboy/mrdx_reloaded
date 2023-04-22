@@ -2,7 +2,7 @@
   "ModId": "MRDX.Game.MonsterEdit",
   "ModName": "Monster Editor",
   "ModAuthor": "jroweboy",
-  "ModVersion": "9.9.9.9",
+  "ModVersion": "{{ MOD_VERSION }}",
   "ModDescription": "View and Edit Monster data",
   "ModDll": "MRDX.Game.MonsterEditor.dll",
   "ModIcon": "Preview.png",

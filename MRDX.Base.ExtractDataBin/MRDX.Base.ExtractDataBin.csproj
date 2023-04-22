@@ -14,8 +14,9 @@
              Test trimming with: `BuildLinked.ps1` in PowerShell. -->
         <ReloadedILLink>false</ReloadedILLink>
         <TargetFramework>netcoreapp3.1</TargetFramework>
-        <AssemblyVersion>1.0.0</AssemblyVersion>
-        <FileVersion>1.0.0</FileVersion>
+        <!-- Use a default version for development -->
+        <Version Condition="'$(Version)' == ''">9.9.9.9</Version>
+        <AssemblyVersion Condition="'$(AssemblyVersion)' == ''">9.9.9.9</AssemblyVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -36,20 +37,12 @@
     <Import Project="Reloaded.Checks.targets" />
 
     <ItemGroup>
-        <None Remove="ModConfig.json" />
         <None Remove="Publish.ps1" />
         <None Remove="BuildLinked.ps1" />
         <None Remove="Reloaded.Trimming.targets" />
         <None Remove="Reloaded.Checks.targets" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <Content Include="ModConfig.json">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </Content>
-        <None Update="Preview.png">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
+        <None Update="ModConfig.json" CopyToOutputDirectory="Always" />
+        <None Update="Preview.png" CopyToOutputDirectory="PreserveNewest" />
     </ItemGroup>
 
     <ItemGroup>
@@ -62,4 +55,11 @@
         <ProjectReference Include="..\MRDX.Base.ExtractDataBin.Interface\MRDX.Base.ExtractDataBin.Interface.csproj" />
     </ItemGroup>
 
+    <Target Name="Replace" BeforeTargets="BeforeBuild;BeforeRebuild">
+        <PropertyGroup>
+            <InputFile>ModConfig.template.json</InputFile>
+            <OutputFile>ModConfig.json</OutputFile>
+        </PropertyGroup>
+        <WriteLinesToFile File="$(OutputFile)" Lines="$([System.IO.File]::ReadAllText($(InputFile)).Replace('{{ MOD_VERSION }}','$(Version)'))" Overwrite="true" />
+    </Target>
 </Project>

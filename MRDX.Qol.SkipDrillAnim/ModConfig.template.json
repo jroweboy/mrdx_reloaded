@@ -1,17 +1,20 @@
 {
-  "ModId": "MRDX.Game.HardMode",
-  "ModName": "Hard Mode",
-  "ModAuthor": "Alchius",
-  "ModVersion": "9.9.9.9",
-  "ModDescription": "A (techs only) port of MR2 Hard Mode to MR2DX",
-  "ModDll": "MRDX.Game.HardMode.dll",
+  "ModId": "MRDX.Qol.SkipDrillAnim",
+  "ModName": "Skip Drill Animation",
+  "ModAuthor": "fadillzzz",
+  "ModVersion": "{{ MOD_VERSION }}",
+  "ModDescription": "Skip drill animation in MR2DX",
+  "ModDll": "MRDX.Qol.SkipDrillAnim.dll",
   "ModIcon": "Preview.png",
-  "ModR2RManagedDll32": "x86/MRDX.Game.HardMode.dll",
-  "ModR2RManagedDll64": "x64/MRDX.Game.HardMode.dll",
+  "ModR2RManagedDll32": "x86/MRDX.Qol.SkipDrillAnim.dll",
+  "ModR2RManagedDll64": "x64/MRDX.Qol.SkipDrillAnim.dll",
   "ModNativeDll32": "",
   "ModNativeDll64": "",
+  "Tags": [],
+  "CanUnload": false,
+  "HasExports": false,
   "IsLibrary": false,
-  "ReleaseMetadataFileName": "MRDX.Game.HardMode.ReleaseMetadata.json",
+  "ReleaseMetadataFileName": "MRDX.Qol.SkipDrillAnim.ReleaseMetadata.json",
   "PluginData": {
     "GitHubRelease": {
       "UserName": "jroweboy",
@@ -23,8 +26,7 @@
   "IsUniversalMod": false,
   "ModDependencies": [
     "reloaded.sharedlib.hooks",
-    "reloaded.universal.redirector",
-    "MRDX.Base.ExtractDataBin"
+    "MRDX.Base.Mod"
   ],
   "OptionalDependencies": [],
   "SupportedAppId": [

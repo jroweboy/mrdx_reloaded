@@ -1,17 +1,17 @@
 {
-  "ModId": "MRDX.Game.HardMode",
-  "ModName": "Hard Mode",
-  "ModAuthor": "Alchius",
-  "ModVersion": "9.9.9.9",
-  "ModDescription": "A (techs only) port of MR2 Hard Mode to MR2DX",
-  "ModDll": "MRDX.Game.HardMode.dll",
+  "ModId": "MRDX.Qol.FastForward",
+  "ModName": "Fast Forward",
+  "ModAuthor": "fadillzzz",
+  "ModVersion": "{{ MOD_VERSION }}",
+  "ModDescription": "Enables easy fast forwarding with the press of a button",
+  "ModDll": "MRDX.Qol.FastForward.dll",
   "ModIcon": "Preview.png",
-  "ModR2RManagedDll32": "x86/MRDX.Game.HardMode.dll",
-  "ModR2RManagedDll64": "x64/MRDX.Game.HardMode.dll",
+  "ModR2RManagedDll32": "x86/MRDX.Qol.FastForward.dll",
+  "ModR2RManagedDll64": "x64/MRDX.Qol.FastForward.dll",
   "ModNativeDll32": "",
   "ModNativeDll64": "",
   "IsLibrary": false,
-  "ReleaseMetadataFileName": "MRDX.Game.HardMode.ReleaseMetadata.json",
+  "ReleaseMetadataFileName": "MRDX.Qol.FastForward.ReleaseMetadata.json",
   "PluginData": {
     "GitHubRelease": {
       "UserName": "jroweboy",
@@ -23,8 +23,7 @@
   "IsUniversalMod": false,
   "ModDependencies": [
     "reloaded.sharedlib.hooks",
-    "reloaded.universal.redirector",
-    "MRDX.Base.ExtractDataBin"
+    "MRDX.Base.Mod"
   ],
   "OptionalDependencies": [],
   "SupportedAppId": [

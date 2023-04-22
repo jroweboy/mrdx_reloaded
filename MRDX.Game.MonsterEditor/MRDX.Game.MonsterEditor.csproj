@@ -10,8 +10,8 @@
         <OutputPath>$(RELOADEDIIMODS)/MRDX.Game.MonsterEditor</OutputPath>
         <ImplicitUsings>enable</ImplicitUsings>
         <ReloadedILLink>false</ReloadedILLink>
-        <AssemblyVersion>1.0.0.0</AssemblyVersion>
-        <FileVersion>1.0.0.0</FileVersion>
+        <Version Condition="'$(Version)' == ''">9.9.9.9</Version>
+        <AssemblyVersion Condition="'$(AssemblyVersion)' == ''">9.9.9.9</AssemblyVersion>
     </PropertyGroup>
 
     <ItemGroup>
@@ -28,15 +28,6 @@
         <PackageReference Include="Reloaded.SharedLib.Hooks" Version="1.9.0" />
         <PackageReference Include="XamlNameReferenceGenerator" Version="1.6.1" />
     </ItemGroup>
-    
-    <ItemGroup>
-        <Content Include="ModConfig.json">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </Content>
-        <None Update="Preview.png">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-    </ItemGroup>
 
     <ItemGroup>
         <ReloadedLinkRoots Include="MRDX.Game.MonsterEditor" />
@@ -45,14 +36,22 @@
     </ItemGroup>
 
     <ItemGroup>
-        <None Remove="ModConfig.json" />
         <None Remove="Publish.ps1" />
         <None Remove="BuildLinked.ps1" />
         <None Remove="Reloaded.Trimming.targets" />
         <None Remove="Reloaded.Checks.targets" />
+        <None Update="ModConfig.json" CopyToOutputDirectory="Always" />
+        <None Update="Preview.png" CopyToOutputDirectory="PreserveNewest" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\MRDX.Base.Mod.Interfaces\MRDX.Base.Mod.Interfaces.csproj" />
+        <ProjectReference Include="..\MRDX.Base.Mod.Interfaces\MRDX.Base.Mod.Interfaces.csproj" />
     </ItemGroup>
+    <Target Name="Replace" BeforeTargets="BeforeBuild;BeforeRebuild">
+        <PropertyGroup>
+            <InputFile>ModConfig.template.json</InputFile>
+            <OutputFile>ModConfig.json</OutputFile>
+        </PropertyGroup>
+        <WriteLinesToFile File="$(OutputFile)" Lines="$([System.IO.File]::ReadAllText($(InputFile)).Replace('{{ MOD_VERSION }}','$(Version)'))" Overwrite="true" />
+    </Target>
 </Project>

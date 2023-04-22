@@ -14,8 +14,9 @@
              If you set this to true, trimming will be enabled when you publish the mod.
              Test trimming with: `BuildLinked.ps1` in PowerShell. -->
         <ReloadedILLink>false</ReloadedILLink>
-        <AssemblyVersion>1.0.0</AssemblyVersion>
-        <FileVersion>1.0.0</FileVersion>
+        <!-- Use a default version for development -->
+        <Version Condition="'$(Version)' == ''">9.9.9.9</Version>
+        <AssemblyVersion Condition="'$(AssemblyVersion)' == ''">9.9.9.9</AssemblyVersion>
     </PropertyGroup>
 
     <ItemGroup>
@@ -28,248 +29,88 @@
     <Import Project="Reloaded.Checks.targets" />
 
     <ItemGroup>
-        <None Remove="ModConfig.json" />
+        <None Update="ModConfig.json" CopyToOutputDirectory="Always" />
+        <None Update="Preview.png" CopyToOutputDirectory="PreserveNewest" />
         <None Remove="Publish.ps1" />
         <None Remove="BuildLinked.ps1" />
         <None Remove="Reloaded.Trimming.targets" />
         <None Remove="Reloaded.Checks.targets" />
-        <None Update="Redirector\mon\btl_con\ka_ka_b.flk">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\btl_con\kb_kb_b.flk">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\btl_con\kc_kc_b.flk">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\btl_con\kd_kd_b.flk">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\btl_con\ke_ke_b.flk">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\btl_con\kf_kf_b.flk">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\btl_con\kh_kh_b.flk">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\btl_con\ki_ki_b.flk">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\btl_con\kk_kk_b.flk">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\btl_con\kl_kl_b.flk">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\btl_con\km_km_b.flk">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\btl_con\ma_ma_b.flk">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\btl_con\mb_mb_b.flk">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\btl_con\mc_mc_b.flk">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\btl_con\md_md_b.flk">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\btl_con\me_me_b.flk">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\btl_con\mf_mf_b.flk">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\btl_con\mg_mg_b.flk">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\btl_con\mh_mh_b.flk">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\btl_con\mi_mi_b.flk">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\btl_con\mj_mj_b.flk">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\btl_con\mk_mk_b.flk">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\btl_con\ml_ml_b.flk">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\btl_con\mm_mm_b.flk">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\btl_con\mn_mn_b.flk">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\btl_con\mo_mo_b.flk">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\btl_con\mp_mp_b.flk">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\btl_con\mq_mq_b.flk">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\btl_con\mr_mr_b.flk">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\btl_con\ms_ms_b.flk">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\btl_con\mt_mt_b.flk">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\btl_con\mu_mu_b.flk">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\btl_con\mv_mv_b.flk">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\btl_con\mw_mw_b.flk">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\btl_con\mx_mx_b.flk">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\btl_con\my_my_b.flk">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\btl_con\mz_mz_b.flk">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\btl_con\na_na_b.flk">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\kapi\ka_ka_wz.bin">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\kmto\km_km_wz.bin">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\klyo\kl_kl_wz.bin">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\kkro\kk_kk_wz.bin">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\kigo\ki_ki_wz.bin">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\khcy\kh_kh_wz.bin">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\kfhe\kf_kf_wz.bin">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\kebe\ke_ke_wz.bin">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\kdro\kd_kd_wz.bin">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\kckn\kc_kc_wz.bin">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\kbdr\kb_kb_wz.bin">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\marig\ma_ma_wz.bin">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\mbhop\mb_mb_wz.bin">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\mcham\mc_mc_wz.bin">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\mdbak\md_md_wz.bin">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\megar\me_me_wz.bin">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\mfakr\mf_mf_wz.bin">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\mggjr\mg_mg_wz.bin">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\mhlam\mh_mh_wz.bin">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\minya\mi_mi_wz.bin">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\mjfbd\mj_mj_wz.bin">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\mkgho\mk_mk_wz.bin">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\mlspm\ml_ml_wz.bin">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\mmxsu\mm_mm_wz.bin">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\mnsnm\mn_mn_wz.bin">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\mochy\mo_mo_wz.bin">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\mpjok\mp_mp_wz.bin">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\mqnen\mq_mq_wz.bin">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\mrpru\mr_mr_wz.bin">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\msund\ms_ms_wz.bin">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\mtgai\mt_mt_wz.bin">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\muoku\mu_mu_wz.bin">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\mvdak\mv_mv_wz.bin">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\mwpla\mw_mw_wz.bin">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\mxris\mx_mx_wz.bin">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\mylau\my_my_wz.bin">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\mzmus\mz_mz_wz.bin">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Redirector\mon\naaga\na_na_wz.bin">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-    </ItemGroup>
-
-    <ItemGroup>
-        <Content Include="ModConfig.json">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </Content>
-        <None Update="Preview.png">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
+        <None Update="Redirector\mon\btl_con\ka_ka_b.flk" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\btl_con\kb_kb_b.flk" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\btl_con\kc_kc_b.flk" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\btl_con\kd_kd_b.flk" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\btl_con\ke_ke_b.flk" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\btl_con\kf_kf_b.flk" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\btl_con\kh_kh_b.flk" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\btl_con\ki_ki_b.flk" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\btl_con\kk_kk_b.flk" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\btl_con\kl_kl_b.flk" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\btl_con\km_km_b.flk" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\btl_con\ma_ma_b.flk" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\btl_con\mb_mb_b.flk" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\btl_con\mc_mc_b.flk" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\btl_con\md_md_b.flk" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\btl_con\me_me_b.flk" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\btl_con\mf_mf_b.flk" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\btl_con\mg_mg_b.flk" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\btl_con\mh_mh_b.flk" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\btl_con\mi_mi_b.flk" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\btl_con\mj_mj_b.flk" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\btl_con\mk_mk_b.flk" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\btl_con\ml_ml_b.flk" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\btl_con\mm_mm_b.flk" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\btl_con\mn_mn_b.flk" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\btl_con\mo_mo_b.flk" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\btl_con\mp_mp_b.flk" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\btl_con\mq_mq_b.flk" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\btl_con\mr_mr_b.flk" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\btl_con\ms_ms_b.flk" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\btl_con\mt_mt_b.flk" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\btl_con\mu_mu_b.flk" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\btl_con\mv_mv_b.flk" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\btl_con\mw_mw_b.flk" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\btl_con\mx_mx_b.flk" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\btl_con\my_my_b.flk" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\btl_con\mz_mz_b.flk" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\btl_con\na_na_b.flk" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\kapi\ka_ka_wz.bin" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\kmto\km_km_wz.bin" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\klyo\kl_kl_wz.bin" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\kkro\kk_kk_wz.bin" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\kigo\ki_ki_wz.bin" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\khcy\kh_kh_wz.bin" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\kfhe\kf_kf_wz.bin" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\kebe\ke_ke_wz.bin" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\kdro\kd_kd_wz.bin" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\kckn\kc_kc_wz.bin" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\kbdr\kb_kb_wz.bin" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\marig\ma_ma_wz.bin" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\mbhop\mb_mb_wz.bin" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\mcham\mc_mc_wz.bin" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\mdbak\md_md_wz.bin" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\megar\me_me_wz.bin" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\mfakr\mf_mf_wz.bin" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\mggjr\mg_mg_wz.bin" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\mhlam\mh_mh_wz.bin" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\minya\mi_mi_wz.bin" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\mjfbd\mj_mj_wz.bin" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\mkgho\mk_mk_wz.bin" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\mlspm\ml_ml_wz.bin" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\mmxsu\mm_mm_wz.bin" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\mnsnm\mn_mn_wz.bin" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\mochy\mo_mo_wz.bin" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\mpjok\mp_mp_wz.bin" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\mqnen\mq_mq_wz.bin" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\mrpru\mr_mr_wz.bin" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\msund\ms_ms_wz.bin" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\mtgai\mt_mt_wz.bin" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\muoku\mu_mu_wz.bin" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\mvdak\mv_mv_wz.bin" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\mwpla\mw_mw_wz.bin" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\mxris\mx_mx_wz.bin" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\mylau\my_my_wz.bin" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\mzmus\mz_mz_wz.bin" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Redirector\mon\naaga\na_na_wz.bin" CopyToOutputDirectory="PreserveNewest" />
     </ItemGroup>
 
     <ItemGroup>
@@ -286,4 +127,11 @@
         <Folder Include="Redirector\" />
     </ItemGroup>
 
+    <Target Name="Replace" BeforeTargets="BeforeBuild;BeforeRebuild">
+        <PropertyGroup>
+            <InputFile>ModConfig.template.json</InputFile>
+            <OutputFile>ModConfig.json</OutputFile>
+        </PropertyGroup>
+        <WriteLinesToFile File="$(OutputFile)" Lines="$([System.IO.File]::ReadAllText($(InputFile)).Replace('{{ MOD_VERSION }}','$(Version)'))" Overwrite="true" />
+    </Target>
 </Project>

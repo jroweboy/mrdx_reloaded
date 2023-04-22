@@ -36,6 +36,9 @@
     Full or relative path to a file containing the changelog for the mod.
     The changelog should be written in Markdown format.
 
+.PARAMETER Version
+    Overrides the project Version for the NuGet and Assembly Version properties.
+
 .PARAMETER IsPrerelease
     Default: $False
 
@@ -165,6 +168,9 @@ param (
     $ProjectPath = "",
     $PackageName = "",
     $PublishOutputDir = "Publish/ToUpload",
+    $Version = "",
+    $BaseExtractDataBinInterface = "",
+    $BaseModInterfaces = "",
 
     ## => User: Delta Config
     # Pick one and configure settings below.
@@ -220,6 +226,7 @@ if ($UseScriptDirectory) {
 # Convert Booleans
 $IsPrerelease = [bool]::Parse($IsPrerelease)
 $MakeDelta = [bool]::Parse($MakeDelta)
+$global:HasDelta = $false
 $Build = [bool]::Parse($Build)
 $BuildR2R = [bool]::Parse($BuildR2R)
 $RemoveExe = [bool]::Parse($RemoveExe)
@@ -267,8 +274,12 @@ function Build {
     dotnet clean $ProjectPath
 
     if ($BuildR2R) {
-        dotnet publish $ProjectPath -c Release -r win-x86 --self-contained false -o "$publishBuildDirectory/x86" /p:PublishReadyToRun=true /p:OutputPath="$TempDirectoryBuild/x86"
-        dotnet publish $ProjectPath -c Release -r win-x64 --self-contained false -o "$publishBuildDirectory/x64" /p:PublishReadyToRun=true /p:OutputPath="$TempDirectoryBuild/x64"
+        dotnet publish $ProjectPath -c Release -r win-x86 --self-contained false -o "$publishBuildDirectory/x86" /p:PublishReadyToRun=true /p:OutputPath="$TempDirectoryBuild/x86" `
+                        /p:Version="$Version" /p:AssemblyVersion="$Version" `
+                        /p:BaseModInterfacesVersion="$BaseModInterfaces" /p:BaseExtractDataBinInterfaceVersion="$BaseExtractDataBinInterface"
+        dotnet publish $ProjectPath -c Release -r win-x64 --self-contained false -o "$publishBuildDirectory/x64" /p:PublishReadyToRun=true /p:OutputPath="$TempDirectoryBuild/x64" `
+                        /p:Version="$Version" /p:AssemblyVersion="$Version" `
+                        /p:BaseModInterfacesVersion="$BaseModInterfaces" /p:BaseExtractDataBinInterfaceVersion="$BaseExtractDataBinInterface"
 
         # Remove Redundant Files
         Move-Item -Path "$publishBuildDirectory/x86/ModConfig.json" -Destination "$publishBuildDirectory/ModConfig.json" -ErrorAction SilentlyContinue
@@ -277,7 +288,9 @@ function Build {
         Remove-Item "$publishBuildDirectory/x64/ModConfig.json" -ErrorAction SilentlyContinue
     }
     else {
-        dotnet publish $ProjectPath -c Release --self-contained false -o "$publishBuildDirectory" /p:OutputPath="$TempDirectoryBuild"
+        dotnet publish $ProjectPath -c Release --self-contained false -o "$publishBuildDirectory" /p:OutputPath="$TempDirectoryBuild" `
+                        /p:Version="$Version" /p:AssemblyVersion="$Version" `
+                        /p:BaseModInterfacesVersion="$BaseModInterfaces" /p:BaseExtractDataBinInterfaceVersion="$BaseExtractDataBinInterface"
     }
 
     # Cleanup Unnecessary Files
@@ -306,7 +319,9 @@ function Get-Last-Version {
         $arguments += " --source GameBanana --gamebananaitemid `"$GameBananaItemId`""
     }
 
-	Invoke-Expression "dotnet `"$updateToolPath`" $arguments"
+    $err = (Invoke-Expression "dotnet `"$updateToolPath`" $arguments ") 2>&1
+    $global:HasDelta = $null -eq $err.Exception
+    Write-Output "setting has delta `"$global:HasDelta`" "
 }
 
 function Get-Common-Publish-Args {
@@ -323,8 +338,8 @@ function Get-Common-Publish-Args {
     if ($ReadmePath) {
         $arguments += " --readmepath `"$readmeFullPath`""
 	}
-	
-	if ($AllowDeltas -and $MakeDelta) {
+	Write-Output "has delta? `"$global:HasDelta`" "
+	if ($AllowDeltas -and $MakeDelta -and $global:HasDelta) {
         $arguments += " --olderversionfolders `"$deltaDirectory`""
 	}
 	

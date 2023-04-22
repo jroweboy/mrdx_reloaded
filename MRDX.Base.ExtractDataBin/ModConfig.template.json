@@ -1,0 +1,30 @@
+{
+  "ModId": "MRDX.Base.ExtractDataBin",
+  "ModName": "MRDX Extract Data Zip",
+  "ModAuthor": "jroweboy",
+  "ModVersion": "1.0.0",
+  "ModDescription": "Useful library for mods that need to edit files in data.bin. This will let mods extract the zip into the directory that the game reads from.",
+  "ModDll": "MRDX.Base.ExtractDataBin.dll",
+  "ModIcon": "Preview.png",
+  "ModR2RManagedDll32": "x86/MRDX.Base.ExtractDataBin.dll",
+  "ModR2RManagedDll64": "x64/MRDX.Base.ExtractDataBin.dll",
+  "ModNativeDll32": "",
+  "ModNativeDll64": "",
+  "IsLibrary": true,
+  "ReleaseMetadataFileName": "MRDX.Base.ExtractDataBin.ReleaseMetadata.json",
+  "PluginData": {
+    "GitHubRelease": {
+      "UserName": "jroweboy",
+      "RepositoryName": "mrdx_reloaded",
+      "UseReleaseTag": false,
+      "AssetFileName": "Mod.zip"
+    }
+  },
+  "IsUniversalMod": false,
+  "ModDependencies": [
+    "reloaded.sharedlib.hooks"
+  ],
+  "OptionalDependencies": [],
+  "SupportedAppId": [],
+  "ProjectUrl": "https://github.com/jroweboy/mrdx_reloaded"
+}

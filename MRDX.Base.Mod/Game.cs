@@ -22,7 +22,10 @@ public class Game : BaseObject<Game>, IGame
     public IMonster Monster { get; set; } = new Monster(Get("Monster"));
 
     public event IGame.MonsterChange? OnMonsterChanged;
+
+#pragma warning disable 0067
     public event IGame.GameSceneChange? OnGameSceneChanged;
+#pragma warning restore 0067
 
     private int FrameStartImpl()
     {

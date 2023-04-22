@@ -1,17 +1,23 @@
 {
-  "ModId": "MRDX.Qol.FastForward",
-  "ModName": "Fast Forward",
+  "ModId": "MRDX.Audio.VolumeConfig",
+  "ModName": "Volume Control",
   "ModAuthor": "fadillzzz",
-  "ModVersion": "9.9.9.9",
-  "ModDescription": "Enables easy fast forwarding with the press of a button",
-  "ModDll": "MRDX.Qol.FastForward.dll",
+  "ModVersion": "{{ MOD_VERSION }}",
+  "ModDescription": "Adds volume control sliders for MR1DX and MR2DX",
+  "ModDll": "MRDX.Audio.VolumeConfig.dll",
   "ModIcon": "Preview.png",
-  "ModR2RManagedDll32": "x86/MRDX.Qol.FastForward.dll",
-  "ModR2RManagedDll64": "x64/MRDX.Qol.FastForward.dll",
+  "ModR2RManagedDll32": "x86/MRDX.Audio.VolumeConfig.dll",
+  "ModR2RManagedDll64": "x64/MRDX.Audio.VolumeConfig.dll",
   "ModNativeDll32": "",
   "ModNativeDll64": "",
+  "Tags": [
+    "Music",
+    "Sound Effect"
+  ],
+  "CanUnload": null,
+  "HasExports": null,
   "IsLibrary": false,
-  "ReleaseMetadataFileName": "MRDX.Qol.FastForward.ReleaseMetadata.json",
+  "ReleaseMetadataFileName": "MRDX.Audio.VolumeConfig.ReleaseMetadata.json",
   "PluginData": {
     "GitHubRelease": {
       "UserName": "jroweboy",
@@ -27,6 +33,7 @@
   ],
   "OptionalDependencies": [],
   "SupportedAppId": [
+    "mf.exe",
     "mf2.exe"
   ],
   "ProjectUrl": "https://github.com/jroweboy/mrdx_reloaded"
