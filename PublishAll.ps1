@@ -19,7 +19,8 @@ $AllProjects = @(
 #    @("MRDX.Game.MonsterEditor", "1.0.0"),
     @("MRDX.Graphics.Widescreen", "1.1.1"),
     @("MRDX.Qol.FastForward", "1.2.1"),
-    @("MRDX.Qol.SkipDrillAnim", "1.2.1")
+    @("MRDX.Qol.SkipDrillAnim", "1.2.1"),
+    @("MRDX.Qol.TurboInput", "1.0.0")
 )
 
 Write-Output "Starting Publish All"
