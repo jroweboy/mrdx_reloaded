@@ -10,8 +10,10 @@ public class Config : Configurable<Config>
     [DefaultValue(true)]
     public bool UseToggle { get; set; } = true;
 
-    [DisplayName("Tick Delay")]
-    [Description("The lower the value, the faster the game runs. Limitation: your monitor refresh rate will be the hard cap for how fast it can run.")]
+    [DisplayName("Next Frame Delay (microseconds)")]
+    [Description("The lower the value, the faster the game runs.\n" +
+                 "This is the number of microseconds the game waits before starting the next frame.\n" +
+                 "Limitation: your monitor refresh rate will be the hard cap for how fast it can run.")]
     [DefaultValue(16000)]
     public int TickDelay { get; set; } = 16000;
 }

@@ -18,7 +18,7 @@ $AllProjects = @(
 #    Not ready for release yet, so leave it as publish false for now
 #    @("MRDX.Game.MonsterEditor", "1.0.0"),
     @("MRDX.Graphics.Widescreen", "1.1.1"),
-    @("MRDX.Qol.FastForward", "1.2.1"),
+    @("MRDX.Qol.FastForward", "1.3.0"),
     @("MRDX.Qol.SkipDrillAnim", "1.2.1"),
     @("MRDX.Qol.TurboInput", "1.0.0")
 )
