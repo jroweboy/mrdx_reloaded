@@ -12,7 +12,14 @@
   "ModNativeDll64": "",
   "IsLibrary": false,
   "ReleaseMetadataFileName": "MRDX.Ui.RawTechValues.ReleaseMetadata.json",
-  "PluginData": {},
+  "PluginData": {
+    "GitHubRelease": {
+      "UserName": "jroweboy",
+      "RepositoryName": "mrdx_reloaded",
+      "UseReleaseTag": false,
+      "AssetFileName": "Mod.zip"
+    }
+  },
   "IsUniversalMod": false,
   "ModDependencies": [
     "reloaded.sharedlib.hooks",

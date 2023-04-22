@@ -21,7 +21,7 @@ $AllProjects = @(
 #    @("MRDX.Game.MonsterEditor", "1.0.0"),
     @("MRDX.Graphics.Widescreen", "1.1.1"),
     @("MRDX.Qol.FastForward", "1.3.0"),
-    @("MRDX.Qol.SkipDrillAnim", "1.2.1"),
+    @("MRDX.Qol.SkipDrillAnim", "1.2.2"),
     @("MRDX.Qol.TurboInput", "1.0.0"),
     @("MRDX.Ui.RawTechValues", "1.0.0")
 )
