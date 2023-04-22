@@ -2,7 +2,7 @@
   "ModId": "MRDX.Base.ExtractDataBin",
   "ModName": "MRDX Extract Data Zip",
   "ModAuthor": "jroweboy",
-  "ModVersion": "1.0.0",
+  "ModVersion": "{{ MOD_VERSION }}",
   "ModDescription": "Useful library for mods that need to edit files in data.bin. This will let mods extract the zip into the directory that the game reads from.",
   "ModDll": "MRDX.Base.ExtractDataBin.dll",
   "ModIcon": "Preview.png",

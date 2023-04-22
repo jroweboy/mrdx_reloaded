@@ -2,7 +2,7 @@
   "ModId": "MRDX.Base.Mod",
   "ModName": "MRDX Base Mod",
   "ModAuthor": "jroweboy",
-  "ModVersion": "1.0.0",
+  "ModVersion": "{{ MOD_VERSION }}",
   "ModDescription": "Basic mod that handles reading/writing/hooking the game code",
   "ModDll": "MRDX.Base.Mod.dll",
   "ModIcon": "Preview.png",
