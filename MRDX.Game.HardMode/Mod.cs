@@ -1,4 +1,5 @@
-﻿using MRDX.Base.ExtractDataBin.Interface;
+﻿using System.Reflection;
+using MRDX.Base.ExtractDataBin.Interface;
 using MRDX.Game.HardMode.Configuration;
 using MRDX.Game.HardMode.Template;
 using Reloaded.Hooks.ReloadedII.Interfaces;
@@ -53,7 +54,7 @@ public class Mod : ModBase // <= Do not Remove.
         _owner = context.Owner;
         _configuration = context.Configuration;
         _modConfig = context.ModConfig;
-
+        var assemblyFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
         var extractDataBin = _modLoader.GetController<IExtractDataBin>();
         var redirector = _modLoader.GetController<IRedirectorController>();
         if (extractDataBin != null && extractDataBin.TryGetTarget(out var ex))
@@ -62,14 +63,23 @@ public class Mod : ModBase // <= Do not Remove.
                 var dataPath = ex.ExtractMr2();
                 if (dataPath == null)
                 {
-                    _logger.WriteLine("Unable to extract MR2 data bin");
+                    _logger.WriteLine("[Hard Mode] Unable to extract MR2 data bin");
                     return;
                 }
 
+                // Debugger.Launch();
                 if (redirector != null && redirector.TryGetTarget(out var re))
-                    re.AddRedirectFolder("", "");
+                {
+                    var path = assemblyFolder + "/Redirector";
+                    _logger.WriteLine(
+                        $"[Hard Mode] Setting up folder redirection for techs from /Resources/data/mf2/data to {path}");
+
+                    re.AddRedirectFolder(path, "/Resources/data/mf2/data");
+                }
                 else
-                    _logger.WriteLine("Unable to setup file redirector?");
+                {
+                    _logger.WriteLine("[Hard Mode] Unable to setup file redirector?");
+                }
             });
     }
 

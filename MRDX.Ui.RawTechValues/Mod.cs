@@ -89,26 +89,26 @@ public class Mod : ModBase // <= Do not Remove.
     {
         var techInfoPointer = GetTechInfoPointer(self);
         Memory.Instance.Read<sbyte>(nuint.Add(techInfoPointer, HitChanceOffset), out var hitChance);
-        return _drawInt!(GetXCoord(hitChance), HitChanceYCoord, hitChance, 0);
+        return _drawInt!(GetXCoord(hitChance), HitChanceYCoord, hitChance);
     }
 
     private int MonsterForceRawNum(nint self, sbyte force, int unk)
     {
-        return _drawInt!(GetXCoord(force), ForceYCoord, force, 0);
+        return _drawInt!(GetXCoord(force), ForceYCoord, force);
     }
 
     private int MonsterSharpnessRawNum(nint self)
     {
         var techInfoPointer = GetTechInfoPointer(self);
         Memory.Instance.Read<sbyte>(nuint.Add(techInfoPointer, SharpnessOffset), out var sharpness);
-        return _drawInt!(GetXCoord(sharpness), SharpnessYCoord, sharpness, 0);
+        return _drawInt!(GetXCoord(sharpness), SharpnessYCoord, sharpness);
     }
 
     private int MonsterWitheringRawNum(nint self)
     {
         var techInfoPointer = GetTechInfoPointer(self);
         Memory.Instance.Read<sbyte>(nuint.Add(techInfoPointer, WitheringOffset), out var withering);
-        return _drawInt!(GetXCoord(withering), WitheringYCoord, withering, 0);
+        return _drawInt!(GetXCoord(withering), WitheringYCoord, withering);
     }
 
     private nuint GetTechInfoPointer(nint self)
