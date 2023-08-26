@@ -8,7 +8,7 @@ Split-Path $MyInvocation.MyCommand.Path | Push-Location
 # These are kinda hard coded into the publish script for now.
 $InterfaceVersions = @{
     BaseExtractDataBinInterface = "1.1.0";
-    BaseModInterfaces = "1.0.5"
+    BaseModInterfaces = "1.0.6"
 }
 
 $AllProjects = @(
