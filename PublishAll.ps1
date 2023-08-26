@@ -6,16 +6,17 @@ Split-Path $MyInvocation.MyCommand.Path | Push-Location
 
 # Name of interface mod, version
 # These are kinda hard coded into the publish script for now.
+$BaseModInterfaceVersion = "1.0.7"
 $InterfaceVersions = @{
     BaseExtractDataBinInterface = "1.1.0";
-    BaseModInterfaces = "1.0.6"
+    BaseModInterfaces = $BaseModInterfaceVersion
 }
 
 $AllProjects = @(
 # Name of mod, version
     @("MRDX.Audio.VolumeConfig", "1.1.3", $false),
     @("MRDX.Base.ExtractDataBin", "1.1.0", $false),
-    @("MRDX.Base.Mod", "1.0.4", $false),
+    @("MRDX.Base.Mod", $BaseModInterfaceVersion, $false),
     @("MRDX.Game.HardMode", "1.2.0", $false),
 #    Not ready for release yet, so leave it commented out for now
 #    @("MRDX.Game.MonsterEditor", "1.0.0", $false),
