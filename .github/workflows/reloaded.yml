@@ -78,6 +78,17 @@ jobs:
           ${{ env.PUBLISH_PATH_GLOB }}
           ./mrdx_reloaded.r2pack
 
+    - name: Release if tagged version
+      uses: softprops/action-gh-release@v1
+      if: github.ref_type == 'tag'
+      with:
+        # Path to load note-worthy description of changes in release from
+        body: Release ${{ github.ref_name }}
+        # Newline-delimited list of path globs for asset files to upload
+        files: |
+          ${{ env.PUBLISH_PATH_GLOB }}
+          ./mrdx_reloaded.r2pack
+
     - name: Push to NuGet (on Tag)
       env:
         NUGET_KEY: ${{ secrets.RELOADED_NUGET_KEY }}
