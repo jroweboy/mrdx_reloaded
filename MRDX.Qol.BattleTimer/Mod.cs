@@ -1,4 +1,5 @@
-﻿using MRDX.Base.Mod.Interfaces;
+﻿using System.Drawing;
+using MRDX.Base.Mod.Interfaces;
 using MRDX.Qol.BattleTimer.Configuration;
 using MRDX.Qol.BattleTimer.Template;
 using Reloaded.Hooks.Definitions;
@@ -58,9 +59,15 @@ public class Mod : ModBase // <= Do not Remove.
         _modConfig = context.ModConfig;
 
         _modLoader.GetController<IHooks>().TryGetTarget(out var hooks);
-        hooks!.AddHook<SetupCCtrlBattle>(SetupCCtrlBattleHook)
+        if (hooks == null)
+        {
+            _logger.WriteLine($"[{_modConfig.ModId}] Could not get hook controller.", Color.Red);
+            return;
+        }
+
+        hooks.AddHook<SetupCCtrlBattle>(SetupCCtrlBattleHook)
             .ContinueWith(result => _battleHook = result.Result.Activate());
-        hooks!.AddHook<DecrementBattleTimer>(DecrementBattleTimerHook)
+        hooks.AddHook<DecrementBattleTimer>(DecrementBattleTimerHook)
             .ContinueWith(result => _timerHook = result.Result.Activate());
     }
 

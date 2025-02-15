@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using System.Drawing;
+using System.Security.Cryptography;
 using System.Text;
 using MRDX.Base.Mod.Interfaces;
 using Reloaded.Memory.Sources;
@@ -19,10 +20,10 @@ public class Randomizer
     private static readonly byte[] NO_OFFSET = BitConverter.GetBytes(0xffffffff);
 
     private readonly Memory _memory;
-    private readonly IRedirectorController _redirector;
+    private readonly WeakReference<IRedirectorController> _redirector;
 
 
-    public Randomizer(ILogger logger, IRedirectorController redirector, string redirectPath, uint seed,
+    public Randomizer(ILogger logger, WeakReference<IRedirectorController> redirector, string redirectPath, uint seed,
         RandomizerConfig config)
     {
         _memory = Memory.Instance;
@@ -133,6 +134,13 @@ public class Randomizer
 
     private async Task SaveAttacks()
     {
+        _redirector.TryGetTarget(out var redirector);
+        if (redirector == null)
+        {
+            Logger?.WriteLine("[MRDX Randomizer] Failed to get redirection controller.", Color.Red);
+            return;
+        }
+
         const int byteCountForAtkName = 34;
         const int byteCountForHeader = 4;
         var atkData =
@@ -177,7 +185,7 @@ public class Randomizer
             var atkfile = monster.SerializeAttackFileData();
             await File.WriteAllBytesAsync(dstpath, atkfile);
             Logger?.WriteLine($"[MRDX Randomizer] redirecting {srcpath} to {dstpath}");
-            _redirector.AddRedirect(srcpath, dstpath);
+            redirector.AddRedirect(srcpath, dstpath);
 
             Logger?.WriteLine($"[MRDX Randomizer] monster {display} updating battle data {dstpath}");
             var flkfilename = $"{name[..2]}_{name[..2]}_b.flk";
@@ -187,7 +195,7 @@ public class Randomizer
             atkfile.CopyTo(flk, 0);
             await File.WriteAllBytesAsync(flkdstpath, flk);
             Logger?.WriteLine($"[MRDX Randomizer] redirecting {flksrcpath} to {flkdstpath}");
-            _redirector.AddRedirect(flksrcpath, flkdstpath);
+            redirector.AddRedirect(flksrcpath, flkdstpath);
         }
 
         // Now write the attack data back to the exe
@@ -305,7 +313,8 @@ public class Randomizer
         }
     }
 
-    public static Randomizer? Create(ILogger logger, IRedirectorController redirector, string modpath, string raw)
+    public static Randomizer? Create(ILogger logger, WeakReference<IRedirectorController> redirector, string modpath,
+        string raw)
     {
         var arr = raw.Split("_");
         if (arr.Length != 2)

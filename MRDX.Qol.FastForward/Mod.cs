@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Drawing;
+using System.Runtime.InteropServices;
 using MRDX.Base.Mod.Interfaces;
 using MRDX.Qol.FastForward.Template;
 using Reloaded.Hooks;
@@ -43,6 +44,8 @@ public class Mod : ModBase // <= Do not Remove.
     /// </summary>
     private readonly IMod _owner;
 
+    private readonly nint _tickDelayPtr;
+
     /// <summary>
     ///     Provides access to this mod's configuration.
     /// </summary>
@@ -51,8 +54,6 @@ public class Mod : ModBase // <= Do not Remove.
     private nuint _fastForwardTickDelayAddr;
 
     private IAsmHook _tickDelayHook;
-
-    private readonly nint _tickDelayPtr;
 
     private bool _wasPressed;
 
@@ -68,7 +69,13 @@ public class Mod : ModBase // <= Do not Remove.
         _gameClient = _modLoader.GetController<IGameClient>();
         _controller = _modLoader.GetController<IController>();
         _controller.TryGetTarget(out var controller);
-        controller!.OnInputChanged += HandleInputChanged;
+        if (controller == null)
+        {
+            _logger.WriteLine($"[{_modConfig.ModId}] Could not get controller controller.", Color.Red);
+            return;
+        }
+
+        controller.OnInputChanged += HandleInputChanged;
 
         _tickDelayPtr = Marshal.AllocHGlobal(4);
         Marshal.WriteInt32(_tickDelayPtr, _configuration.TickDelay);

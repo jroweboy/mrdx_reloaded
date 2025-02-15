@@ -1,4 +1,5 @@
-﻿using MRDX.Base.Mod.Interfaces;
+﻿using System.Drawing;
+using MRDX.Base.Mod.Interfaces;
 using MRDX.Ui.RawTechValues.Template;
 using Reloaded.Hooks.Definitions;
 using Reloaded.Memory.Sources;
@@ -64,15 +65,21 @@ public class Mod : ModBase // <= Do not Remove.
         _modConfig = context.ModConfig;
 
         _modLoader.GetController<IHooks>().TryGetTarget(out var hooks);
-        hooks!.AddHook<DrawMonsterCardHitChanceValue>(MonsterHitChanceRawNum)
+        if (hooks == null)
+        {
+            _logger.WriteLine("[MRDX.Ui.RawTechValues] ERROR: Failed to get hooks controller.", Color.Red);
+            return;
+        }
+
+        hooks.CreateWrapper<DrawIntWithHorizontalSpacing>().ContinueWith(res => { _drawInt = res.Result; });
+        hooks.AddHook<DrawMonsterCardHitChanceValue>(MonsterHitChanceRawNum)
             .ContinueWith(result => _hitChanceHook = result.Result.Activate());
-        hooks!.AddHook<DrawMonsterCardForceValue>(MonsterForceRawNum)
+        hooks.AddHook<DrawMonsterCardForceValue>(MonsterForceRawNum)
             .ContinueWith(result => _forceHook = result.Result.Activate());
-        hooks!.AddHook<DrawMonsterCardSharpnessValue>(MonsterSharpnessRawNum)
+        hooks.AddHook<DrawMonsterCardSharpnessValue>(MonsterSharpnessRawNum)
             .ContinueWith(result => _sharpnessHook = result.Result.Activate());
-        hooks!.AddHook<DrawMonsterCardWitheringValue>(MonsterWitheringRawNum)
+        hooks.AddHook<DrawMonsterCardWitheringValue>(MonsterWitheringRawNum)
             .ContinueWith(result => _witheringHook = result.Result.Activate());
-        hooks.CreateWrapper<DrawIntWithHorizontalSpacing>().ContinueWith(result => _drawInt = result.Result);
     }
 
     #region For Exports, Serialization etc.
@@ -111,13 +118,13 @@ public class Mod : ModBase // <= Do not Remove.
         return _drawInt!(GetXCoord(withering), WitheringYCoord, withering);
     }
 
-    private nuint GetTechInfoPointer(nint self)
+    private static nuint GetTechInfoPointer(nint self)
     {
         Memory.Instance.Read<nuint>(nuint.Add((nuint)self, 0x10C), out var techInfoPointer);
         return techInfoPointer;
     }
 
-    private short GetXCoord(sbyte techVal)
+    private static short GetXCoord(sbyte techVal)
     {
         var offset = techVal.ToString().Length - 1;
         return (short)(TechValueXCoord - 3 * offset);

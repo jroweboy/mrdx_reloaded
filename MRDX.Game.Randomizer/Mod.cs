@@ -43,6 +43,8 @@ public class Mod : ModBase // <= Do not Remove.
     /// </summary>
     private Config _configuration;
 
+    private readonly WeakReference<IRedirectorController>? _redirector;
+
     public Mod(ModContext context)
     {
         _modLoader = context.ModLoader;
@@ -55,7 +57,8 @@ public class Mod : ModBase // <= Do not Remove.
         _logger.WriteLine(
             $"[MRDX Randomizer] Default flagstring {new RandomizerConfig().ToFlags()}");
 
-        _modLoader.GetController<IRedirectorController>().TryGetTarget(out var redirector);
+        _redirector = _modLoader.GetController<IRedirectorController>();
+        _redirector.TryGetTarget(out var redirector);
         if (redirector == null)
         {
             _logger.WriteLine(
@@ -63,7 +66,8 @@ public class Mod : ModBase // <= Do not Remove.
             return;
         }
 
-        var randomizer = Randomizer.Create(_logger, redirector, _modLoader.GetDirectoryForModId("MRDX.Game.Randomizer"),
+        var randomizer = Randomizer.Create(_logger, _redirector,
+            _modLoader.GetDirectoryForModId("MRDX.Game.Randomizer"),
             _configuration.FlagString);
         if (randomizer == null)
         {

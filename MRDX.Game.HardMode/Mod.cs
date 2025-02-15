@@ -1,4 +1,5 @@
-﻿using MRDX.Base.ExtractDataBin.Interface;
+﻿using System.Drawing;
+using MRDX.Base.ExtractDataBin.Interface;
 using MRDX.Base.Mod;
 using MRDX.Base.Mod.Interfaces;
 using MRDX.Game.HardMode.Template;
@@ -166,6 +167,8 @@ public class Mod : ModBase // <= Do not Remove.
         }
     };
 
+    private readonly string? _dataBinPath;
+
     /// <summary>
     ///     Provides access to the Reloaded.Hooks API.
     /// </summary>
@@ -194,14 +197,12 @@ public class Mod : ModBase // <= Do not Remove.
     /// </summary>
     private readonly IMod _owner;
 
-    private readonly IRedirectorController _redirector;
+    private readonly WeakReference<IRedirectorController> _redirector;
 
     /// <summary>
     ///     Provides access to this mod's configuration.
     /// </summary>
     private Config _configuration;
-
-    private string? _dataBinPath;
 
     public Mod(ModContext context)
     {
@@ -212,30 +213,25 @@ public class Mod : ModBase // <= Do not Remove.
         _configuration = context.Configuration;
         _modConfig = context.ModConfig;
 
-        _modLoader.GetController<IExtractDataBin>().TryGetTarget(out var extract);
-        _modLoader.GetController<IRedirectorController>().TryGetTarget(out var redirect);
-        _redirector = redirect!;
         _modPath = _modLoader.GetDirectoryForModId(_modConfig.ModId);
 
-        if (extract!.ExtractedPath == null)
+        _redirector = _modLoader.GetController<IRedirectorController>();
+        _modLoader.GetController<IExtractDataBin>().TryGetTarget(out var extract);
+        if (extract == null)
         {
-            extract.ExtractComplete += path =>
-            {
-                // TODO: not sure if this works right. The goal is if the extraction hasn't finished before
-                // loading the mod then we want to setup the redirection later.
-                _dataBinPath = path;
-                _redirector.AddRedirectFolder(path,
-                    _modPath + @"\Redirector\data");
-                SetupRedirectToLifespan();
-            };
-        }
-        else
-        {
-            _dataBinPath = extract.ExtractedPath;
-            _logger.WriteLine(@$"[MRDX.HardMode] path to csv {_dataBinPath}\SDATA_MONSTER.csv");
-            SetupRedirectToLifespan();
+            _logger.WriteLine($"[{_modConfig.ModId}] Failed to get extract data bin controller.", Color.Red);
+            return;
         }
 
+        _redirector.TryGetTarget(out var redirect);
+        if (redirect == null)
+        {
+            _logger.WriteLine($"[{_modConfig.ModId}] Failed to get redirection controller.", Color.Red);
+            return;
+        }
+
+        _dataBinPath = extract.ExtractedPath;
+        SetupRedirectToLifespan();
         UpdateErrantryMonsterStats();
     }
 
@@ -278,11 +274,18 @@ public class Mod : ModBase // <= Do not Remove.
     {
         var path = _configuration.UseOriginalLifespan ? "PS1Lifespan" : "DXLifespan";
 
-        _redirector.RemoveRedirect(_dataBinPath + @"\SDATA_MONSTER.csv");
-        _redirector.RemoveRedirect(_dataBinPath + @"\mf2\data\monbase\base.obj");
-        _redirector.AddRedirect(_dataBinPath + @"\SDATA_MONSTER.csv",
+        _redirector.TryGetTarget(out var redirect);
+        if (redirect == null)
+        {
+            _logger.WriteLine($"[{_modConfig.ModId}] Failed to get redirection controller.", Color.Red);
+            return;
+        }
+
+        redirect.RemoveRedirect(_dataBinPath + @"\SDATA_MONSTER.csv");
+        redirect.RemoveRedirect(_dataBinPath + @"\mf2\data\monbase\base.obj");
+        redirect.AddRedirect(_dataBinPath + @"\SDATA_MONSTER.csv",
             _modPath + @$"\ManualRedirected\{path}\SDATA_MONSTER.csv");
-        _redirector.AddRedirect(_dataBinPath + @"\mf2\data\monbase\base.obj",
+        redirect.AddRedirect(_dataBinPath + @"\mf2\data\monbase\base.obj",
             _modPath + @$"\ManualRedirected\{path}\base.obj");
     }
 

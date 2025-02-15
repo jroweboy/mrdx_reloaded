@@ -1,4 +1,5 @@
-﻿using MRDX.Base.Mod.Interfaces;
+﻿using System.Drawing;
+using MRDX.Base.Mod.Interfaces;
 using MRDX.Base.Mod.Template;
 using Reloaded.Hooks.Definitions;
 using Reloaded.Mod.Interfaces;
@@ -8,14 +9,22 @@ namespace MRDX.Base.Mod;
 public class Game : BaseObject<Game>, IGame
 {
     private readonly ILogger _logger;
+    private readonly IModConfig _modConfig;
     private MonsterCache _cache = new();
     private IHook<FrameStart>? _hook;
 
     public Game(ModContext context)
     {
         _logger = context.Logger;
+        _modConfig = context.ModConfig;
         context.ModLoader.GetController<IHooks>().TryGetTarget(out var hooks);
-        hooks!.AddHook<FrameStart>(FrameStartImpl).ContinueWith(result => _hook = result.Result.Activate());
+        if (hooks == null)
+        {
+            _logger.WriteLine($"[{_modConfig.ModId}] Could not get hook controller.", Color.Red);
+            return;
+        }
+
+        hooks.AddHook<FrameStart>(FrameStartImpl).ContinueWith(result => _hook = result.Result.Activate());
     }
 
     [BaseOffset(BaseGame.Mr2, Region.Us, 0x97A0C)]
@@ -31,7 +40,13 @@ public class Game : BaseObject<Game>, IGame
     {
         UpdateMonster();
         CheckForSceneChange();
-        return _hook!.OriginalFunction.Invoke();
+        if (_hook == null)
+        {
+            _logger.WriteLine($"[{_modConfig.ModId}] Function hook for frame start is null.", Color.Red);
+            return 0;
+        }
+
+        return _hook.OriginalFunction.Invoke();
     }
 
     private void UpdateMonster()
@@ -44,11 +59,21 @@ public class Game : BaseObject<Game>, IGame
         StatFlags flags = 0;
         foreach (var prop in typeof(IMonster).GetProperties())
             if (StatFlagUtil.LookUp.TryGetValue(prop.Name, out var value))
-                flags |= prop.GetValue(_cache)!.Equals(prop.GetValue(newCache)) ? 0 : value;
-        _logger.WriteLine($"Monster changed: {flags}");
+            {
+                var val = prop.GetValue(_cache);
+                flags |= val?.Equals(prop.GetValue(newCache)) ?? false ? 0 : value;
+            }
+
+        // _logger.WriteLine($"[MRDX.Base.Mod] Monster changed: {flags}");
+        if (Monster is not Monster mon)
+        {
+            _logger.WriteLine($"[{_modConfig.ModId}] Monster in UpdateMonster is not a Monster.", Color.Red);
+            return;
+        }
+
         OnMonsterChanged?.Invoke(new StandardMonsterChanged
         {
-            Offset = (Monster as Monster)!.BaseAddress,
+            Offset = mon.BaseAddress,
             Previous = _cache,
             Current = newCache,
             IsChangeFromMod = false,

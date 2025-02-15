@@ -1,4 +1,5 @@
-﻿using MRDX.Base.Mod.Interfaces;
+﻿using System.Drawing;
+using MRDX.Base.Mod.Interfaces;
 using MRDX.Qol.SkipDrillAnim.Template;
 using Reloaded.Hooks.Definitions;
 using Reloaded.Memory.Sources;
@@ -58,15 +59,21 @@ public class Mod : ModBase // <= Do not Remove.
         _skipDrillAnimation = context.Configuration.SkipDrill;
         _skipItemFindAnimation = context.Configuration.SkipItemFind;
 
+        _input = _modLoader.GetController<IController>();
         _modLoader.GetController<IHooks>().TryGetTarget(out var hooks);
-        hooks!.AddHook<IsTrainingDone>(ShouldSkipTraining)
-            .ContinueWith(result => _drillhook = result.Result?.Activate());
+        if (hooks == null)
+        {
+            _logger.WriteLine($"[{_modConfig.ModId}] Could not get hook controller.", Color.Red);
+            return;
+        }
 
-        hooks!.AddHook<InitializeRuins2dData>(ShouldSkipItemFind)
-            .ContinueWith(result => { _itemhook = result.Result?.Activate(); });
+        hooks.AddHook<IsTrainingDone>(ShouldSkipTraining)
+            .ContinueWith(result => _drillhook = result.Result.Activate());
+
+        hooks.AddHook<InitializeRuins2dData>(ShouldSkipItemFind)
+            .ContinueWith(result => { _itemhook = result.Result.Activate(); });
 
         hooks.CreateWrapper<CheckIfMonsterGrabbedAnItem>().ContinueWith(result => _itemfunc = result.Result);
-        _input = _modLoader.GetController<IController>();
     }
 
 

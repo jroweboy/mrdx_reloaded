@@ -23,7 +23,7 @@ public static class Base
         Game = string.Equals(module.FileName, "mf.exe") ? BaseGame.Mr1 : BaseGame.Mr2;
         Region = module.FileVersionInfo.FileDescription == "MonsterRancher 1&2 DX" ? Region.Us : Region.Japan;
     }
-    
+
     public static string ReadString(nint address, int length = -1)
     {
         var sb = new StringBuilder();
@@ -32,31 +32,25 @@ public static class Base
             // Strings are a variable length byte/ushort combination. If the first byte is 0xb0 <= x <= 0xb6 then
             // its a multi byte string and we read an extra number.
             // 0xff is a terminator byte for the string.
-            int i = 0;
+            var i = 0;
             while (true)
             {
-                Memory.Instance.Read<ushort>((nuint)(address + i*2), out var b);
+                Memory.Instance.Read<ushort>((nuint)(address + i * 2), out var b);
 
                 if (b == 0x00ff) break;
 
                 i++;
-                if (b is >= 0xb000 and < 0xb067)
-                {
-                    b += 0x500;
-                }
+                if (b is >= 0xb000 and < 0xb067) b += 0x500;
 
-                if (b is >= 0x00a2 and <= 0x00ab)
-                {
-                    b += 0xb557 - 0xa2;
-                }
+                if (b is >= 0x00a2 and <= 0x00ab) b += 0xb557 - 0xa2;
                 sb.Append(CharMap.Forward.TryGetValue(b, out var s) ? s : '?');
             }
 
             return sb.ToString();
         }
-        
-        
-        Memory.Instance.ReadRaw((nuint)(address), out var rawBytes, length * 2);
+
+
+        Memory.Instance.ReadRaw((nuint)address, out var rawBytes, length * 2);
         // Strings are a variable length byte/ushort combination. If the first byte is 0xb0 <= x <= 0xb6 then
         // its a multi byte string and we read an extra number.
         // 0xff is a terminator byte for the string.
@@ -264,7 +258,10 @@ public class BaseObject<TParent> where TParent : class
 
     public static int GetOffset<T>(string propName)
     {
-        return typeof(T).GetProperty(propName)!.GetCustomAttributes<BaseOffsetAttribute>()
+        var prop = typeof(T).GetProperty(propName);
+        if (prop == null)
+            throw new ArgumentException(propName + " cannot be found on property " + typeof(TParent).Name);
+        return prop.GetCustomAttributes<BaseOffsetAttribute>()
             .First(attr => (attr.Game & Base.Game) != 0 && (attr.Region & Base.Region) != 0).Offset;
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Drawing;
 using System.Runtime.InteropServices;
 using MRDX.Base.Mod.Interfaces;
 using MRDX.Graphics.Widescreen.Template;
@@ -71,7 +72,13 @@ public class Mod : ModBase // <= Do not Remove.
         _gameClient = _modLoader.GetController<IGameClient>();
 
         _modLoader.GetController<IHooks>().TryGetTarget(out var hooks);
-        hooks!.AddHook<CreateOverlay>(CreateOverlayHook)
+        if (hooks == null)
+        {
+            _logger.WriteLine($"[{_modConfig.ModId}] Could not get hook controller.", Color.Red);
+            return;
+        }
+
+        hooks.AddHook<CreateOverlay>(CreateOverlayHook)
             .ContinueWith(result => _createOverlayHook = result.Result?.Activate());
         UpdateWindowBounds(_configuration.AspectRatio);
         CalculateSkyboxCoords(_configuration.AspectRatio);
@@ -91,7 +98,7 @@ public class Mod : ModBase // <= Do not Remove.
 
     #endregion
 
-    private float CalculateNewWidth(float width, Config.AspectRatioEnum ratio)
+    private static float CalculateNewWidth(float width, Config.AspectRatioEnum ratio)
     {
         var originalAspectRatio = ConvertAspectRatio(Config.AspectRatioEnum.Force_4_3);
         var newAspectRatio = ConvertAspectRatio(ratio);
@@ -102,8 +109,13 @@ public class Mod : ModBase // <= Do not Remove.
     {
         var newWidth = CalculateNewWidth(OriginalWidth, ratio);
         _gameClient.TryGetTarget(out var gameClient);
+        if (gameClient == null)
+        {
+            _logger.WriteLine($"[{_modConfig.ModId}] Could not load game client to set the Render Bounds!");
+            return;
+        }
 
-        gameClient!.RenderBounds.Width = newWidth;
+        gameClient.RenderBounds.Width = newWidth;
         gameClient.RenderScaleUniform.WidthScale = newWidth;
     }
 
@@ -132,7 +144,7 @@ public class Mod : ModBase // <= Do not Remove.
 
     private nint CreateOverlayHook(nint self, OverlayDrawMode drawMode)
     {
-        _logger!.WriteLine($"[MRDX.Graphics.Widescreen] original drawmode value: {(uint)drawMode}");
+        // _logger.WriteLine($"[{_modConfig.ModId}] original drawmode value: {(uint)drawMode}");
         return _createOverlayHook!.OriginalFunction(self, OverlayDrawMode.NoOverlay);
     }
 
@@ -141,7 +153,7 @@ public class Mod : ModBase // <= Do not Remove.
         var newWidth = CalculateNewWidth(OriginalWidth, ratio);
 
         _skyboxEndYPtr = Marshal.AllocHGlobal(2);
-        short newYVal = 0x78;
+        const short newYVal = 0x78;
         Marshal.WriteInt16(_skyboxEndYPtr, newYVal);
 
         _skyboxStartXPtr = Marshal.AllocHGlobal(2);

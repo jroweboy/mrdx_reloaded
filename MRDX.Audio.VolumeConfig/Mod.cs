@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Drawing;
 using System.Runtime.InteropServices;
 using CoreAudio;
 using MRDX.Audio.VolumeConfig.Template;
@@ -14,16 +15,18 @@ namespace MRDX.Audio.VolumeConfig;
 /// </summary>
 public class Mod : ModBase // <= Do not Remove.
 {
-    /// <summary>
-    ///     Provides access to the Reloaded logger.
-    /// </summary>
-    private static ILogger? _logger;
+    private readonly WeakReference<IGameClient>? _gameClient;
 
     /// <summary>
     ///     Provides access to the Reloaded.Hooks API.
     /// </summary>
     /// <remarks>This is null if you remove dependency on Reloaded.SharedLib.Hooks in your mod.</remarks>
     private readonly IReloadedHooks? _hooks;
+
+    /// <summary>
+    ///     Provides access to the Reloaded logger.
+    /// </summary>
+    private readonly ILogger _logger;
 
     /// <summary>
     ///     The configuration of the currently executing mod.
@@ -35,6 +38,8 @@ public class Mod : ModBase // <= Do not Remove.
     /// </summary>
     private readonly IModLoader _modLoader;
 
+    private readonly float _originalVolume = -1.0f;
+
     /// <summary>
     ///     Entry point into the mod, instance that created this class.
     /// </summary>
@@ -45,11 +50,8 @@ public class Mod : ModBase // <= Do not Remove.
     /// </summary>
     private Config _configuration;
 
-    private readonly WeakReference<IGameClient>? _gameClient;
-
     // private static float _currentFmvVolume;
     private bool _isPlayingFmv;
-    private readonly float _originalVolume = -1.0f;
 
     // private readonly nint _musicVolumeAddress;
     // private readonly nint _sfxVolumeAddress;
@@ -72,8 +74,15 @@ public class Mod : ModBase // <= Do not Remove.
 
         _gameClient = _modLoader.GetController<IGameClient>();
         _modLoader.GetController<IHooks>().TryGetTarget(out var hooks);
-        hooks!.AddHook<PlayFmv>(PlayFmvHook).ContinueWith(result => _playFmvHook = result.Result?.Activate());
-        hooks!.AddHook<StopFmv>(StopFmvHook).ContinueWith(result => _stopFmvHook = result.Result?.Activate());
+
+        if (hooks == null)
+        {
+            _logger.WriteLine($"[{_modConfig.ModId}] Could not get hook controller.", Color.Red);
+            return;
+        }
+
+        hooks.AddHook<PlayFmv>(PlayFmvHook).ContinueWith(result => _playFmvHook = result.Result?.Activate());
+        hooks.AddHook<StopFmv>(StopFmvHook).ContinueWith(result => _stopFmvHook = result.Result?.Activate());
 
         var deviceEnumerator = new MMDeviceEnumerator(Guid.NewGuid());
         var device = deviceEnumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
@@ -99,7 +108,7 @@ public class Mod : ModBase // <= Do not Remove.
     {
         WriteVolumeToMemory(configuration);
         _configuration = configuration;
-        _logger!.WriteLine($"[{_modConfig.ModId}] Config Updated: Applying");
+        _logger.WriteLine($"[{_modConfig.ModId}] Config Updated: Applying");
     }
 
     #endregion
@@ -131,9 +140,9 @@ public class Mod : ModBase // <= Do not Remove.
             foreach (var session in device.AudioSessionManager2!.Sessions!)
             {
                 var proc = Process.GetProcessById((int)session.ProcessID);
-                if (proc.ProcessName.ToLower() != "mf2") continue;
+                if (!proc.ProcessName.Equals("mf2", StringComparison.CurrentCultureIgnoreCase)) continue;
 
-                _volumeControl = session?.SimpleAudioVolume;
+                _volumeControl = session.SimpleAudioVolume;
                 break;
             }
         }

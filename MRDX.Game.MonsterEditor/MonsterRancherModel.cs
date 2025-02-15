@@ -1,4 +1,5 @@
-﻿using MRDX.Base.Mod.Interfaces;
+﻿using System.Drawing;
+using MRDX.Base.Mod.Interfaces;
 using Reloaded.Mod.Interfaces;
 
 namespace MRDX.Game.MonsterEditor;
@@ -6,6 +7,7 @@ namespace MRDX.Game.MonsterEditor;
 public class MonsterRancherModel
 {
     private readonly WeakReference<IGame> _game;
+    private readonly ILogger _logger;
     private WeakReference<IGameClient> _client;
 
     public MonsterModel Monster;
@@ -14,8 +16,15 @@ public class MonsterRancherModel
     {
         _game = modLoader.GetController<IGame>();
         _client = modLoader.GetController<IGameClient>();
+        _logger = (ILogger)modLoader.GetLogger();
         _game.TryGetTarget(out var g);
-        g!.OnMonsterChanged += MonsterChanged;
+        if (g == null)
+        {
+            _logger.WriteLine("[TODO MonsterEditor] Could not get game target.", Color.Red);
+            return;
+        }
+
+        g.OnMonsterChanged += MonsterChanged;
         Monster = new MonsterModel(g.Monster);
     }
 
