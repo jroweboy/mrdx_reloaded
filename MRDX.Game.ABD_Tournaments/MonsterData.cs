@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Runtime.InteropServices;
 using MRDX.Base.Mod.Interfaces;
 using Reloaded.Mod.Interfaces;
 
@@ -20,21 +21,6 @@ public class MonsterBreed
 
 
     public MonsterBreed (string n, string nshort, byte bid, byte sid, string identifier, byte[] techniques) {
-        /*
-        name = IMonster.AllMonsters[ id ].Name;
-        name_short = IMonster.AllMonsters[ id ].ShortName;
-        breed_id = id;
-        breed_identifier = name_short.Substring( 0, 2 );
-
-        if ( breed_identifier == "un" ) {
-            if ( name_short.EndsWith("1") ) { breed_identifier = "xx"; }
-            else if ( name_short.EndsWith( "2" ) ) { breed_identifier = "xy"; }
-            else if ( name_short.EndsWith( "3" ) ) { breed_identifier = "xz"; }
-            else if ( name_short.EndsWith( "4" ) ) { breed_identifier = "yx"; }
-            else if ( name_short.EndsWith( "5" ) ) { breed_identifier = "yy"; }
-            else { breed_identifier = "zz"; }
-        }*/
-
         name = n;
         name_short = nshort;
 
@@ -105,21 +91,28 @@ public class MonsterBreed
     /// <summary> Reads from the provided FileStream and returns a byte list. 0 = Basic, 1 Hit, 2 Heavy, 3 Withering, 4 Sharp, 5 Special, 6 Invalid </summary>
     private static byte [] ParseTechniqueFile(FileStream fs) {
         byte[] techniqueList = new byte[ 24 ];
-        /*long tpos = 0;
+        long tpos = 0;
         
+        for ( var i = 0; i < 24; i++ ) { techniqueList[ i ] = 6; }
+
         for ( var i = 0; i < 24; i++ ) {
             fs.Position = i * 4; 
             tpos = (long) fs.ReadByte(); tpos += (long) fs.ReadByte() * 256;
 
-            if ( tpos == 0xFFFF ) { techniqueList[ i ] = 6; }
-            else {
+            if ( tpos != 0xFFFF ) {
                 fs.Position = (long) tpos + 0x10;
-                techniqueList[ i ] = (byte) fs.ReadByte();
-                
+                techniqueList[ (byte) ((tpos - 0x60) / 0x20) ] = (byte) fs.ReadByte();
+                Console.WriteLine( tpos + " " + ( tpos - 0x60 ) + " " + ( ( tpos - 0x60 ) / 0x20 ) );
+                //techniqueList[ i ] = (byte) fs.ReadByte();
             }
+            
+        }
+
+        for ( var i = 0; i < 24; i++ ) {
             Console.Write( techniqueList[ i ] + "," );
-        }*/
+        }
         // This is super suspect and relies on the fact that invalid/empty techs are always at the end of the file. (4 gaps = last 4 are emepty and they are not interspersed with the other 20)
+        /*
         long vt = 0;
         byte validtechs = 24;
         for ( var i = 0; i < 24; i++ ) {
@@ -134,7 +127,7 @@ public class MonsterBreed
             techniqueList[ i ] = (byte) fs.ReadByte();
 
             if ( i >= vt ) { techniqueList[ i ] = 6; }
-        }
+        }*/
 
         fs.Close();
         return techniqueList;

@@ -260,7 +260,7 @@ public class TournamentPool
         // // // // // // 
 
         MonsterBreed randomBreed = MonsterBreed.AllBreeds[ Random.Shared.Next() % MonsterBreed.AllBreeds.Count ];
-        while (randomBreed.breed_id != 27) { randomBreed = MonsterBreed.AllBreeds[ Random.Shared.Next() % MonsterBreed.AllBreeds.Count ]; }
+        while (randomBreed.breed_id != 33) { randomBreed = MonsterBreed.AllBreeds[ Random.Shared.Next() % MonsterBreed.AllBreeds.Count ]; }
         nm.breed_main = (byte) randomBreed.breed_id; nm.breed_sub = (byte) randomBreed.sub_id;
 
         // // // // // //
