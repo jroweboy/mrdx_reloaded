@@ -228,6 +228,8 @@ public class TournamentPool
 
         stat_start = sstart;
         stat_end = send;
+
+        tournament_tier = tier;
     }
 
     public void MonsterAdd(ABD_TournamentMonster m)
@@ -258,6 +260,7 @@ public class TournamentPool
         // // // // // // 
 
         MonsterBreed randomBreed = MonsterBreed.AllBreeds[ Random.Shared.Next() % MonsterBreed.AllBreeds.Count ];
+        while (randomBreed.breed_id != 27) { randomBreed = MonsterBreed.AllBreeds[ Random.Shared.Next() % MonsterBreed.AllBreeds.Count ]; }
         nm.breed_main = (byte) randomBreed.breed_id; nm.breed_sub = (byte) randomBreed.sub_id;
 
         // // // // // //
@@ -316,7 +319,6 @@ public class ABD_TournamentMonster
     public ushort lifetotal = 0;
     public ushort lifespan = 0;
 
-    byte growth_focuses = 0;
     ushort growth_rate = 0;
     private byte[] growth_options;
 
@@ -360,7 +362,7 @@ public class ABD_TournamentMonster
 
         agegroup *= growth_rate;
 
-        Console.WriteLine( monster.name + " age " + lifespan.ToString() + " gaining " + agegroup.ToString() + " stats from " + growth_rate.ToString() + " growth rate." );
+        //Console.WriteLine( monster.name + " age " + lifespan.ToString() + " gaining " + agegroup.ToString() + " stats from " + growth_rate.ToString() + " growth rate." );
         for (var i = 0; i < agegroup; i++) {
             var stat = growth_options[TournamentData.GrowthRNG.Next() % growth_options.Length];
             if (stat == 0) { monster.stat_lif++; }
@@ -373,12 +375,17 @@ public class ABD_TournamentMonster
     }
 
     public void LearnTechnique() { // TODO: Smarter Logic About which tech to get
+        Console.Write( "\n" + monster.name + " " + monster.techniques + " trying to learn a move : " );
         for ( var i = 0; i < 100; i++ ) {
             var newTech = Random.Shared.Next() % 24;
-            if ( breedInfo.technique_types[ newTech ] == 0 || breedInfo.technique_types[ newTech ] == 6 || (( monster.techniques >> newTech ) & 1) == 1 ) { } // If the technique is invalid, basic, or already learned
+            if ( breedInfo.technique_types[ newTech ] == 0 || breedInfo.technique_types[ newTech ] == 6 || (( monster.techniques >> newTech ) & 1) == 1 ) {
+                Console.Write( " x" + newTech + "x" );
+            } // If the technique is invalid, basic, or already learned
             else {
+                Console.Write( " !" + newTech + "!" );
                 monster.techniques += (uint) ( 1 << newTech );
                 i = 101;
+                Console.Write( " : " + monster.techniques );
             }
         }
     }

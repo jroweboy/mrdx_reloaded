@@ -49,6 +49,9 @@ public class MonsterBreed
                 technique_basics += (uint) (1 << ( t ));
             }
         }
+
+        Console.WriteLine( "Basic Techs List : " + name + " " + technique_basics );
+        //technique_basics = 7;
     }
 
     public static void SetupMonsterBreedList ( string gamePath ) {
@@ -63,6 +66,8 @@ public class MonsterBreed
 
                 // Build a singular tech list. This will be the same for every breed until I do the right now and actually check errantry (no thanks :( )
                 FileStream fs = File.OpenRead( techniqueFile );
+
+                Console.Write( "\nReading Techniques for " + info.Name + ": " );
                 byte [] techniqueList = ParseTechniqueFile( fs );
 
                 // Enumerate through each species tex file and generate the final breeds.
@@ -95,14 +100,12 @@ public class MonsterBreed
             }
 
         }
-
-
     }
 
     /// <summary> Reads from the provided FileStream and returns a byte list. 0 = Basic, 1 Hit, 2 Heavy, 3 Withering, 4 Sharp, 5 Special, 6 Invalid </summary>
     private static byte [] ParseTechniqueFile(FileStream fs) {
         byte[] techniqueList = new byte[ 24 ];
-        long tpos = 0;
+        /*long tpos = 0;
         
         for ( var i = 0; i < 24; i++ ) {
             fs.Position = i * 4; 
@@ -112,8 +115,27 @@ public class MonsterBreed
             else {
                 fs.Position = (long) tpos + 0x10;
                 techniqueList[ i ] = (byte) fs.ReadByte();
+                
             }
+            Console.Write( techniqueList[ i ] + "," );
+        }*/
+        // This is super suspect and relies on the fact that invalid/empty techs are always at the end of the file. (4 gaps = last 4 are emepty and they are not interspersed with the other 20)
+        long vt = 0;
+        byte validtechs = 24;
+        for ( var i = 0; i < 24; i++ ) {
+            fs.Position = i * 4;
+            vt = (long) fs.ReadByte(); vt += (long) fs.ReadByte() * 256;
+
+            if ( vt == 0xFFFF ) { validtechs--; }
         }
+
+        for ( var i = 0; i < 24; i++ ) {
+            fs.Position = (long) ( 0x60 + ( i * 0x20 ) ) + 0x10;
+            techniqueList[ i ] = (byte) fs.ReadByte();
+
+            if ( i >= vt ) { techniqueList[ i ] = 6; }
+        }
+
         fs.Close();
         return techniqueList;
     }
@@ -124,24 +146,6 @@ public class MonsterBreed
             if ( mb.breed_id == main && mb.sub_id == sub ) { return mb; }
         }
         return MonsterBreed.AllBreeds[ 0 ];
-    }
-
-    public static void SetupValidSubBreeds ( string gamePath ) {
-        /*
-        foreach ( MonsterBreed breed in AllBreeds ) {
-            if ( !breed.name.StartsWith( "Unknown" ) ) {
-                var textureFiles = Directory.EnumerateFiles( gamePath + "\\mf2\\data\\mon\\" + breed.name_short + "\\", breed.breed_identifier + "_??.tex" );
-                foreach ( string currentFile in textureFiles ) {
-                    var sub_identifier = currentFile.Substring( currentFile.Length - 6, 2 );
-
-                    foreach ( MonsterBreed sub in AllBreeds ) {
-                        if ( sub.breed_identifier == sub_identifier ) {
-                            breed.breed_valid_subs = breed.breed_valid_subs + (ulong) ( 1 << sub.breed_id );
-                        }
-                    }
-                }
-            }
-        }*/
     }
 }
 
@@ -197,7 +201,11 @@ public class TournamentMonster {
     public byte per_spoil { get => _per_spoil; set { _per_spoil = value; raw_bytes[ 42 ] = value; } }
 
     // 43-46 Techniques, Represented by Bits (First Byte is always empty)
-    public uint techniques { get => _techniques; set { _techniques = value; raw_bytes[ 43 ] = 0; raw_bytes[ 44 ] = (byte) ( ( value & 0xff0000 ) >> 16 ); raw_bytes[ 45 ] = (byte) ( ( value & 0xff00 ) >> 8 ); raw_bytes[ 46 ] = (byte) ( value & 0xff ); } }
+    public uint techniques { get => _techniques; set { _techniques = value; 
+            raw_bytes[ 43 ] = 0; 
+            raw_bytes[ 44 ] = (byte) ( value & 0xff ); 
+            raw_bytes[ 45 ] = (byte) ( ( value & 0xff00 ) >> 8 );  
+            raw_bytes[ 46 ] = (byte) ( ( value & 0xff0000 ) >> 16 );  } }
 
     public byte arena_movespeed { get => _arena_movespeed; set { _arena_movespeed = value; raw_bytes[ 48 ] = value; } }
     public byte arena_gutsrate { get => _arena_gutsrate; set { _arena_gutsrate = value; raw_bytes[ 49 ] = value; } }
@@ -245,7 +253,7 @@ public class TournamentMonster {
         per_fear = raw[ 41 ];
         per_spoil = raw[ 42 ];
 
-        techniques = (uint) ( ( raw[ 44 ] << 16 ) + ( raw[ 45 ] << 8 ) + raw[ 46 ] );
+        techniques = (uint) ( raw [44] + ( raw[ 45 ] << 8 ) + ( raw[ 46 ] << 16 ) );
 
         arena_movespeed = raw[ 48 ];
         arena_gutsrate = raw[ 49 ];

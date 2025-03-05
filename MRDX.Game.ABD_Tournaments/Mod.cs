@@ -155,7 +155,7 @@ public class Mod : ModBase // <= Do not Remove.
         AdvanceMonthUpdateTournamentMonsters(currentWeekAddress);
         UpdateInGameTournamentData(tournamentAddress);
         
-         _logger.Write($"[{_modConfig.ModId}] update.", Color.Red);   
+        //_logger.Write($"[{_modConfig.ModId}] update.", Color.Red);   
     }
 
 
@@ -195,14 +195,14 @@ public class Mod : ModBase // <= Do not Remove.
         tournamentData = new TournamentData();
 
         var enemyAddresses = tournamentAddress + 0xA8C;
-        _logger.WriteLine("Read from " + enemyAddresses, Color.Lime);
+        //_logger.WriteLine("Read from " + enemyAddresses, Color.Lime);
         for ( var i = 0; i < 120; i++ )
         {
             Memory.Instance.ReadRaw(enemyAddresses + ((nuint) (i * 60)), out byte[] tm_raw, 60);
             TournamentMonster tm = new(tm_raw);
             tournamentData.AddExistingMonster(tm, i);
             
-            _logger.WriteLine("Monster " + i + " Parsed: " + tm, Color.Lime);
+            //_logger.WriteLine("Monster " + i + " Parsed: " + tm, Color.Lime);
 
             string bytes = "";
             for ( var z = 0; z < 60; z++ )
