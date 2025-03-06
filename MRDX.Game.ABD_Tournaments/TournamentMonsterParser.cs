@@ -2,11 +2,13 @@
 using System.Collections;
 using System.Diagnostics.Tracing;
 using System.Drawing;
+using System.Runtime.InteropServices.Marshalling;
 using System.Xml.Linq;
 using MRDX.Base.ExtractDataBin.Interface;
 using MRDX.Base.Mod;
 using MRDX.Base.Mod.Interfaces;
 using Reloaded.Mod.Interfaces;
+using static MRDX.Base.Mod.Interfaces.TournamentData;
 
 namespace MRDX.Base.Mod.Interfaces;
 public class TournamentMonsterParser
@@ -107,6 +109,8 @@ public class TournamentData
     public static Random GrowthRNG = new Random(0);
     public static Random LifespanRNG = new Random(1);
 
+    public uint _currentWeek = 0;
+
     // Promotion Data
     //D Rank: 900
     //C Rank: 1300
@@ -166,44 +170,50 @@ public class TournamentData
         }
     }
 
-    public void AdvanceMonth()
-    {
-        if ( !_initialized ) { return; }
+    public void AdvanceWeek ( uint currentWeek ) {
+        if ( !_initialized ) { _currentWeek = currentWeek; return; }
 
-        _logger.WriteLine( "ABD_TD: Advancing Month", Color.Blue );
-        for (var i = monsters.Count -1 ; i >= 0 ; i--)
-        {
-            var m = monsters[i];
+        while ( _currentWeek < currentWeek ) {
+            _currentWeek++;
 
-            _logger.WriteLine( "ABD_TD: Advancing Month for " + m.monster.name, Color.Aqua );
-            m.AdvanceMonth();
-
-            foreach (TournamentPool pool in tournamentPools.Values) {
-                if ( ( m.monster.stat_total >= pool.stat_start && m.monster.stat_total <= pool.stat_end) && m.alive ) {
-                    pool.MonsterAdd(m);
-                    m.LearnTechnique();
-                }
-                else {
-                    pool.MonsterRemove(m); }
+            if ( _currentWeek % 4 == 0 ) {
+                AdvanceMonth();
             }
 
-            if ( !m.alive ) {
-                monsters.Remove( m );
+            if ( _currentWeek % 12 == 0 ) {
+                AdvanceTournamentPromotions();
             }
+
         }
 
-        foreach (TournamentPool pool in tournamentPools.Values)
-        {
-            while (pool.monsters.Count < pool._minimumSize)
-            {
-                _logger.WriteLine( "ABD_TD: Generating New Monster For Pool " + pool._name, Color.Azure );
+        foreach ( TournamentPool pool in tournamentPools.Values ) {
+            while ( pool.monsters.Count < pool._minimumSize ) {
                 pool.GenerateNewValidMonster();
             }
-            
+
             // Shuffle Monsters - TODO: This should happen weekly.
             ABD_TournamentMonster[] ml = pool.monsters.ToArray();
-            Random.Shared.Shuffle(ml);
-            pool.monsters = new List<ABD_TournamentMonster>(ml);
+            Random.Shared.Shuffle( ml );
+            pool.monsters = new List<ABD_TournamentMonster>( ml );
+        }
+    }
+    public void AdvanceMonth()
+    {
+        for (var i = monsters.Count -1 ; i >= 0 ; i--) {
+            var m = monsters[i];
+
+            m.AdvanceMonth();
+            if ( !m.alive ) {
+                foreach ( TournamentPool tp in m.pools ) {
+                    tp.MonsterRemove( m );
+                }
+                monsters.Remove( m );
+            }
+
+            // TODO CONFIG TECHNIQUE RATE
+            if ( Random.Shared.Next() % 10 == 0 ) {
+                m.LearnTechnique();
+            }
         }
     }
 
@@ -227,8 +237,6 @@ public class TournamentData
         foreach( TournamentPool pool in tournamentPools.Values ) {
             pool.monsters.Clear();
         }
-
-        
     }
 
 }
@@ -268,7 +276,6 @@ public class TournamentPool
     public void MonsterAdd(ABD_TournamentMonster m)
     {
         if (!monsters.Contains(m)) {
-            Console.WriteLine(m.monster.name + " was promoted to " + _name);
             monsters.Add(m);
             m.pools.Add(this);
         }
@@ -276,9 +283,7 @@ public class TournamentPool
 
     public void MonsterRemove(ABD_TournamentMonster m)
     {
-        if ( monsters.Contains(m) )
-        {
-            Console.WriteLine(m.monster.name + " was removed from " + _name);
+        if ( monsters.Contains(m) ) {
             monsters.Remove(m);
             m.pools.Remove(this);
         }
@@ -433,10 +438,34 @@ public class ABD_TournamentMonster
     }
 
     public void LearnTechnique() { // TODO: Smarter Logic About which tech to get
+        // 0 = Basic, 1 Hit, 2 Heavy, 3 Withering, 4 Sharp, 5 Special, 6 Invalid
+        List<byte> toLearn = new List<byte>();
+        for ( var i = 0; i < 24; i++ ) {
+            var type = breedInfo.technique_types[ i ];
+            if ( type != 6 && ( ( monster.techniques >> i ) & 1 ) == 0 ) {
+                if ( growth_group == growth_groups.power && type == 2 ) { toLearn.Add( (byte) i ); }
+                else if ( growth_group == growth_groups.intel && type == 1 ) { toLearn.Add( (byte) i ); }
+                else if ( growth_group == growth_groups.wither && type == 3 ) { toLearn.Add( (byte) i ); }
+                else if ( growth_group == growth_groups.speedy && type == 4 ) { toLearn.Add( (byte) i ); }
+
+                if ( breedInfo.technique_types[ i ] == 5 ) {
+                    if ( ( _monsterRank == EMonsterRanks.S || _monsterRank == EMonsterRanks.A || _monsterRank == EMonsterRanks.B ) ) { toLearn.Add( (byte) i ); toLearn.Add( (byte) i ); }
+                }
+                else { toLearn.Add( (byte) i ); }
+            }
+        }
+
+        if ( toLearn.Count > 0 ) {
+            monster.techniques += (uint) ( 1 << toLearn[ Random.Shared.Next() % toLearn.Count ] );
+        }
+
+        /*
         for ( var i = 0; i < 100; i++ ) {
+            for ( var )
             var newTech = Random.Shared.Next() % 24;
             if ( breedInfo.technique_types[ newTech ] == 6 || ( ( monster.techniques >> newTech ) & 1 ) == 1 ) { } // Invalid or Already Learned
-            else if ( breedInfo.technique_types[ newTech ] == 5 && ( _monsterRank == EMonsterRanks.S || _monsterRank == EMonsterRanks.A || _monsterRank == EMonsterRanks.B ) ) {
+
+            else if ( breedInfo.technique_types[ newTech ] == 5 && ( _monsterRank == EMonsterRanks.S || _monsterRank == EMonsterRanks.A || _monsterRank == EMonsterRanks.B ) ) { // Special techs only for B Rank+ Monsters
                 monster.techniques += (uint) ( 1 << newTech );
                 i = 101;
             }
@@ -445,7 +474,7 @@ public class ABD_TournamentMonster
                 monster.techniques += (uint) ( 1 << newTech );
                 i = 101;
             }
-        }
+        }*/
     }
 
     public byte[] ToSaveFile() {

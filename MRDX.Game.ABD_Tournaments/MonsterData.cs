@@ -16,6 +16,7 @@ public class MonsterBreed
     public string breed_identifier;
 
     public byte[] technique_types;
+    public uint technique_scaling;
     public uint technique_basics;
 
 
@@ -35,9 +36,6 @@ public class MonsterBreed
                 technique_basics += (uint) (1 << ( t ));
             }
         }
-
-        Console.WriteLine( "Basic Techs List : " + name + " " + technique_basics );
-        //technique_basics = 7;
     }
 
     public static void SetupMonsterBreedList ( string gamePath ) {
@@ -102,32 +100,13 @@ public class MonsterBreed
             if ( tpos != 0xFFFF ) {
                 fs.Position = (long) tpos + 0x10;
                 techniqueList[ (byte) ((tpos - 0x60) / 0x20) ] = (byte) fs.ReadByte();
-                Console.WriteLine( tpos + " " + ( tpos - 0x60 ) + " " + ( ( tpos - 0x60 ) / 0x20 ) );
+
+
+                
                 //techniqueList[ i ] = (byte) fs.ReadByte();
             }
             
         }
-
-        for ( var i = 0; i < 24; i++ ) {
-            Console.Write( techniqueList[ i ] + "," );
-        }
-        // This is super suspect and relies on the fact that invalid/empty techs are always at the end of the file. (4 gaps = last 4 are emepty and they are not interspersed with the other 20)
-        /*
-        long vt = 0;
-        byte validtechs = 24;
-        for ( var i = 0; i < 24; i++ ) {
-            fs.Position = i * 4;
-            vt = (long) fs.ReadByte(); vt += (long) fs.ReadByte() * 256;
-
-            if ( vt == 0xFFFF ) { validtechs--; }
-        }
-
-        for ( var i = 0; i < 24; i++ ) {
-            fs.Position = (long) ( 0x60 + ( i * 0x20 ) ) + 0x10;
-            techniqueList[ i ] = (byte) fs.ReadByte();
-
-            if ( i >= vt ) { techniqueList[ i ] = 6; }
-        }*/
 
         fs.Close();
         return techniqueList;
