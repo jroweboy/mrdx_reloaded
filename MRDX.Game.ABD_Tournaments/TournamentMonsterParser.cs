@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections;
 using System.Diagnostics.Tracing;
+using System.Drawing;
 using System.Xml.Linq;
 using MRDX.Base.ExtractDataBin.Interface;
 using MRDX.Base.Mod;
 using MRDX.Base.Mod.Interfaces;
+using Reloaded.Mod.Interfaces;
 
 namespace MRDX.Base.Mod.Interfaces;
 public class TournamentMonsterParser
@@ -96,40 +98,45 @@ static ushort HexTextToValue(char ht1, char ht2)
 }
 }
 
+public enum EMonsterRanks { S, A, B, C, D, E };
 public class TournamentData
 {
+    public static ILogger _logger;
+
+    public bool _initialized = false;
     public static Random GrowthRNG = new Random(0);
     public static Random LifespanRNG = new Random(1);
 
     // Promotion Data
-    //E Class: 900
-    //D Rank: 1100
-    //C Rank: 1500
-    //B Rank: 1950
-    //A Rank: 2500
-    //S Rank: 3100
+    //D Rank: 900
+    //C Rank: 1300
+    //B Rank: 1700
+    //A Rank: 2300
+    //S Rank: 2800
     //Major 4: 3500
     public enum e_pools { S, A, B, C, D, E };
+    
     public Dictionary<e_pools, TournamentPool> tournamentPools = new Dictionary<e_pools, TournamentPool>();
     public List<ABD_TournamentMonster> monsters = new List<ABD_TournamentMonster>();
 
     public List<byte[]> startingMonsterTemplates = new List<byte[]>();
    
-    public TournamentData()
+    public TournamentData(ILogger logger) 
     {
-        tournamentPools.Add(e_pools.S, new TournamentPool(this, "S Rank", 8, 1, 8,    2501, 9900, 5));
-        tournamentPools.Add(e_pools.A, new TournamentPool(this, "A Rank", 8, 9, 16,   1951, 2500, 4));
-        tournamentPools.Add(e_pools.B, new TournamentPool(this, "B Rank", 10, 17, 26, 1501, 1950, 3));
-        tournamentPools.Add(e_pools.C, new TournamentPool(this, "C Rank", 10, 27, 36, 1101, 1500, 2));
-        tournamentPools.Add(e_pools.D, new TournamentPool(this, "D Rank", 8, 37, 44,  901,  1100, 1));
-        tournamentPools.Add(e_pools.E, new TournamentPool(this, "E Rank", 6, 45, 50,  500,  900 , 0));
+        TournamentData._logger = logger;
 
-        startingMonsterTemplates.Add([181, 1, 181, 40, 181, 43, 181, 26, 181, 39, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 7, 215, 0, 72, 1, 228, 0, 233, 0, 184, 0, 216, 0, 50, 50, 50, 0, 255, 104, 9, 0, 3, 13, 0, 0, 65, 0, 0, 0, 0, 0, 255, 255]); // 112 Boran?
+        tournamentPools.Add(e_pools.S, new TournamentPool(this, EMonsterRanks.S, "S Rank", 8, 1, 8,    2800, 9900, 5));
+        tournamentPools.Add(e_pools.A, new TournamentPool(this, EMonsterRanks.A, "A Rank", 8, 9, 16,   2300, 2599, 4));
+        tournamentPools.Add(e_pools.B, new TournamentPool(this, EMonsterRanks.B, "B Rank", 10, 17, 26, 1700, 2099, 3));
+        tournamentPools.Add(e_pools.C, new TournamentPool(this, EMonsterRanks.C, "C Rank", 10, 27, 36, 1300, 1699, 2));
+        tournamentPools.Add(e_pools.D, new TournamentPool(this, EMonsterRanks.D, "D Rank", 8, 37, 44,  900,  1299, 1));
+        tournamentPools.Add(e_pools.E, new TournamentPool(this, EMonsterRanks.E, "E Rank", 6, 45, 50,  600,  899 , 0));
+
+        /*startingMonsterTemplates.Add([181, 1, 181, 40, 181, 43, 181, 26, 181, 39, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 7, 215, 0, 72, 1, 228, 0, 233, 0, 184, 0, 216, 0, 50, 50, 50, 0, 255, 104, 9, 0, 3, 13, 0, 0, 65, 0, 0, 0, 0, 0, 255, 255]); // 112 Boran?
         startingMonsterTemplates.Add([181, 14, 181, 26, 181, 36, 181, 37, 181, 30, 181, 50, 181, 38, 181, 26, 181, 39, 255, 0, 0, 0, 0, 0, 0, 0, 27, 27, 154, 0, 158, 0, 91, 0, 62, 0, 155, 0, 26, 0, 25, 20, 20, 0, 129, 2, 0, 0, 1, 14, 0, 0, 19, 0, 0, 0, 0, 0, 255, 255]); // TODO : OAKLEYMANNNN
         startingMonsterTemplates.Add([181, 12, 181, 40, 181, 41, 181, 30, 181, 45, 181, 40, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 7, 240, 0, 61, 1, 245, 0, 252, 0, 39, 1, 26, 1, 201, 40, 40, 0, 255, 0, 0, 0, 4, 9, 0, 0, 74, 1, 0, 0, 0, 0, 255, 255]); // 99 Mopeto
         startingMonsterTemplates.Add([181, 11, 181, 26, 181, 32, 181, 34, 181, 43, 181, 46, 181, 44, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 180, 1, 241, 1, 162, 1, 152, 2, 183, 1, 99, 2, 25, 50, 50, 0, 223, 55, 0, 0, 2, 17, 0, 0, 33, 0, 0, 0, 0, 0, 255, 255]); //65 Lagrius
-        startingMonsterTemplates.Add([181, 11, 181, 30, 181, 40, 181, 39, 181, 30, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 13, 99, 0, 116, 0, 87, 0, 171, 0, 162, 0, 143, 0, 55, 30, 30, 0, 5, 0, 0, 0, 3, 11, 0, 0, 11, 1, 0, 0, 0, 0, 255, 255]); // 48Leone
-
+        startingMonsterTemplates.Add([181, 11, 181, 30, 181, 40, 181, 39, 181, 30, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 13, 99, 0, 116, 0, 87, 0, 171, 0, 162, 0, 143, 0, 55, 30, 30, 0, 5, 0, 0, 0, 3, 11, 0, 0, 11, 1, 0, 0, 0, 0, 255, 255]); // 48Leone*/
     }
 
     public void AddExistingMonster(TournamentMonster m, int id)
@@ -137,22 +144,38 @@ public class TournamentData
         e_pools pool = e_pools.S;
         ABD_TournamentMonster abdm = new ABD_TournamentMonster(m);
 
-        if ( id >= 1 && id <= 8 ) { pool = TournamentData.e_pools.S; }
-        else if ( id >= 9 && id <= 16 ) { pool = TournamentData.e_pools.A; }
-        else if ( id >= 17 && id <= 26 ) { pool = TournamentData.e_pools.B; }
-        else if ( id >= 27 && id <= 36 ) { pool = TournamentData.e_pools.C; }
-        else if ( id >= 37 && id <= 44 ) { pool = TournamentData.e_pools.D; }
-        else if ( id >= 45 && id <= 50 ) { pool = TournamentData.e_pools.E; }
+        if ( id >= 1 && id <= 8 )           { pool = TournamentData.e_pools.S; }
+        else if ( id >= 9 && id <= 16 )     { pool = TournamentData.e_pools.A; }
+        else if ( id >= 17 && id <= 26 )    { pool = TournamentData.e_pools.B; }
+        else if ( id >= 27 && id <= 36 )    { pool = TournamentData.e_pools.C; }
+        else if ( id >= 37 && id <= 44 )    { pool = TournamentData.e_pools.D; }
+        else if ( id >= 45 && id <= 50 )    { pool = TournamentData.e_pools.E; }
+
+        abdm._monsterRank = tournamentPools[ pool ]._monsterRank;
 
         monsters.Add(abdm);
         tournamentPools[pool].MonsterAdd(abdm);
     }
 
+    public void AddExistingMonster(ABD_TournamentMonster abdm) {
+        monsters.Add( abdm );
+        foreach ( TournamentPool pool in tournamentPools.Values ) {
+            if ( ( abdm.monster.stat_total >= pool.stat_start && abdm.monster.stat_total <= pool.stat_end ) ) {
+                pool.MonsterAdd( abdm );
+            }
+        }
+    }
+
     public void AdvanceMonth()
     {
-        for (var i = monsters.Count -1; i >= 0 ; i--)
+        if ( !_initialized ) { return; }
+
+        _logger.WriteLine( "ABD_TD: Advancing Month", Color.Blue );
+        for (var i = monsters.Count -1 ; i >= 0 ; i--)
         {
             var m = monsters[i];
+
+            _logger.WriteLine( "ABD_TD: Advancing Month for " + m.monster.name, Color.Aqua );
             m.AdvanceMonth();
 
             foreach (TournamentPool pool in tournamentPools.Values) {
@@ -167,24 +190,21 @@ public class TournamentData
             if ( !m.alive ) {
                 monsters.Remove( m );
             }
-
         }
 
         foreach (TournamentPool pool in tournamentPools.Values)
         {
-            Console.WriteLine(pool._name + " has " + pool.monsters.Count + " current out of " + pool._minimumSize);
             while (pool.monsters.Count < pool._minimumSize)
             {
+                _logger.WriteLine( "ABD_TD: Generating New Monster For Pool " + pool._name, Color.Azure );
                 pool.GenerateNewValidMonster();
             }
-
-            // TODO STILL BROKEN
+            
+            // Shuffle Monsters - TODO: This should happen weekly.
             ABD_TournamentMonster[] ml = pool.monsters.ToArray();
             Random.Shared.Shuffle(ml);
             pool.monsters = new List<ABD_TournamentMonster>(ml);
         }
-
-
     }
 
     public List<ABD_TournamentMonster>GetTournamentMembers( int start, int end ) {
@@ -200,11 +220,23 @@ public class TournamentData
         return participants;
     }
 
+    public void ClearAllData() {
+        _initialized = false;
+
+        monsters.Clear();
+        foreach( TournamentPool pool in tournamentPools.Values ) {
+            pool.monsters.Clear();
+        }
+
+        
+    }
+
 }
 
 public class TournamentPool
 {
     public TournamentData tournamentData;
+    public EMonsterRanks _monsterRank;
     public string _name = "Pool";
     public int _minimumSize = 0;
     public int _indexStart = 0;
@@ -217,9 +249,10 @@ public class TournamentPool
 
     public List<ABD_TournamentMonster> monsters = new List<ABD_TournamentMonster>();
 
-    public TournamentPool(TournamentData data, string name, int size, int istart, int iend, int sstart, int send, int tier)
+    public TournamentPool(TournamentData data, EMonsterRanks rank, string name, int size, int istart, int iend, int sstart, int send, int tier)
     {
         tournamentData = data;
+        _monsterRank = rank;
 
         _name = name;
         _minimumSize = size;
@@ -253,16 +286,18 @@ public class TournamentPool
 
     public void GenerateNewValidMonster()
     {
-        byte[] nmraw = tournamentData.startingMonsterTemplates[Random.Shared.Next() % tournamentData.startingMonsterTemplates.Count];
+        TournamentData._logger.WriteLineAsync( "TP: Generating", Color.AliceBlue );
+        byte[] nmraw = [ 181, 0, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 215, 0, 72, 1, 228, 0, 233, 0, 184, 0, 216, 0, 50, 50, 50, 0, 255, 104, 9, 0, 3, 13, 0, 0, 65, 0, 0, 0, 0, 0, 255, 255 ]; // This doesn't matter, it gets completely overwritten below anyways.
         TournamentMonster nm = new TournamentMonster(nmraw);
 
         // TODO: Smarter Logic for deciding which breed to make the monster!
         // // // // // // 
 
+        TournamentData._logger.WriteLineAsync( "TP: Getting Breed", Color.AliceBlue );
         MonsterBreed randomBreed = MonsterBreed.AllBreeds[ Random.Shared.Next() % MonsterBreed.AllBreeds.Count ];
-        while (randomBreed.breed_id != 33) { randomBreed = MonsterBreed.AllBreeds[ Random.Shared.Next() % MonsterBreed.AllBreeds.Count ]; }
+        //while (randomBreed.breed_id != 33) { randomBreed = MonsterBreed.AllBreeds[ Random.Shared.Next() % MonsterBreed.AllBreeds.Count ]; }
         nm.breed_main = (byte) randomBreed.breed_id; nm.breed_sub = (byte) randomBreed.sub_id;
-
+        TournamentData._logger.WriteLineAsync( "TP: Breed " + nm.breed_main + " " + nm.breed_sub, Color.AliceBlue );
         // // // // // //
 
         ABD_TournamentMonster abdm = new ABD_TournamentMonster(nm);
@@ -285,19 +320,21 @@ public class TournamentPool
         abdm.monster.battle_specials = 0;
 
         abdm.monster.techniques = abdm.breedInfo.technique_basics;
-        
+
+        TournamentData._logger.WriteLineAsync( "TP: Basics Setup", Color.AliceBlue );
         while ( abdm.monster.stat_total < stat_start ) {
             abdm.AdvanceMonth();
         }
-
+        TournamentData._logger.WriteLineAsync( "TP: Advancing", Color.AliceBlue );
         for ( int i = 0; i < tournament_tier; i++ ) {
             abdm.LearnTechnique();
         }
-
+        TournamentData._logger.WriteLineAsync( "TP: Techs", Color.AliceBlue );
         if ( !abdm.alive ) {
             abdm.alive = true;
             abdm.lifespan += 6;
         }
+        TournamentData._logger.WriteLineAsync( "TP: Cleanup", Color.AliceBlue );
         tournamentData.monsters.Add(abdm);
         this.MonsterAdd(abdm);
     }
@@ -307,8 +344,9 @@ public class TournamentPool
 public class ABD_TournamentMonster
 {
 
-    public static string[] random_name_list = ["Cimasio", "Kyrades", "Ambroros", "Teodeus", "Lazan", "Pegetus", "Perseos", "Asandrou", "Agametrios", "Lazion", "Morphosyne", "Gelantinos", "Narkelous", "Taloclus", "Baltsalus", "Hypnaeon", "Atrol", "Alexede", "Baccinos", "Idastos"];
-
+    public static string[] random_name_list = ["Cimasio", "Kyrades", "Ambroros", "Teodeus", "Lazan", "Pegetus", "Perseos", "Asandrou", "Agametrios", "Lazion", "Morphosyne", "Gelantinos", "Narkelous", "Taloclus", "Baltsalus", "Hypnaeon", "Atrol", "Alexede", "Baccinos", "Idastos", "Ophyroe","Larissa","Asperata",
+        "Alnifolia","Dentala","Celsa","Hempera","Laurel","Haldiphe","Saffronea", "Quinn",
+"Poplarbush","Snowdrop","Funnyfluff","Firo","Limespice","Herb","Twinklespa","Spring","Shinyglade","Almond","Foggytree","Pecan","Jesterfeet","Skylark","Rainbowhor","Snow","Oakswamp","Liri", "Briarpuff",];
 
     public TournamentMonster monster;
     public MonsterBreed breedInfo;
@@ -322,6 +360,8 @@ public class ABD_TournamentMonster
     ushort growth_rate = 0;
     private byte[] growth_options;
 
+    public EMonsterRanks _monsterRank;
+
     public enum growth_groups { balanced, power, intel, defend, wither, speedy }
     growth_groups growth_group = growth_groups.balanced;
     
@@ -330,23 +370,40 @@ public class ABD_TournamentMonster
     {
         monster = m;
         breedInfo = MonsterBreed.GetBreedInfo( monster.breed_main, monster.breed_sub );
-        SetupGrowthPlan();
-    }
 
-    private void SetupGrowthPlan()
-    {
-        lifetotal =  (ushort) (30 + TournamentData.LifespanRNG.Next() % 31); // 30-60
+        lifetotal = (ushort) ( 30 + TournamentData.LifespanRNG.Next() % 31 ); // 30-60
         lifespan = lifetotal;
-        growth_rate = (ushort) (4 + TournamentData.GrowthRNG.Next() % 13); // 4-16
-
+        growth_rate = (ushort) ( 6 + TournamentData.GrowthRNG.Next() % 11 ); // 6-16
         growth_group = (growth_groups) ( TournamentData.GrowthRNG.Next() % 6 );
 
-        if ( growth_group == growth_groups.balanced )       { growth_options = [ 0, 0, 0, 0, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5 ]; }
-        else if ( growth_group == growth_groups.power )     { growth_options = [ 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 4, 4, 4, 4, 5 ]; }
-        else if ( growth_group == growth_groups.intel )     { growth_options = [ 0, 0, 0, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 5, 5, 5, 5, 5, 5 ]; }
-        else if ( growth_group == growth_groups.defend )    { growth_options = [ 0, 0, 0, 0, 0, 0, 1, 1, 2, 2, 2, 3, 4, 4, 4, 4, 4, 4, 5, 5 ]; }
-        else if ( growth_group == growth_groups.wither )    { growth_options = [ 0, 0, 0, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 5, 5, 5, 5 ]; }
-        else if ( growth_group == growth_groups.speedy )    { growth_options = [ 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 4, 5 ]; }
+        SetupGrowthOptions();
+    }
+
+    public ABD_TournamentMonster(byte[] rawabd ) {
+
+        byte[] rawmonster = new byte[ 60 ];
+        for ( var i = 0; i < 60; i++ ) { rawmonster[ i ] = rawabd[ i + 40 ]; }
+
+        monster = new TournamentMonster( rawmonster );
+        breedInfo = MonsterBreed.GetBreedInfo( monster.breed_main, monster.breed_sub );
+
+        lifetotal = rawabd[ 0 ];
+        lifespan = rawabd[ 2 ];
+        growth_rate = rawabd[ 4 ];
+        growth_group = (growth_groups) rawabd[ 6 ];
+
+        _monsterRank = (EMonsterRanks) rawabd[ 8 ];
+
+        SetupGrowthOptions();
+    }
+
+    private void SetupGrowthOptions() {
+        if ( growth_group == growth_groups.balanced ) { growth_options =    [ 0, 0, 0, 0, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5 ]; }
+        else if ( growth_group == growth_groups.power ) { growth_options =  [ 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 4, 4, 4, 4, 5 ]; }
+        else if ( growth_group == growth_groups.intel ) { growth_options =  [ 0, 0, 0, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 5, 5, 5, 5, 5, 5 ]; }
+        else if ( growth_group == growth_groups.defend ) { growth_options = [ 0, 0, 0, 0, 0, 0, 1, 1, 2, 2, 2, 3, 4, 4, 4, 4, 4, 4, 5, 5 ]; }
+        else if ( growth_group == growth_groups.wither ) { growth_options = [ 0, 0, 0, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 5, 5, 5, 5 ]; }
+        else if ( growth_group == growth_groups.speedy ) { growth_options = [ 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 4, 5 ]; }
     }
 
     public void AdvanceMonth()
@@ -361,8 +418,9 @@ public class ABD_TournamentMonster
         if ( lifespan < 6 ) { agegroup--; }
 
         agegroup *= growth_rate;
+        // TODO: SPEED UP! REMOVE
+        //agegroup += 50;
 
-        //Console.WriteLine( monster.name + " age " + lifespan.ToString() + " gaining " + agegroup.ToString() + " stats from " + growth_rate.ToString() + " growth rate." );
         for (var i = 0; i < agegroup; i++) {
             var stat = growth_options[TournamentData.GrowthRNG.Next() % growth_options.Length];
             if (stat == 0) { monster.stat_lif++; }
@@ -375,19 +433,42 @@ public class ABD_TournamentMonster
     }
 
     public void LearnTechnique() { // TODO: Smarter Logic About which tech to get
-        Console.Write( "\n" + monster.name + " " + monster.techniques + " trying to learn a move : " );
         for ( var i = 0; i < 100; i++ ) {
             var newTech = Random.Shared.Next() % 24;
-            if ( breedInfo.technique_types[ newTech ] == 0 || breedInfo.technique_types[ newTech ] == 6 || (( monster.techniques >> newTech ) & 1) == 1 ) {
-                Console.Write( " x" + newTech + "x" );
-            } // If the technique is invalid, basic, or already learned
-            else {
-                Console.Write( " !" + newTech + "!" );
+            if ( breedInfo.technique_types[ newTech ] == 6 || ( ( monster.techniques >> newTech ) & 1 ) == 1 ) { } // Invalid or Already Learned
+            else if ( breedInfo.technique_types[ newTech ] == 5 && ( _monsterRank == EMonsterRanks.S || _monsterRank == EMonsterRanks.A || _monsterRank == EMonsterRanks.B ) ) {
                 monster.techniques += (uint) ( 1 << newTech );
                 i = 101;
-                Console.Write( " : " + monster.techniques );
+            }
+
+            else if ( breedInfo.technique_types[newTech ] <= 4 ) {
+                monster.techniques += (uint) ( 1 << newTech );
+                i = 101;
             }
         }
+    }
+
+    public byte[] ToSaveFile() {
+        // ABD_TournamentMonster data will consist of 40 new bytes, followed by the standard 60 tracked by the game for Tournament Monsters.
+        // 0-1, Lifetotal
+        // 2-3, Current Remaining Lifespan
+        // 4-5, Growth Rate Per Months
+        // 6-7, Growth Group (Enum)
+        // 8-9, Monster Rank (Enum)
+        // 8-39, UNUSED
+
+        byte[] data = new byte[ 40 + 60 ]; 
+
+        data[ 0 ] = (byte) lifetotal;
+        data[ 2 ] = (byte) lifespan;
+        data[ 4 ] = (byte) growth_rate;
+        data[ 6 ] = (byte) growth_group;
+        data[ 8 ] = (byte) _monsterRank;
+
+        for ( var i = 0; i < 60; i++ ) {
+            data[ i + 40 ] = monster.raw_bytes[ i ];
+        }
+        return data;
     }
 }
 

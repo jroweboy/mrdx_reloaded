@@ -27,6 +27,23 @@ public class Config : Configurable<Config>
         The `DefaultValue` attribute is used as part of the `Reset` button in Reloaded-Launcher.
     */
 
+    [Category("Tournament Opponents")]
+    [DisplayName( "Monster Species" )]
+    [Description( "Determines the types of monsters that are present in tournaments.\n" +
+        "Player Only - Besides themed events, tournament monsters use the same unlocked pool of monsters as the player.\n" +
+        "Realistic - Monster species variety is loosely tied to the in game year.\n" +
+        "PO/Realistic - A combination of Player Only and Realistic criteria allowing for species to be present.\n" +
+        "Wild West - Any legal species is available from Year 1000." )]
+    [DefaultValue( ConfABDSpecies.PlayerOnlyRealistic )]
+    public ConfABDSpecies _confABDSpecies { get; set; } = ConfABDSpecies.PlayerOnlyRealistic;
+    public enum ConfABDSpecies { PlayerOnly, Realistic, PlayerOnlyRealistic, WildWest }
+
+    [Category( "Advanced - Monster Growths" )]
+    [DisplayName( "Average Monthly Growth" )]
+    [Description( "The average monthly growth rate for trainer monsters in their prime." )]
+    [DefaultValue( 48 )]
+    public int _confABD_monthlyGrowth { get; set; } = 48;
+
     [DisplayName("String")]
     [Description("This is a string.")]
     [DefaultValue("Default Name")]

@@ -23,15 +23,12 @@ using System.Xml.Linq;
 using System.Runtime.InteropServices;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Resources;
+using System.IO;
 //using static MRDX.Base.Mod.Interfaces.TournamentData;
 //using IReloadedHooks = Reloaded.Hooks.ReloadedII.Interfaces.IReloadedHooks;
 
-
 namespace MRDX.Game.ABD_Tournaments;
 
-/// <summary>
-/// Your mod logic goes here.
-/// </summary>
 public class Mod : ModBase // <= Do not Remove.
 {
     #region Reloaded Templating
@@ -75,14 +72,16 @@ public class Mod : ModBase // <= Do not Remove.
 
     private IHook<UpdateGenericState>? _updateHook;
 
-    private bool il_tournamentData = false;
-    private TournamentData tournamentData;
+    public TournamentData tournamentData;
     private uint lastCheckedWeek = 0;
+
+    private SaveFileManager _saveFileManager;
 
     private IHook<CheckShrineUnlockRequirementHook>? _shrineUnlockHook;
     private bool monsterUnlockCheckDefaults = false;
 
     private nuint gameAddress = 0;
+    private string _gamePath = "";
  
     public Mod(ModContext context)
     {
@@ -93,11 +92,13 @@ public class Mod : ModBase // <= Do not Remove.
         _configuration = context.Configuration;
         _modConfig = context.ModConfig;
 
+        _saveFileManager = new SaveFileManager( this, _modLoader, _modConfig, _logger );
+
         _redirector = _modLoader.GetController<IRedirectorController>();
         _modLoader.GetController<IExtractDataBin>().TryGetTarget(out var extract);
         _modLoader.GetController<IHooks>().TryGetTarget(out var hooks);
+
         var startupScanner = _modLoader.GetController<IStartupScanner>();
-        
         
         if (extract == null) {
             _logger.WriteLine($"[{_modConfig.ModId}] Failed to get extract data bin controller.", Color.Red);
@@ -107,13 +108,15 @@ public class Mod : ModBase // <= Do not Remove.
         if (redirect == null) {
             _logger.WriteLine($"[{_modConfig.ModId}] Failed to get redirection controller.", Color.Red);
             return; }
+        else {
+            redirect.Loading += _saveFileManager.SaveDataMonitor;
+        }
 
-        
+        _gamePath = extract.ExtractedPath;
+
         if (hooks == null) {
             _logger.WriteLine($"[{_modConfig.ModId}] Could not get hook controller.", Color.Red);
             return; }
-
-        
 
         hooks.AddHook<UpdateGenericState>(SetupUpdateHook)
             .ContinueWith(result => _updateHook = result.Result.Activate());
@@ -124,12 +127,9 @@ public class Mod : ModBase // <= Do not Remove.
             SetupCheckShrineUnlockRequirementsHookX(scanner);
         }
 
-        SetupMonsterBreeds(extract.ExtractedPath);
-
-        
-        
-
-        
+        tournamentData = new TournamentData(_logger);
+        SetupMonsterBreeds();
+        SetupTournamentParticipantsFromTaikai();
 
         //hooks.AddHook<CheckShrineUnlockRequirementHook>(SetupCheckShrineUnlockRequirementsHook)
         //    .ContinueWith(result => _shrineUnlockHook = result.Result.Activate());
@@ -139,35 +139,81 @@ public class Mod : ModBase // <= Do not Remove.
         //_logger.WriteLine($"[{_modConfig.ModId}] Could not load startup scanner!");
     }
 
-    private void SetupMonsterBreeds(string gamePath) {
-        MonsterBreed.SetupMonsterBreedList(gamePath);
+    /*private void PrintOnFileLoad ( string path ) {
+        
+            if ( path.Contains( "usb#vid" ) || path.Contains( "hid#vid" ) )
+                return;
+
+        _logger.WriteLine( $"CUSTOM MONITOR: {path}", Color.Blue );
+    }*/
+
+    private void SetupMonsterBreeds() {
+        MonsterBreed.SetupMonsterBreedList(_gamePath);
+    }
+
+    private void SetupTournamentParticipantsFromTaikai() {
+
+        tournamentData.ClearAllData();
+
+        string tournamentMonsterFile = _gamePath + "\\mf2\\data\\taikai\\taikai_en.flk";
+        byte[] rawmonster = new byte[ 60 ];
+
+        FileStream fs = new FileStream( tournamentMonsterFile, FileMode.Open );
+        fs.Position = 0xA8C; // This relies upon nothing earlier in the file being appended. 
+        for ( var i = 1; i < 120; i++ ) { // 0 = Dummy Monster so skip. 119 in the standard file.
+            fs.Read( rawmonster, 0, 60 );
+            TournamentMonster tm = new( rawmonster );
+            tournamentData.AddExistingMonster( tm, i );
+
+            string bytes = ""; for ( var z = 0; z < 60; z++ ) { bytes += rawmonster[ z ] + ","; }
+            _logger.WriteLine( "Monster " + i + " Parsed: " + tm, Color.Lime ); _logger.WriteLine( bytes, Color.Green );
+        }
+
+        tournamentData._initialized = true;
     }
 
     private void SetupUpdateHook(nint parent)
     {
-        var b = Mr2StringExtension.AsBytes(Mr2StringExtension.AsMr2("Oakleyman"));
         _updateHook!.OriginalFunction(parent);
         gameAddress = (nuint)Base.Mod.Base.ExeBaseAddress;
 
         var tournamentAddress = gameAddress + 0x548D10;
         var currentWeekAddress = gameAddress + 0x379444;
 
+        LoadGameUpdateTournamentData();
         AdvanceMonthUpdateTournamentMonsters(currentWeekAddress);
-        UpdateInGameTournamentData(tournamentAddress);
+        UpdateMemoryTournamentData(tournamentAddress);
         
-        //_logger.Write($"[{_modConfig.ModId}] update.", Color.Red);   
+        _logger.Write($"[{_modConfig.ModId}] update.", Color.Red);   
     }
 
 
-    /// <summary> Performs a one-time load of the original Tournament Monster Data (taikai_en.flk) </summary>
-    private void UpdateInGameTournamentData(nuint tournamentAddress)
+    private void LoadGameUpdateTournamentData() {
+        if ( _saveFileManager._saveData_gameLoaded ) {
+            _logger.WriteLineAsync( "Mod: Thinks the game has been loaded." );
+            List<ABD_TournamentMonster> monsters = _saveFileManager.LoadABDTournamentData();
+            if ( monsters.Count == 0 ) {
+                _logger.WriteLineAsync( "Mod: No custom tournament data found. Loading taikai_en." );
+                SetupTournamentParticipantsFromTaikai();
+            } else {
+                _logger.WriteLineAsync( "Mod: Found Data for " + monsters.Count + " monsters." );
+                tournamentData.ClearAllData();
+                _logger.WriteLineAsync( "Mod: Cleared Existing Data" );
+                foreach(ABD_TournamentMonster abdm in monsters) {
+                    tournamentData.AddExistingMonster( abdm );
+                }
+            }
+            tournamentData._initialized = true;
+            _logger.WriteLine( "Mod: Init Complete" );
+        }
+    }
+    /// <summary>  </summary>
+    private void UpdateMemoryTournamentData(nuint tournamentAddress)
     {
         // We are looking for a header of '0600 0000 0000 0000 2000 0000 F404 0000'
         Memory.Instance.ReadRaw(tournamentAddress, out byte[] header, 64);
         if (header[0] == 0x06 && header[8] == 0x20 && header[12] == 0xF4 && header[13] == 0x04)
         {
-            if (!il_tournamentData) { ReadTournamentMonsterData(tournamentAddress); }
-
             var enemyAddresses = tournamentAddress + 0xA8C;
             List<ABD_TournamentMonster> monsters = tournamentData.GetTournamentMembers(1, 50);
             for ( var i = 1; i <= 50; i++ )
@@ -183,16 +229,14 @@ public class Mod : ModBase // <= Do not Remove.
             lastCheckedWeek = currentWeek;
             if ( lastCheckedWeek % 4 == 0 ) {
                 _logger.WriteLine( "Advancing Month!", Color.Blue );
-                if ( il_tournamentData ) { tournamentData.AdvanceMonth(); }
+                tournamentData.AdvanceMonth();
             }
         }
     }
     /// <summary> Performs a one-time load of the original Tournament Monster Data (taikai_en.flk) </summary>
     private void ReadTournamentMonsterData(nuint tournamentAddress)
     {
-        il_tournamentData = true;
-
-        tournamentData = new TournamentData();
+        tournamentData = new TournamentData(_logger);
 
         var enemyAddresses = tournamentAddress + 0xA8C;
         //_logger.WriteLine("Read from " + enemyAddresses, Color.Lime);
@@ -201,48 +245,27 @@ public class Mod : ModBase // <= Do not Remove.
             Memory.Instance.ReadRaw(enemyAddresses + ((nuint) (i * 60)), out byte[] tm_raw, 60);
             TournamentMonster tm = new(tm_raw);
             tournamentData.AddExistingMonster(tm, i);
-            
-            //_logger.WriteLine("Monster " + i + " Parsed: " + tm, Color.Lime);
 
-            string bytes = "";
-            for ( var z = 0; z < 60; z++ )
-            {
-                bytes += tm_raw[z] + ",";
-            }_logger.WriteLine(bytes, Color.Green);
+            string bytes = ""; for ( var z = 0; z < 60; z++ ) { bytes += tm_raw[z] + ","; }
+            _logger.WriteLine( "Monster " + i + " Parsed: " + tm, Color.Lime ); _logger.WriteLine(bytes, Color.Green);
         }
     }
 
+    /// <summary>
+    /// This function replaces an assembly jump with two nops. The jmp originally checked the id of the monster against some bizarre set of mathematics that determined whether the monster was a 'default' species (i.e., unlocked at the beginning of the game).
+    /// The game has flags that map to each species unlock requirements. Removing this jmp call results in the game checking all species against these flags. For normal gameplay, this does nothing. This 'fix' would only be useful in the instance where
+    /// other mods restrict the main breeds available to each player, (i.e., disabling access to Pixie by setting the flag to 0 instead of the 1 it defaults to).
+    /// </summary>
+    /// <param name="scanner"></param>
     private void SetupCheckShrineUnlockRequirementsHookX(IStartupScanner scanner)
     {
         scanner.AddMainModuleScan("55 8B EC 53 8B 5D 08 8A C3 24 03 02 C0 56 57 8B F9 BE 01 00 00 00 B1 07", result =>
         {
             var addr = (nuint)(Base.Mod.Base.ExeBaseAddress + result.Offset);
-            Memory.Instance.SafeRead(addr + 0x2F, out ushort smx);
-            _logger.WriteLine(result.Offset.ToString(), Color.Blue);
+            //Memory.Instance.SafeRead(addr + 0x2F, out ushort smx);
             Memory.Instance.SafeWrite(addr + 0x2f, (ushort)37008);
             //_shrineUnlockHook = new AsmHook(modifyCoords, addr, AsmHookBehaviour.ExecuteAfter).Activate();
         });
-    }
-
-    private void SetupCheckShrineUnlockRequirementsHook(nint parent)
-    {
-
-        
-        // 37008 = 90 90, Two No Op Instructions
-        // 0x2F (47 Bytes) from Function Start)
-
-        if (!monsterUnlockCheckDefaults)
-        {
-            //_logger.WriteLine(parent.ToString(), Color.Blue);
-            //Memory.Instance.SafeRead(parent + 0x2F, out uint smx);
-
-            
-
-            //Memory.Instance.SafeWrite(parent + 0x2f, (uint)2313);
-
-            monsterUnlockCheckDefaults = true;
-        }
-        _shrineUnlockHook!.OriginalFunction(parent);
     }
 
     #region Standard Overrides
