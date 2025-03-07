@@ -183,12 +183,12 @@ namespace MRDX.Game.ABD_Tournaments
             ABD_TournamentMonster abdm = new ABD_TournamentMonster( nm );
 
             abdm.monster.name = TournamentData._random_name_list[ Random.Shared.Next() % TournamentData._random_name_list.Length ];
-            abdm.monster.stat_lif = 100;
-            abdm.monster.stat_pow = 80;
-            abdm.monster.stat_ski = 100;
-            abdm.monster.stat_spd = 100;
-            abdm.monster.stat_def = 80;
-            abdm.monster.stat_int = 80;
+            abdm.monster.stat_lif = 90;
+            abdm.monster.stat_pow = 40;
+            abdm.monster.stat_ski = 70;
+            abdm.monster.stat_spd = 50;
+            abdm.monster.stat_def = 60;
+            abdm.monster.stat_int = 40;
 
             abdm.monster.per_nature = (byte) ( Random.Shared.Next() % 255 );
             abdm.monster.per_fear = (byte) ( Random.Shared.Next() % 100 );
@@ -199,7 +199,13 @@ namespace MRDX.Game.ABD_Tournaments
 
             abdm.monster.battle_specials = 0;
 
-            abdm.monster.techniques = abdm.breedInfo.technique_basics;
+            var firstbasic = 0;
+            for ( var j = 0; j < 24; j++ ) {
+                if ( ( ( abdm.breedInfo.technique_basics >> j ) & 1 ) == 1 ) { 
+                    if ( firstbasic < 2 || Random.Shared.Next() % 4 == 0 ) { firstbasic++; abdm.monster.techniques = abdm.monster.techniques + (uint) ( 1 << j ); }
+                }
+            }
+                //abdm.monster.techniques = abdm.breedInfo.technique_basics;
 
             TournamentData._mod.DebugLog( 3, "TP: Basics Setup", Color.AliceBlue );
             while ( abdm.monster.stat_total < stat_start ) {

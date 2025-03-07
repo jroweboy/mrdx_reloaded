@@ -169,7 +169,7 @@ public class Mod : ModBase // <= Do not Remove.
         byte[] rawmonster = new byte[ 60 ];
 
         FileStream fs = new FileStream( tournamentMonsterFile, FileMode.Open );
-        fs.Position = 0xA8C; // This relies upon nothing earlier in the file being appended. 
+        fs.Position = 0xA8C + 60; // This relies upon nothing earlier in the file being appended. 
         for ( var i = 1; i < 120; i++ ) { // 0 = Dummy Monster so skip. 119 in the standard file.
             fs.Read( rawmonster, 0, 60 );
             TournamentMonster tm = new( rawmonster );
