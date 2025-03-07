@@ -24,6 +24,9 @@ using System.Runtime.InteropServices;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Resources;
 using System.IO;
+using System.Numerics;
+using System.Runtime.InteropServices.JavaScript;
+using Iced.Intel;
 //using static MRDX.Base.Mod.Interfaces.TournamentData;
 //using IReloadedHooks = Reloaded.Hooks.ReloadedII.Interfaces.IReloadedHooks;
 
@@ -73,7 +76,7 @@ public class Mod : ModBase // <= Do not Remove.
     private IHook<UpdateGenericState>? _updateHook;
 
     public TournamentData tournamentData;
-    private uint lastCheckedWeek = 0;
+    private uint _game_currentWeek = 0;
 
     private SaveFileManager _saveFileManager;
 
@@ -89,7 +92,7 @@ public class Mod : ModBase // <= Do not Remove.
     private List<MonsterGenus> _unlockedmonsters;
 
     
- 
+
     public Mod(ModContext context)
     {
         _modLoader = context.ModLoader;
@@ -142,7 +145,7 @@ public class Mod : ModBase // <= Do not Remove.
             SetupCheckShrineUnlockRequirementsHookX(scanner);
         }
 
-        tournamentData = new TournamentData(_logger);
+        tournamentData = new TournamentData(_logger, _configuration);
         SetupMonsterBreeds();
         SetupTournamentParticipantsFromTaikai();
 
@@ -185,25 +188,53 @@ public class Mod : ModBase // <= Do not Remove.
         }
 
         tournamentData._initialized = true;
+
     }
 
     private void SetupUpdateHook(nint parent)
     {
         _updateHook!.OriginalFunction(parent);
 
-        GetUnlockedMonsters( _address_unlockedmonsters );
+        Memory.Instance.Read<uint>( _address_currentweek, out uint currentWeek );
+        if ( _game_currentWeek != currentWeek ) { 
+            _game_currentWeek = currentWeek; currentWeek = 1; }
+
+        // Unfortunately the ordering of these function calls matters so we have to do this shuffling depending on if the game week progressed.
+        if ( currentWeek == 1 ) { GetUnlockedMonsters( _address_unlockedmonsters ); }
         LoadGameUpdateTournamentData();
-        AdvanceWeekUpdateTournamentMonsters(_address_currentweek, _unlockedmonsters);
+        if ( currentWeek == 1 ) { AdvanceWeekUpdateTournamentMonsters( _unlockedmonsters ); }
         UpdateMemoryTournamentData(_address_tournamentmonsters);
         
         _logger.Write($"[{_modConfig.ModId}] update.", Color.Red);   
     }
 
     private void GetUnlockedMonsters(nuint unlockAddress) {
-        Memory.Instance.ReadRaw( unlockAddress, out byte[] unlocks, 37 );
-
-        _logger.Write( "[ABD Tournaments]:", Color.Pink );
+        byte[] unlocks = new byte[44];
         _unlockedmonsters.Clear();
+
+        if ( _configuration._confABD_tournamentBreeds == Config.E_ConfABD_TournamentBreeds.PlayerOnly ) {
+            unlocks = GetUnlockedMonsters_Player( unlockAddress );
+        }
+
+        else if ( _configuration._confABD_tournamentBreeds == Config.E_ConfABD_TournamentBreeds.Realistic ) {
+            unlocks = GetUnlockedMonsters_Realistic();
+        }
+
+        else if ( _configuration._confABD_tournamentBreeds == Config.E_ConfABD_TournamentBreeds.PlayerOnlyRealistic ) {
+            unlocks = GetUnlockedMonsters_Realistic();
+            var ulp = GetUnlockedMonsters_Player( unlockAddress );
+
+            // This uses some special logic for Unique Monsters. I do not respect the player unlock flag here (which is always true). Otherwise, it's just if either case is true they will show up.
+            for ( var i = 0; i <= 38; i++ ) {
+                unlocks[ i ] = (byte) ( unlocks[ i ] | ulp[ i ] );
+            }
+        }
+
+        else if ( _configuration._confABD_tournamentBreeds == Config.E_ConfABD_TournamentBreeds.WildWest ) {
+            for ( var i = 0; i < unlocks.Length; i++ ) { unlocks[ i ] = 0x01; }
+        }
+
+
         for ( var i = 0; i < unlocks.Length; i++ ) {
             if ( unlocks[ i ] == 0x01 ) {
                 _unlockedmonsters.Add( (MonsterGenus) i );
@@ -212,6 +243,70 @@ public class Mod : ModBase // <= Do not Remove.
         }
     }
 
+#region GetUnlockedMonsters
+    private byte [] GetUnlockedMonsters_Player(nuint unlockAddress) {
+        Memory.Instance.ReadRaw( unlockAddress, out byte[] punlock, 44 ); // Technically only the first 38 bytes are used, but we need them for the return.
+        for ( var i = 38; i < 44; i++ ) { punlock[ i ] = 1; }
+        return punlock;
+    }
+
+    private byte[] GetUnlockedMonsters_Realistic() {
+        // Most of these are psuedo random. Improvements that could be made are:
+        // Phoenix - Unlock when the first Expedition is completed.
+        // Joker and Jill - Tie to Phoenix's date.
+        // FIMBA - Actually tie the unlock date to the year of the tournament. I'm just using three for now.
+        // Beaclon - Tie to the FIMBA Date as well but with a delay.
+        // Metalner - I've never even seen this even so perhaps tie it to that?
+
+        byte[] unlocks = new byte[ 44 ];
+        unlocks[ (int) MonsterGenus.Pixie ] = 1;
+        unlocks[ (int) MonsterGenus.Dragon ] = (byte) ( ( _game_currentWeek >= ( 48 * 8 ) ) ? 1 : 0 );
+        unlocks[ (int) MonsterGenus.Centaur ] = (byte) ( ( _game_currentWeek >= ( 48 * 90 ) ) ? 1 : 0 );
+        unlocks[ (int) MonsterGenus.ColorPandora ] = 1;
+        unlocks[ (int) MonsterGenus.Beaclon ] = (byte) ( ( _game_currentWeek >= ( 48 * 40 ) ) ? 1 : 0 ); // FIMBA+
+        unlocks[ (int) MonsterGenus.Henger ] = (byte) ( ( _game_currentWeek >= ( 48 * 3 ) ) ? 1 : 0 ); // FIMBA
+        unlocks[ (int) MonsterGenus.Wracky ] = (byte) ( ( _game_currentWeek >= ( 48 * 60 ) ) ? 1 : 0 );
+        unlocks[ (int) MonsterGenus.Golem ] = 1; // They're just large.
+        unlocks[ (int) MonsterGenus.Zuum ] = 1;
+        unlocks[ (int) MonsterGenus.Durahan ] = (byte) ( ( _game_currentWeek >= ( 48 * 50 ) ) ? 1 : 0 );
+        unlocks[ (int) MonsterGenus.Arrowhead ] = 1;
+        unlocks[ (int) MonsterGenus.Tiger ] = 1;
+        unlocks[ (int) MonsterGenus.Hopper ] = 1;
+        unlocks[ (int) MonsterGenus.Hare ] = 1;
+        unlocks[ (int) MonsterGenus.Baku ] = 1; // They're just large.
+        unlocks[ (int) MonsterGenus.Gali ] = (byte) ( ( _game_currentWeek >= ( 48 * 3 ) ) ? 1 : 0 ); // FIMBA
+        unlocks[ (int) MonsterGenus.Kato ] = 1;
+        unlocks[ (int) MonsterGenus.Zilla ] = (byte) ( ( _game_currentWeek >= ( 48 * 40 ) ) ? 1 : 0 );
+        unlocks[ (int) MonsterGenus.Bajarl ] = (byte) ( ( _game_currentWeek >= ( 48 * 70 ) ) ? 1 : 0 );
+        unlocks[ (int) MonsterGenus.Mew ] = (byte) ( ( _game_currentWeek >= ( 48 * 3 ) ) ? 1 : 0 ); // FIMBA
+        unlocks[ (int) MonsterGenus.Phoenix ] = (byte) ( ( _game_currentWeek >= ( 48 * 15 ) ) ? 1 : 0 );
+        unlocks[ (int) MonsterGenus.Ghost ] = (byte) ( ( _game_currentWeek >= ( 48 * 2 ) ) ? 1 : 0 );
+        unlocks[ (int) MonsterGenus.Metalner ] = (byte) ( ( _game_currentWeek >= ( 48 * 100 ) ) ? 1 : 0 );
+        unlocks[ (int) MonsterGenus.Suezo ] = 1;
+        unlocks[ (int) MonsterGenus.Jill ] = (byte) ( ( _game_currentWeek >= ( 48 * 48 ) ) ? 1 : 0 );
+        unlocks[ (int) MonsterGenus.Mocchi ] = 1;
+        unlocks[ (int) MonsterGenus.Joker ] = (byte) ( ( _game_currentWeek >= ( 48 * 36 ) ) ? 1 : 0 );
+        unlocks[ (int) MonsterGenus.Gaboo ] = 1;
+        unlocks[ (int) MonsterGenus.Jell ] = 1;
+        unlocks[ (int) MonsterGenus.Undine ] = (byte) ( ( _game_currentWeek >= ( 48 * 40 ) ) ? 1 : 0 );
+        unlocks[ (int) MonsterGenus.Niton ] = (byte) ( ( _game_currentWeek >= ( 48 * 5 ) ) ? 1 : 0 );
+        unlocks[ (int) MonsterGenus.Mock ] = (byte) ( ( _game_currentWeek >= ( 48 * 20 ) ) ? 1 : 0 );
+        unlocks[ (int) MonsterGenus.Ducken ] = (byte) ( ( _game_currentWeek >= ( 48 * 4 ) ) ? 1 : 0 );
+        unlocks[ (int) MonsterGenus.Plant ] = 1;
+        unlocks[ (int) MonsterGenus.Monol ] = 1;
+        unlocks[ (int) MonsterGenus.Ape ] = 1;
+        unlocks[ (int) MonsterGenus.Worm ] = (byte) ( ( _game_currentWeek >= ( 48 * 3 ) ) ? 1 : 0 ); // FIMBA
+        unlocks[ (int) MonsterGenus.Naga ] = 1;
+        unlocks[ (int) MonsterGenus.Unknown1 ] = (byte) ( ( _game_currentWeek >= ( 48 * 40 ) ) ? 1 : 0 );
+        unlocks[ (int) MonsterGenus.Unknown2 ] = (byte) ( ( _game_currentWeek >= ( 48 * 50 ) ) ? 1 : 0 );
+        unlocks[ (int) MonsterGenus.Unknown3 ] = (byte) ( ( _game_currentWeek >= ( 48 * 70 ) ) ? 1 : 0 );
+        unlocks[ (int) MonsterGenus.Unknown4 ] = (byte) ( ( _game_currentWeek >= ( 48 * 90 ) ) ? 1 : 0 );
+        unlocks[ (int) MonsterGenus.Unknown5 ] = (byte) ( ( _game_currentWeek >= ( 48 * 110 ) ) ? 1 : 0 );
+        unlocks[ (int) MonsterGenus.Unknown6 ] = (byte) ( ( _game_currentWeek >= ( 48 * 120 ) ) ? 1 : 0 );
+        return unlocks;
+    }
+
+    #endregion
     private void LoadGameUpdateTournamentData() {
         if ( _saveFileManager._saveData_gameLoaded ) {
             _logger.WriteLineAsync( "Mod: Thinks the game has been loaded." );
@@ -248,13 +343,9 @@ public class Mod : ModBase // <= Do not Remove.
         }
     }
 
-    private void AdvanceWeekUpdateTournamentMonsters(nuint currentWeekAddress, List<MonsterGenus> unlockedmonsters) {
-        Memory.Instance.Read<uint>( currentWeekAddress, out uint currentWeek );
-        if ( lastCheckedWeek != currentWeek ) {
-            _logger.WriteLine( "[ABD Tournaments]: Advancing to week " + currentWeek, Color.Blue );
-            lastCheckedWeek = currentWeek;
-            tournamentData.AdvanceWeek(currentWeek, unlockedmonsters);
-        }
+    private void AdvanceWeekUpdateTournamentMonsters(List<MonsterGenus> unlockedmonsters) {
+        DebugLog( 2, "Advancing to week " + _game_currentWeek, Color.Blue );
+        tournamentData.AdvanceWeek(_game_currentWeek, unlockedmonsters);
     }
 
     /// <summary>
@@ -268,10 +359,18 @@ public class Mod : ModBase // <= Do not Remove.
         scanner.AddMainModuleScan("55 8B EC 53 8B 5D 08 8A C3 24 03 02 C0 56 57 8B F9 BE 01 00 00 00 B1 07", result =>
         {
             var addr = (nuint)(Base.Mod.Base.ExeBaseAddress + result.Offset);
-            //Memory.Instance.SafeRead(addr + 0x2F, out ushort smx);
             Memory.Instance.SafeWrite(addr + 0x2f, (ushort)37008);
-            //_shrineUnlockHook = new AsmHook(modifyCoords, addr, AsmHookBehaviour.ExecuteAfter).Activate();
         });
+    }
+
+    public void DebugLog( int verbosity, string message, Color c ) {
+        if ( verbosity == 0 ) { _logger.WriteLineAsync( "[ABDT]: " + message, c ); }
+        else if (verbosity == 1 && _configuration._confABD_debugging != Config.E_ConfABD_Debugging.Off ) {
+            _logger.WriteLineAsync( "[ABDT]: " + message, c );
+        }
+        else if ( verbosity >= 1 && _configuration._confABD_debugging == Config.E_ConfABD_Debugging.Verbose ) {
+            _logger.WriteLineAsync( "[ABDT]: " + message, c );
+        }
     }
 
     #region Standard Overrides

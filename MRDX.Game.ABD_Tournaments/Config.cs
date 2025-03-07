@@ -34,16 +34,88 @@ public class Config : Configurable<Config>
         "Realistic - Monster species variety is loosely tied to the in game year.\n" +
         "PO/Realistic - A combination of Player Only and Realistic criteria allowing for species to be present.\n" +
         "Wild West - Any legal species is available from Year 1000." )]
-    [DefaultValue( ConfABDSpecies.PlayerOnlyRealistic )]
-    public ConfABDSpecies _confABDSpecies { get; set; } = ConfABDSpecies.PlayerOnlyRealistic;
-    public enum ConfABDSpecies { PlayerOnly, Realistic, PlayerOnlyRealistic, WildWest }
+    [DefaultValue( E_ConfABD_TournamentBreeds.PlayerOnlyRealistic )]
+    public E_ConfABD_TournamentBreeds _confABD_tournamentBreeds { get; set; } = E_ConfABD_TournamentBreeds.PlayerOnlyRealistic;
+    public enum E_ConfABD_TournamentBreeds { PlayerOnly, Realistic, PlayerOnlyRealistic, WildWest }
+
+
+    [Category( "Tournament Ranks" )]
+    [DisplayName( "Stat Cap - Major 4" )]
+    [Description( "The Soft Stat Cap to promote from M4 to Legend Status.\n" +
+        "Note: This currently has no effect on the player." )]
+    [DefaultValue( 4600 )]
+    public int _confABD_tournament_rank_m4 { get; set; } = 4600;
+
+    [Category( "Tournament Ranks" )]
+    [DisplayName( "Stat Cap - S Rank" )]
+    [Description( "The Soft Stat Cap to promote from S into M4.\n" +
+        "Note: This currently has no effect on the player." )]
+    [DefaultValue( 3900 )]
+    public int _confABD_tournament_rank_s { get; set; } = 3900;
+
+    [Category( "Tournament Ranks" )]
+    [DisplayName( "Stat Cap - A Rank" )]
+    [Description( "The Soft Stat Cap to promote from A into S.\n" +
+    "Note: This currently has no effect on the player." )]
+    [DefaultValue( 3300 )]
+    public int _confABD_tournament_rank_a { get; set; } = 3300;
+
+    [Category( "Tournament Ranks" )]
+    [DisplayName( "Stat Cap - B Rank" )]
+    [Description( "The Soft Stat Cap to promote from B into A.\n" +
+    "Note: This currently has no effect on the player." )]
+    [DefaultValue( 2700 )]
+    public int _confABD_tournament_rank_b { get; set; } = 2700;
+
+    [Category( "Tournament Ranks" )]
+    [DisplayName( "Stat Cap - C Rank" )]
+    [Description( "The Soft Stat Cap to promote from C into B.\n" +
+    "Note: This currently has no effect on the player." )]
+    [DefaultValue( 2000 )]
+    public int _confABD_tournament_rank_c { get; set; } = 2000;
+
+    [Category( "Tournament Ranks" )]
+    [DisplayName( "Stat Cap - D Rank" )]
+    [Description( "The Soft Stat Cap to promote from D into C.\n" +
+    "Note: This currently has no effect on the player." )]
+    [DefaultValue( 1500 )]
+    public int _confABD_tournament_rank_d { get; set; } = 1500;
+
+    [Category( "Tournament Ranks" )]
+    [DisplayName( "Stat Cap - E Rank" )]
+    [Description( "The Soft Stat Cap to promote from E into D.\n" +
+    "Note: This currently has no effect on the player." )]
+    [DefaultValue( 1000 )]
+    public int _confABD_tournament_rank_e { get; set; } = 1000;
+
+    //[Category("Advanced - Tournament Ranks") ]
+    //[DisplayName("")]
+    [ Category( "Advanced - Monster Growths" )]
+    [DisplayName( "Average Monthly Growth" )]
+    [Description( "The average monthly growth rate for trainer monsters in their prime.\n" +
+        "This value can be impacted by multiple factors including breed, variance, and age." )]
+    [DefaultValue( 48 )]
+    public int _confABD_growth_monthly { get; set; } = 48;
 
     [Category( "Advanced - Monster Growths" )]
-    [DisplayName( "Average Monthly Growth" )]
-    [Description( "The average monthly growth rate for trainer monsters in their prime." )]
-    [DefaultValue( 48 )]
-    public int _confABD_monthlyGrowth { get; set; } = 48;
+    [DisplayName( "Average Monthly Growth Variance" )]
+    [Description( "The general variance for trainer monster growth rates in prime.\n" +
+        "Higher variance will result in some opponent tournament monsters being powerful for their class.\n" +
+        "Higher variance will result in the appearance of more stragglers (monsters stuck or lagging for their class.")]
+    [DefaultValue( 12 )]
+    public int _confABD_growth_monthlyvariance { get; set; } = 12;
 
+    [Category("Advanced - Mod Debugging")]
+    [DisplayName("Reloaded Message Verbosity")]
+    [Description("Enables internal printouts to the Reloaded Log file to help debug issues.\n" +
+        "Off - No debug messages printed. For normal gameplay.\n" +
+        "Minimal - Prints messages for major events only.\n" +
+        "Verbose - Prints tons of cryptic messages. Useful if there is consistent crashing.")]
+    [DefaultValue(E_ConfABD_Debugging.Off )]
+    public E_ConfABD_Debugging _confABD_debugging { get; set; } = E_ConfABD_Debugging.Off;
+    public enum E_ConfABD_Debugging { Off, Minimal, Verbose }
+
+    /*
     [DisplayName("String")]
     [Description("This is a string.")]
     [DefaultValue("Default Name")]
@@ -118,7 +190,7 @@ public class Config : Configurable<Config>
         fileNameLabel: "ModFolder",
         multiSelect: true,
         forceFileSystem: true)]
-    public string Folder { get; set; } = "";
+    public string Folder { get; set; } = "";*/
 }
 
 /// <summary>

@@ -19,6 +19,8 @@ public class MonsterBreed
     public uint technique_scaling;
     public uint technique_basics;
 
+    public byte _rarity;
+
     public MonsterBreed (string n, string nshort, byte bid, byte sid, string identifier, byte[] techniques) {
         name = n;
         name_short = nshort;
@@ -34,6 +36,8 @@ public class MonsterBreed
                 technique_basics += (uint) (1 << ( t ));
             }
         }
+
+        // Calculate Monster Rarity based upon breed and subbreeds.
     }
 
     public static void SetupMonsterBreedList ( string gamePath ) {
