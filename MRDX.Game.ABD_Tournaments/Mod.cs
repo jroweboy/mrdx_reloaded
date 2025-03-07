@@ -80,8 +80,15 @@ public class Mod : ModBase // <= Do not Remove.
     private IHook<CheckShrineUnlockRequirementHook>? _shrineUnlockHook;
     private bool monsterUnlockCheckDefaults = false;
 
-    private nuint gameAddress = 0;
     private string _gamePath = "";
+    private nuint gameAddress = 0;
+    private nuint _address_tournamentmonsters = 0;
+    private nuint _address_currentweek = 0;
+    private nuint _address_unlockedmonsters = 0;
+
+    private List<MonsterGenus> _unlockedmonsters;
+
+    
  
     public Mod(ModContext context)
     {
@@ -99,7 +106,15 @@ public class Mod : ModBase // <= Do not Remove.
         _modLoader.GetController<IHooks>().TryGetTarget(out var hooks);
 
         var startupScanner = _modLoader.GetController<IStartupScanner>();
-        
+
+        gameAddress = (nuint) Base.Mod.Base.ExeBaseAddress;
+
+        _address_unlockedmonsters = gameAddress + 0x3795A2;
+        _address_tournamentmonsters = gameAddress + 0x548D10;
+        _address_currentweek = gameAddress + 0x379444;
+
+        _unlockedmonsters = new List<MonsterGenus>();
+
         if (extract == null) {
             _logger.WriteLine($"[{_modConfig.ModId}] Failed to get extract data bin controller.", Color.Red);
             return; }
@@ -166,7 +181,7 @@ public class Mod : ModBase // <= Do not Remove.
             tournamentData.AddExistingMonster( tm, i );
 
             string bytes = ""; for ( var z = 0; z < 60; z++ ) { bytes += rawmonster[ z ] + ","; }
-            _logger.WriteLine( "Monster " + i + " Parsed: " + tm, Color.Lime ); _logger.WriteLine( bytes, Color.Green );
+            _logger.WriteLine( "Monster " + i + " Parsed: " + tm, Color.Lime ); //_logger.WriteLine( bytes, Color.Green );
         }
 
         tournamentData._initialized = true;
@@ -175,18 +190,27 @@ public class Mod : ModBase // <= Do not Remove.
     private void SetupUpdateHook(nint parent)
     {
         _updateHook!.OriginalFunction(parent);
-        gameAddress = (nuint)Base.Mod.Base.ExeBaseAddress;
 
-        var tournamentAddress = gameAddress + 0x548D10;
-        var currentWeekAddress = gameAddress + 0x379444;
-
+        GetUnlockedMonsters( _address_unlockedmonsters );
         LoadGameUpdateTournamentData();
-        AdvanceMonthUpdateTournamentMonsters(currentWeekAddress);
-        UpdateMemoryTournamentData(tournamentAddress);
+        AdvanceWeekUpdateTournamentMonsters(_address_currentweek, _unlockedmonsters);
+        UpdateMemoryTournamentData(_address_tournamentmonsters);
         
         _logger.Write($"[{_modConfig.ModId}] update.", Color.Red);   
     }
 
+    private void GetUnlockedMonsters(nuint unlockAddress) {
+        Memory.Instance.ReadRaw( unlockAddress, out byte[] unlocks, 37 );
+
+        _logger.Write( "[ABD Tournaments]:", Color.Pink );
+        _unlockedmonsters.Clear();
+        for ( var i = 0; i < unlocks.Length; i++ ) {
+            if ( unlocks[ i ] == 0x01 ) {
+                _unlockedmonsters.Add( (MonsterGenus) i );
+                _logger.Write( i + ",", Color.Pink );
+            }
+        }
+    }
 
     private void LoadGameUpdateTournamentData() {
         if ( _saveFileManager._saveData_gameLoaded ) {
@@ -204,6 +228,7 @@ public class Mod : ModBase // <= Do not Remove.
                 }
             }
             tournamentData._initialized = true;
+            tournamentData._firstweek = true;
             _logger.WriteLine( "Mod: Init Complete" );
         }
     }
@@ -223,31 +248,12 @@ public class Mod : ModBase // <= Do not Remove.
         }
     }
 
-    private void AdvanceMonthUpdateTournamentMonsters(nuint currentWeekAddress) {
+    private void AdvanceWeekUpdateTournamentMonsters(nuint currentWeekAddress, List<MonsterGenus> unlockedmonsters) {
         Memory.Instance.Read<uint>( currentWeekAddress, out uint currentWeek );
         if ( lastCheckedWeek != currentWeek ) {
+            _logger.WriteLine( "[ABD Tournaments]: Advancing to week " + currentWeek, Color.Blue );
             lastCheckedWeek = currentWeek;
-            if ( lastCheckedWeek % 4 == 0 ) {
-                _logger.WriteLine( "Advancing Month!", Color.Blue );
-                tournamentData.AdvanceMonth();
-            }
-        }
-    }
-    /// <summary> Performs a one-time load of the original Tournament Monster Data (taikai_en.flk) </summary>
-    private void ReadTournamentMonsterData(nuint tournamentAddress)
-    {
-        tournamentData = new TournamentData(_logger);
-
-        var enemyAddresses = tournamentAddress + 0xA8C;
-        //_logger.WriteLine("Read from " + enemyAddresses, Color.Lime);
-        for ( var i = 0; i < 120; i++ )
-        {
-            Memory.Instance.ReadRaw(enemyAddresses + ((nuint) (i * 60)), out byte[] tm_raw, 60);
-            TournamentMonster tm = new(tm_raw);
-            tournamentData.AddExistingMonster(tm, i);
-
-            string bytes = ""; for ( var z = 0; z < 60; z++ ) { bytes += tm_raw[z] + ","; }
-            _logger.WriteLine( "Monster " + i + " Parsed: " + tm, Color.Lime ); _logger.WriteLine(bytes, Color.Green);
+            tournamentData.AdvanceWeek(currentWeek, unlockedmonsters);
         }
     }
 

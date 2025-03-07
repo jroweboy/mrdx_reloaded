@@ -11,22 +11,20 @@ public class MonsterBreed
     public string name;
     public string name_short;
 
-    public byte breed_id;
-    public byte sub_id;
+    public MonsterGenus breed_id;
+    public MonsterGenus sub_id;
     public string breed_identifier;
 
     public byte[] technique_types;
     public uint technique_scaling;
     public uint technique_basics;
 
-
-
     public MonsterBreed (string n, string nshort, byte bid, byte sid, string identifier, byte[] techniques) {
         name = n;
         name_short = nshort;
 
-        breed_id = bid;
-        sub_id = sid;
+        breed_id = (MonsterGenus) bid;
+        sub_id = (MonsterGenus) sid;
         breed_identifier = identifier;
 
         technique_types = new byte[ 24 ];
@@ -100,19 +98,14 @@ public class MonsterBreed
             if ( tpos != 0xFFFF ) {
                 fs.Position = (long) tpos + 0x10;
                 techniqueList[ (byte) ((tpos - 0x60) / 0x20) ] = (byte) fs.ReadByte();
-
-
-                
-                //techniqueList[ i ] = (byte) fs.ReadByte();
             }
-            
         }
 
         fs.Close();
         return techniqueList;
     }
 
-    public static MonsterBreed GetBreedInfo(byte main, byte sub) {
+    public static MonsterBreed GetBreedInfo(MonsterGenus main, MonsterGenus sub) {
         for ( var i = 0; i < MonsterBreed.AllBreeds.Count; i++ ) {
             var mb = MonsterBreed.AllBreeds[ i ];
             if ( mb.breed_id == main && mb.sub_id == sub ) { return mb; }
@@ -125,8 +118,8 @@ public class TournamentMonster {
     public byte[] raw_bytes = new byte[ 60 ];
     #region Raw Variables
     private string _name;
-    private byte _breed_main;
-    private byte _breed_sub;
+    private MonsterGenus _breed_main;
+    private MonsterGenus _breed_sub;
     private ushort _stat_lif;
     private ushort _stat_pow;
     private ushort _stat_def;
@@ -155,8 +148,8 @@ public class TournamentMonster {
     }
 
     // 26, 27 : Monster Species / Subspecies
-    public byte breed_main { get => _breed_main; set { _breed_main = value; raw_bytes[ 26 ] = value; } }
-    public byte breed_sub { get => _breed_sub; set { _breed_sub = value; raw_bytes[ 27 ] = value; } }
+    public MonsterGenus breed_main { get => _breed_main; set { _breed_main = value; raw_bytes[ 26 ] = (byte) value; } }
+    public MonsterGenus breed_sub { get => _breed_sub; set { _breed_sub = value; raw_bytes[ 27 ] = (byte) value; } }
 
     // 2 Bytes Per Stat, 28-39, Life-Pow-Def-Ski-Spd-Int
     public ushort stat_lif { get => _stat_lif; set { _stat_lif = value; raw_bytes[ 28 ] = (byte) ( value & 0xff ); raw_bytes[ 29 ] = (byte) ( ( value & 0xff00 ) >> 8 ); } }
@@ -211,8 +204,8 @@ public class TournamentMonster {
 
         name = Mr2StringExtension.AsString( Mr2StringExtension.AsShorts( rawname ) );
 
-        breed_main = raw[ 26 ];
-        breed_sub = raw[ 27 ];
+        breed_main = (MonsterGenus) raw[ 26 ];
+        breed_sub = (MonsterGenus) raw[ 27 ];
 
         stat_lif = (ushort) ( raw[ 28 ] + ( raw[ 29 ] << 8 ) );
         stat_pow = (ushort) ( raw[ 30 ] + ( raw[ 31 ] << 8 ) );
