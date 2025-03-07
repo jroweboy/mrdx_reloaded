@@ -145,7 +145,7 @@ public class Mod : ModBase // <= Do not Remove.
             SetupCheckShrineUnlockRequirementsHookX(scanner);
         }
 
-        tournamentData = new TournamentData(_logger, _configuration);
+        tournamentData = new TournamentData(this, _logger, _configuration);
         SetupMonsterBreeds();
         SetupTournamentParticipantsFromTaikai();
 
@@ -156,14 +156,6 @@ public class Mod : ModBase // <= Do not Remove.
         //else
         //_logger.WriteLine($"[{_modConfig.ModId}] Could not load startup scanner!");
     }
-
-    /*private void PrintOnFileLoad ( string path ) {
-        
-            if ( path.Contains( "usb#vid" ) || path.Contains( "hid#vid" ) )
-                return;
-
-        _logger.WriteLine( $"CUSTOM MONITOR: {path}", Color.Blue );
-    }*/
 
     private void SetupMonsterBreeds() {
         MonsterBreed.SetupMonsterBreedList(_gamePath);
@@ -184,7 +176,7 @@ public class Mod : ModBase // <= Do not Remove.
             tournamentData.AddExistingMonster( tm, i );
 
             string bytes = ""; for ( var z = 0; z < 60; z++ ) { bytes += rawmonster[ z ] + ","; }
-            _logger.WriteLine( "Monster " + i + " Parsed: " + tm, Color.Lime ); //_logger.WriteLine( bytes, Color.Green );
+            DebugLog( 2, "Monster " + i + " Parsed: " + tm, Color.Lime );
         }
 
         tournamentData._initialized = true;
@@ -205,7 +197,7 @@ public class Mod : ModBase // <= Do not Remove.
         if ( currentWeek == 1 ) { AdvanceWeekUpdateTournamentMonsters( _unlockedmonsters ); }
         UpdateMemoryTournamentData(_address_tournamentmonsters);
         
-        _logger.Write($"[{_modConfig.ModId}] update.", Color.Red);   
+        DebugLog(3, "Hook Game Update", Color.Red);   
     }
 
     private void GetUnlockedMonsters(nuint unlockAddress) {
@@ -238,7 +230,7 @@ public class Mod : ModBase // <= Do not Remove.
         for ( var i = 0; i < unlocks.Length; i++ ) {
             if ( unlocks[ i ] == 0x01 ) {
                 _unlockedmonsters.Add( (MonsterGenus) i );
-                _logger.Write( i + ",", Color.Pink );
+                DebugLog(3, "Unlocked Monster Check " + i + ",", Color.Pink );
             }
         }
     }
@@ -309,22 +301,21 @@ public class Mod : ModBase // <= Do not Remove.
     #endregion
     private void LoadGameUpdateTournamentData() {
         if ( _saveFileManager._saveData_gameLoaded ) {
-            _logger.WriteLineAsync( "Mod: Thinks the game has been loaded." );
+            DebugLog( 1, "Game Load Detected", Color.Orange );
             List<ABD_TournamentMonster> monsters = _saveFileManager.LoadABDTournamentData();
             if ( monsters.Count == 0 ) {
-                _logger.WriteLineAsync( "Mod: No custom tournament data found. Loading taikai_en." );
+                DebugLog( 2, "No custom tournament data found. Loading taikai_en.", Color.Orange );
                 SetupTournamentParticipantsFromTaikai();
             } else {
-                _logger.WriteLineAsync( "Mod: Found Data for " + monsters.Count + " monsters." );
+                DebugLog( 2, "Found Data for " + monsters.Count + " monsters.", Color.Orange );
                 tournamentData.ClearAllData();
-                _logger.WriteLineAsync( "Mod: Cleared Existing Data" );
                 foreach(ABD_TournamentMonster abdm in monsters) {
                     tournamentData.AddExistingMonster( abdm );
                 }
             }
             tournamentData._initialized = true;
             tournamentData._firstweek = true;
-            _logger.WriteLine( "Mod: Init Complete" );
+            DebugLog( 2, "Initialization Complete", Color.Orange );
         }
     }
     /// <summary>  </summary>
@@ -363,13 +354,20 @@ public class Mod : ModBase // <= Do not Remove.
         });
     }
 
+    public void DebugLog(int verbosity, string message) {
+        DebugLog( verbosity, message, Color.White );
+    }
+
     public void DebugLog( int verbosity, string message, Color c ) {
-        if ( verbosity == 0 ) { _logger.WriteLineAsync( "[ABDT]: " + message, c ); }
+        if ( verbosity == 0 ) { _logger.WriteLineAsync( "[ABDT Urgent]: " + message, c ); }
         else if (verbosity == 1 && _configuration._confABD_debugging != Config.E_ConfABD_Debugging.Off ) {
-            _logger.WriteLineAsync( "[ABDT]: " + message, c );
+            _logger.WriteLineAsync( "[ABDT High]: " + message, c );
         }
-        else if ( verbosity >= 1 && _configuration._confABD_debugging == Config.E_ConfABD_Debugging.Verbose ) {
-            _logger.WriteLineAsync( "[ABDT]: " + message, c );
+        else if ( verbosity == 2 && ( _configuration._confABD_debugging == Config.E_ConfABD_Debugging.Medium || _configuration._confABD_debugging == Config.E_ConfABD_Debugging.Verbose ) ) {
+            _logger.WriteLineAsync( "[ABDT Med]: " + message, c );
+        }
+        else if ( verbosity == 3 && _configuration._confABD_debugging == Config.E_ConfABD_Debugging.Verbose ) {
+            _logger.WriteLineAsync( "[ABDT Low]: " + message, c );
         }
     }
 

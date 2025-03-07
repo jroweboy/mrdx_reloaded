@@ -110,10 +110,11 @@ public class Config : Configurable<Config>
     [Description("Enables internal printouts to the Reloaded Log file to help debug issues.\n" +
         "Off - No debug messages printed. For normal gameplay.\n" +
         "Minimal - Prints messages for major events only.\n" +
-        "Verbose - Prints tons of cryptic messages. Useful if there is consistent crashing.")]
+        "Medium - Prints lots messages. Useful if there is consistent crashing.\n" +
+        "Verbose - Prints so many that the the log may be a source of issue itself. Most helpful for diagnoisng issues though.")]
     [DefaultValue(E_ConfABD_Debugging.Off )]
     public E_ConfABD_Debugging _confABD_debugging { get; set; } = E_ConfABD_Debugging.Off;
-    public enum E_ConfABD_Debugging { Off, Minimal, Verbose }
+    public enum E_ConfABD_Debugging { Off, Minimal, Medium, Verbose }
 
     /*
     [DisplayName("String")]

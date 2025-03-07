@@ -56,19 +56,22 @@ namespace MRDX.Game.ABD_Tournaments
         }
 
         public void MonsterPromoteToNewPool ( TournamentPool newPool ) {
-            TournamentData._logger.WriteLineAsync( "[ABD Tournaments]: Promoting Monster to new pool : " + newPool, Color.Orange );
+            TournamentData._mod.DebugLog( 1, "Promoting monster from " + _name + " to " + newPool._name, Color.LightBlue );
             int stattotal = 0; ABD_TournamentMonster promoted;
             promoted = monsters[ 0 ];
 
             foreach ( ABD_TournamentMonster abdm in monsters ) {
-                stattotal += abdm.monster.stat_total;
+                stattotal += Math.Max(abdm.monster.stat_total - (stat_end - 100), 1);
             }
+
+            if ( stattotal < 20 ) { TournamentData._mod.DebugLog( 1, "Tournament Stat Totals dangeorusly low. Growth rates may be too low.", Color.Yellow ); }
 
             stattotal = Random.Shared.Next() % stattotal;
             for ( var i = 0; i < monsters.Count; i++ ) {
-                stattotal -= monsters[ i ].monster.stat_total;
+                int mvalue = Math.Max( monsters[ i ].monster.stat_total - ( stat_end - 100 ), 1 ); ;
+                stattotal -= mvalue;
                 promoted = monsters[ i ];
-                if ( stattotal < 0 ) { break; }
+                if ( stattotal <= 0 ) { break; }
             }
 
             promoted.LearnTechnique();
@@ -76,10 +79,11 @@ namespace MRDX.Game.ABD_Tournaments
 
             MonsterRemove( promoted );
             newPool.MonsterAdd( promoted );
+            TournamentData._mod.DebugLog( 1, promoted.monster.name + " promoted.", Color.LightBlue );
         }
 
         public void GenerateNewValidMonster ( List<MonsterGenus> available ) {
-            TournamentData._logger.WriteLineAsync( "[ABD Tournaments] TP: Getting Breed", Color.AliceBlue );
+            TournamentData._mod.DebugLog( 1, "TP: Getting Breed", Color.AliceBlue );
             MonsterBreed breed = MonsterBreed.AllBreeds[ 0 ];
 
             // TODO: Smarter Logic for deciding which breed to make the monster!
@@ -156,23 +160,24 @@ namespace MRDX.Game.ABD_Tournaments
                 for ( var i = 0; i < 100; i++ ) {
                     breed = MonsterBreed.AllBreeds[ Random.Shared.Next() % MonsterBreed.AllBreeds.Count ];
                     if ( available.Contains( breed.breed_id ) && available.Contains( breed.sub_id ) ) {
-                        TournamentData._logger.WriteLineAsync( "[ABD Tournaments]: Found valid breed. " + breed.breed_id + "/" + breed.sub_id );
+                        
                         break;
                     }
                 }
             }
+            TournamentData._mod.DebugLog( 1, "Breed chosen " + breed.breed_id + "/" + breed.sub_id, Color.AliceBlue );
             GenerateNewValidMonster( breed );
 
         }
         private void GenerateNewValidMonster ( MonsterBreed breed ) {
-            TournamentData._logger.WriteLineAsync( "[ABD Tournaments] TP: Generating", Color.AliceBlue );
+            TournamentData._mod.DebugLog( 2, "TP: Generating", Color.AliceBlue );
             //byte[] nmraw = [ 181, 0, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 215, 0, 72, 1, 228, 0, 233, 0, 184, 0, 216, 0, 50, 50, 50, 0, 255, 104, 9, 0, 3, 13, 0, 0, 65, 0, 0, 0, 0, 0, 255, 255 ];
             byte[] nmraw = new byte[ 60 ];// This doesn't matter, it gets completely overwritten below anyways.
             TournamentMonster nm = new TournamentMonster( nmraw );
 
 
             nm.breed_main = breed.breed_id; nm.breed_sub = breed.sub_id;
-            TournamentData._logger.WriteLineAsync( "TP: Breed " + nm.breed_main + " " + nm.breed_sub, Color.AliceBlue );
+            TournamentData._mod.DebugLog( 3, "TP: Breed " + nm.breed_main + " " + nm.breed_sub, Color.AliceBlue );
             // // // // // //
 
             ABD_TournamentMonster abdm = new ABD_TournamentMonster( nm );
@@ -196,15 +201,15 @@ namespace MRDX.Game.ABD_Tournaments
 
             abdm.monster.techniques = abdm.breedInfo.technique_basics;
 
-            TournamentData._logger.WriteLineAsync( "[ABD Tournaments] TP: Basics Setup", Color.AliceBlue );
+            TournamentData._mod.DebugLog( 3, "TP: Basics Setup", Color.AliceBlue );
             while ( abdm.monster.stat_total < stat_start ) {
                 abdm.AdvanceMonth();
             }
-            TournamentData._logger.WriteLineAsync( "[ABD Tournaments] TP: Advancing", Color.AliceBlue );
+            TournamentData._mod.DebugLog( 3, "TP: Advancing", Color.AliceBlue );
             for ( int i = 0; i < tournament_tier; i++ ) {
                 abdm.LearnTechnique();
             }
-            TournamentData._logger.WriteLineAsync( "[ABD Tournaments] TP: Techs", Color.AliceBlue );
+            TournamentData._mod.DebugLog( 3, "TP: Techs", Color.AliceBlue );
             if ( !abdm.alive ) {
                 abdm.alive = true;
                 abdm.lifespan = 6;
@@ -212,7 +217,7 @@ namespace MRDX.Game.ABD_Tournaments
 
             abdm._monsterRank = _monsterRank;
 
-            TournamentData._logger.WriteLineAsync( "[ABD Tournaments] TP: Cleanup", Color.AliceBlue );
+            TournamentData._mod.DebugLog( 2, "TP: Complete", Color.AliceBlue );
             tournamentData.monsters.Add( abdm );
             this.MonsterAdd( abdm );
         }

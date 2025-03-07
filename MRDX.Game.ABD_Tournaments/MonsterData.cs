@@ -53,7 +53,7 @@ public class MonsterBreed
                 // Build a singular tech list. This will be the same for every breed until I do the right now and actually check errantry (no thanks :( )
                 FileStream fs = File.OpenRead( techniqueFile );
 
-                Console.Write( "\nReading Techniques for " + info.Name + ": " );
+                //Console.Write( "\nReading Techniques for " + info.Name + ": " );
                 byte [] techniqueList = ParseTechniqueFile( fs );
 
                 // Enumerate through each species tex file and generate the final breeds.

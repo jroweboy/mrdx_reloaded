@@ -112,6 +112,7 @@ public enum ETournamentPools { L, M, S, A, B, C, D, E,
 }
 public class TournamentData
 {
+    public static Mod _mod;
     public static ILogger _logger;
     public static Config _configuration;
     
@@ -140,8 +141,9 @@ public class TournamentData
 
     public List<byte[]> startingMonsterTemplates = new List<byte[]>();
    
-    public TournamentData(ILogger logger, Config config) 
+    public TournamentData(Mod m, ILogger logger, Config config) 
     {
+        TournamentData._mod = m;
         TournamentData._logger = logger;
         TournamentData._configuration = config;
 
@@ -244,7 +246,7 @@ public class TournamentData
 
         }
 
-        _logger.WriteLineAsync( "[ABD Tournaments]: Finished Advancing Weeks, Checking Pools", Color.Orange );
+        _mod.DebugLog( 1, "Finished Advancing Weeks, Checking Pools", Color.Yellow );
         foreach ( TournamentPool pool in tournamentPools.Values ) {
             while ( pool.monsters.Count < pool._minimumSize ) {
                 pool.GenerateNewValidMonster(_unlockedTournamentBreeds);
@@ -260,27 +262,30 @@ public class TournamentData
     }
     public void AdvanceMonth()
     {
-        _logger.WriteLineAsync( "[ABD Tournaments]: Advancing Month", Color.Blue );
-        for (var i = monsters.Count -1 ; i >= 0 ; i--) {
+        _mod.DebugLog( 1, "Advancing month from TournamentData", Color.Blue );
+        for (var i = monsters.Count - 1 ; i >= 0 ; i--) {
             var m = monsters[i];
 
             m.AdvanceMonth();
             if ( !m.alive ) {
-                foreach ( TournamentPool tp in m.pools ) {
-                    tp.MonsterRemove( m );
+                _mod.DebugLog( 3, m.monster.name + " has died. Removing from pools.", Color.Blue );
+                for ( var j = m.pools.Count() - 1; j >= 0; j-- ) {
+                    m.pools[j].MonsterRemove( m );
+                    _mod.DebugLog( 3, m.monster.name + " removed from a pool.", Color.Blue );
                 }
+                _mod.DebugLog( 3, m.monster.name + " removing from master pool list.", Color.Blue );
                 monsters.Remove( m );
+                _mod.DebugLog( 3, m.monster.name + " removed from master pool list.", Color.Blue );
             }
 
             // TODO CONFIG TECHNIQUE RATE
-            if ( Random.Shared.Next() % 20 == 0 ) {
+            if ( Random.Shared.Next() % 25 == 0 ) {
                 m.LearnTechnique();
             }
         }
     }
 
     private void AdvanceTournamentPromotions() {
-        _logger.WriteLineAsync( "[ABD Tournaments]: Tournament Promotions", Color.Orange );
         tournamentPools[ ETournamentPools.M ].MonsterPromoteToNewPool( tournamentPools[ ETournamentPools.L ] );
         tournamentPools[ ETournamentPools.S ].MonsterPromoteToNewPool( tournamentPools[ ETournamentPools.M ] );
         tournamentPools[ ETournamentPools.A ].MonsterPromoteToNewPool( tournamentPools[ ETournamentPools.S ] );
@@ -362,7 +367,7 @@ public class ABD_TournamentMonster
 
     public ABD_TournamentMonster(TournamentMonster m)
     {
-        //_logger.WriteLineAsync( "[ABD Tournaments]: Creating monster from game data.", Color.Orange );
+        TournamentData._mod.DebugLog( 1, "Creating monster from game data.", Color.Lime );
         monster = m;
         breedInfo = MonsterBreed.GetBreedInfo( monster.breed_main, monster.breed_sub );
 
@@ -377,7 +382,7 @@ public class ABD_TournamentMonster
         growth_rate = (ushort) ( growth_rate / 4 );// Account for Prime Bonus, 4x
 
         growth_group = (growth_groups) ( TournamentData.GrowthRNG.Next() % 6 );
-
+        
 
         // This section applies special bonuses to monster breeds. Dragons are in both groups, and a pure Dragon/Dragon gets +6/+4 to its growth rate. A Tiger/Gali would only get +0/+2 as Gali is only in one group and only the sub.
         List<MonsterGenus> bonuses = new List<MonsterGenus>(); List<MonsterGenus> bonuses2 = new List<MonsterGenus>();
@@ -392,11 +397,13 @@ public class ABD_TournamentMonster
         if ( bonuses.Contains( (MonsterGenus) monster.breed_sub ) ) { growth_rate += 2; }
         if ( bonuses2.Contains( (MonsterGenus) monster.breed_sub ) ) { growth_rate += 2; }
 
+        TournamentData._mod.DebugLog( 2, "Monster Created: " + m.name + ", " + m.breed_main + "/" + m.breed_sub + ", LIFE: " + lifespan + ", GROWTH: " + growth_rate, Color.Lime );
+
         SetupGrowthOptions();
     }
 
     public ABD_TournamentMonster(byte[] rawabd) {
-        TournamentData._logger.WriteLineAsync( "[ABD Tournaments]: Loading monster from ABD Save File.", Color.Orange );
+        TournamentData._mod.DebugLog( 1, "Loading monster from ABD Save File.", Color.Lime );
         byte[] rawmonster = new byte[ 60 ];
         for ( var i = 0; i < 60; i++ ) { rawmonster[ i ] = rawabd[ i + 40 ]; }
 
@@ -424,8 +431,7 @@ public class ABD_TournamentMonster
 
     public void AdvanceMonth()
     {
-
-        TournamentData._logger.WriteLineAsync( "[ABD Tournaments]: ABDM Advancing Month: [GROWTH:" + growth_rate + ", LIFE: " + lifespan + "]" , Color.Orange );
+        TournamentData._mod.DebugLog(2, "Monster " + monster.name + " Advancing Month: [GROWTH:" + growth_rate + ", LIFE: " + lifespan + "]" , Color.Yellow );
 
         int agegroup = 2;
         lifespan--;
@@ -449,10 +455,11 @@ public class ABD_TournamentMonster
             else if (stat == 4) { monster.stat_def++; }
             else if (stat == 5) { monster.stat_int++; }
         }
+        TournamentData._mod.DebugLog( 3, "Monster " + monster.name + " Completed Growth: [GROWTH:" + growth_rate + ", LIFE: " + lifespan + ", ALIVE: " + alive + "]", Color.Yellow );
     }
 
     public void LearnTechnique() { // TODO: Smarter Logic About which tech to get
-        TournamentData._logger.WriteLineAsync( "[ABD Tournaments]: Monster attempting to learn technique.", Color.Orange );
+        TournamentData._mod.DebugLog( 2, "Monster " + monster.name + " attempting to learn technique.", Color.Orange );
         // 0 = Basic, 1 Hit, 2 Heavy, 3 Withering, 4 Sharp, 5 Special, 6 Invalid
         List<byte> toLearn = new List<byte>();
         for ( var i = 0; i < 24; i++ ) {
@@ -473,23 +480,6 @@ public class ABD_TournamentMonster
         if ( toLearn.Count > 0 ) {
             monster.techniques += (uint) ( 1 << toLearn[ Random.Shared.Next() % toLearn.Count ] );
         }
-
-        /*
-        for ( var i = 0; i < 100; i++ ) {
-            for ( var )
-            var newTech = Random.Shared.Next() % 24;
-            if ( breedInfo.technique_types[ newTech ] == 6 || ( ( monster.techniques >> newTech ) & 1 ) == 1 ) { } // Invalid or Already Learned
-
-            else if ( breedInfo.technique_types[ newTech ] == 5 && ( _monsterRank == EMonsterRanks.S || _monsterRank == EMonsterRanks.A || _monsterRank == EMonsterRanks.B ) ) { // Special techs only for B Rank+ Monsters
-                monster.techniques += (uint) ( 1 << newTech );
-                i = 101;
-            }
-
-            else if ( breedInfo.technique_types[newTech ] <= 4 ) {
-                monster.techniques += (uint) ( 1 << newTech );
-                i = 101;
-            }
-        }*/
     }
 
     public byte[] ToSaveFile() {
