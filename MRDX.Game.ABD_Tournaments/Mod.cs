@@ -1,32 +1,23 @@
 ﻿
 
 using MRDX.Game.ABD_Tournaments.Template;
-using MRDX.Game.ABD_Tournaments.Configuration;
 using Reloaded.Universal.Redirector.Interfaces;
 
 using System.Drawing;
 using MRDX.Base.ExtractDataBin.Interface;
-using MRDX.Base.Mod;
 using MRDX.Base.Mod.Interfaces;
 using Reloaded.Memory.Sources;
 
 using Config = MRDX.Game.ABD_Tournaments.Configuration.Config;
 using Reloaded.Hooks.Definitions;
 using Reloaded.Hooks.Definitions.X86;
-using Reloaded.Hooks.Definitions.Enums;
 using Reloaded.Mod.Interfaces;
 using Reloaded.Memory.SigScan.ReloadedII.Interfaces;
-using Reloaded.Hooks;
 
 using IReloadedHooks = Reloaded.Hooks.ReloadedII.Interfaces.IReloadedHooks;
-using System.Xml.Linq;
-using System.Runtime.InteropServices;
+
 using static System.Runtime.InteropServices.JavaScript.JSType;
-using System.Resources;
-using System.IO;
-using System.Numerics;
-using System.Runtime.InteropServices.JavaScript;
-using Iced.Intel;
+
 //using static MRDX.Base.Mod.Interfaces.TournamentData;
 //using IReloadedHooks = Reloaded.Hooks.ReloadedII.Interfaces.IReloadedHooks;
 

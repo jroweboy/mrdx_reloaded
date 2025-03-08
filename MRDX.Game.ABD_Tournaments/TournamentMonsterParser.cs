@@ -383,12 +383,19 @@ public class ABD_TournamentMonster
         growth_rate = 0;
         for ( var i = 0; i < 4; i++ ) {
             growth_rate += (ushort) (TournamentData.GrowthRNG.Next() % TournamentData._configuration._confABD_growth_monthly);
-        } growth_rate = (ushort) (growth_rate / 4 ); // i
+        }
+        TournamentData._mod.DebugLog( 3, "Growth Pre Average" + growth_rate, Color.Lime );
+
+        growth_rate = (ushort) (1 + (growth_rate / 4 )); // i
+        TournamentData._mod.DebugLog( 3, "Growth Post Average" + growth_rate, Color.Lime );
+
         growth_rate += (ushort) Math.Max(1, ( ( TournamentData.GrowthRNG.Next() % ( 2 * TournamentData._configuration._confABD_growth_monthlyvariance ) ) + 1 - ( TournamentData._configuration._confABD_growth_monthlyvariance ) ) );
-        growth_rate = (ushort) ( growth_rate / 4 );// Account for Prime Bonus, 4x
+        TournamentData._mod.DebugLog( 3, "Growth Post Variance" + growth_rate, Color.Lime );
+
+        growth_rate = (ushort) (1 + ( growth_rate / 4 ));// Account for Prime Bonus, 4x
+        TournamentData._mod.DebugLog( 3, "Growth Post Prime" + growth_rate, Color.Lime );
 
         growth_group = (growth_groups) ( TournamentData.GrowthRNG.Next() % 6 );
-        
 
         // This section applies special bonuses to monster breeds. Dragons are in both groups, and a pure Dragon/Dragon gets +6/+4 to its growth rate. A Tiger/Gali would only get +0/+2 as Gali is only in one group and only the sub.
         List<MonsterGenus> bonuses = new List<MonsterGenus>(); List<MonsterGenus> bonuses2 = new List<MonsterGenus>();
@@ -442,8 +449,6 @@ public class ABD_TournamentMonster
 
     public void AdvanceMonth()
     {
-        TournamentData._mod.DebugLog(2, "Monster " + monster.name + " Advancing Month: [GROWTH:" + growth_rate + ", LIFE: " + lifespan + "]" , Color.Yellow );
-
         int agegroup = 2;
         lifespan--;
         if ( lifespan == 0 ) { alive = false; }
@@ -454,8 +459,8 @@ public class ABD_TournamentMonster
         if ( lifespan < 6 ) { agegroup--; agegroup--; }
 
         agegroup *= growth_rate;
-        // TODO: SPEED UP! REMOVE
-        //agegroup += 50;
+
+        TournamentData._mod.DebugLog( 2, "Monster " + monster.name + " Advancing Month: [GROWTH:" + growth_rate + " CGROW: " + agegroup + ", LIFE: " + lifespan + "]", Color.Yellow );
 
         for (var i = 0; i < agegroup; i++) {
             var stat = growth_options[TournamentData.GrowthRNG.Next() % growth_options.Length];
@@ -465,6 +470,7 @@ public class ABD_TournamentMonster
             else if (stat == 3) { monster.stat_spd++; }
             else if (stat == 4) { monster.stat_def++; }
             else if (stat == 5) { monster.stat_int++; }
+            else { monster.stat_lif++; }
         }
         TournamentData._mod.DebugLog( 3, "Monster " + monster.name + " Completed Growth: [GROWTH:" + growth_rate + ", LIFE: " + lifespan + ", ALIVE: " + alive + "]", Color.Yellow );
     }

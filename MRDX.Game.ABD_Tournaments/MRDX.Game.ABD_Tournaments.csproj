@@ -47,11 +47,6 @@
 	<!-- <None Update="ManualRedirected\**\*" CopyToOutputDirectory="PreserveNewest" /> -->
   </ItemGroup>
 
-    <ItemGroup>
-		<!-- <Folder Include="ManualRedirected\" /> -->
-		<Folder Include="Redirector\" />
-	</ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.ILLink.Tasks" Version="8.0.8" />
 	<PackageReference Include="Reloaded.Hooks" Version="4.3.0" />
