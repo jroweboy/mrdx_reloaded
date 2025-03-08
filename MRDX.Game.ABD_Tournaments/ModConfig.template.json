@@ -3,7 +3,7 @@
     "ModName": "ABD Tournaments",
     "ModAuthor": "ArchbishopDave",
     "ModVersion": "{{ MOD_VERSION }}",
-    "ModDescription": "Dynamically updates tournament data as years pass.",
+    "ModDescription": "Dynamically updates tournament data as time passes. New monsters are introduced into tournament brackets and grow over time.",
     "ModDll": "MRDX.Game.ABD_Tournaments.dll",
     "ModIcon": "Preview.png",
     "ModR2RManagedDll32": "x86/MRDX.Game.ABD_Tournaments.dll",
@@ -12,7 +12,13 @@
     "ModNativeDll64": "",
     "IsLibrary": false,
     "ReleaseMetadataFileName": "MRDX.Game.ABD_Tournaments.ReleaseMetadata.json",
-    "PluginData": {},
+    "PluginData": {
+        "GitHubRelease": {
+            "UserName": "archbishopdave",
+            "RepositoryName": "mrdx_reloaded",
+            "UseReleaseTag": false
+        }
+    },
     "IsUniversalMod": false,
     "ModDependencies": [
         "reloaded.sharedlib.hooks",
