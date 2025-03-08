@@ -380,16 +380,13 @@ public class ABD_TournamentMonster
         lifespan = lifetotal;
         lifespan -= (ushort) ( 4 * ( monster.stat_total / 500 ) ); // Take an arbitrary amount of life off for starting stats.
 
-        growth_rate = 0;
+        growth_rate = (ushort) TournamentData._configuration._confABD_growth_monthly;
         for ( var i = 0; i < 4; i++ ) {
-            growth_rate += (ushort) (TournamentData.GrowthRNG.Next() % TournamentData._configuration._confABD_growth_monthly);
+            growth_rate -= (ushort) TournamentData._configuration._confABD_growth_monthlyvariance;
+            growth_rate += (ushort) (TournamentData.GrowthRNG.Next() % ( 2 * TournamentData._configuration._confABD_growth_monthlyvariance ));
         }
-        TournamentData._mod.DebugLog( 3, "Growth Pre Average" + growth_rate, Color.Lime );
 
-        growth_rate = (ushort) (1 + (growth_rate / 4 )); // i
-        TournamentData._mod.DebugLog( 3, "Growth Post Average" + growth_rate, Color.Lime );
-
-        growth_rate += (ushort) Math.Max(1, ( ( TournamentData.GrowthRNG.Next() % ( 2 * TournamentData._configuration._confABD_growth_monthlyvariance ) ) + 1 - ( TournamentData._configuration._confABD_growth_monthlyvariance ) ) );
+        growth_rate = Math.Clamp( growth_rate, (ushort) (TournamentData._configuration._confABD_growth_monthly / 2), (ushort) (TournamentData._configuration._confABD_growth_monthly * 1.66) );
         TournamentData._mod.DebugLog( 3, "Growth Post Variance" + growth_rate, Color.Lime );
 
         growth_rate = (ushort) (1 + ( growth_rate / 4 ));// Account for Prime Bonus, 4x
