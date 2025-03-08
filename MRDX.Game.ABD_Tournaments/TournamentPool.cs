@@ -199,7 +199,7 @@ namespace MRDX.Game.ABD_Tournaments
             abdm.monster.arena_movespeed = (byte) ( Random.Shared.Next() % 4 ); // TODO: Where does this come from?
             abdm.monster.arena_gutsrate = (byte) ( 7 + Random.Shared.Next() % 14 ); // 7 - 20?
 
-            abdm.monster.battle_specials = 0;
+            abdm.monster.battle_specials = (byte) (Random.Shared.Next() % 4);
 
             var firstbasic = 0;
             for ( var j = 0; j < 24; j++ ) {
