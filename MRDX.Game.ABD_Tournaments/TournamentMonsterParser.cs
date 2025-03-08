@@ -469,6 +469,10 @@ public class ABD_TournamentMonster
             else if (stat == 5) { monster.stat_int++; }
             else { monster.stat_lif++; }
         }
+
+        if ( monster.per_fear < 100 ) { monster.per_fear += (byte) (TournamentData.GrowthRNG.Next() % 2); }
+        if ( monster.per_spoil < 100 ) { monster.per_spoil += (byte) ( TournamentData.GrowthRNG.Next() % 2); }
+
         TournamentData._mod.DebugLog( 3, "Monster " + monster.name + " Completed Growth: [GROWTH:" + growth_rate + ", LIFE: " + lifespan + ", ALIVE: " + alive + "]", Color.Yellow );
     }
 
@@ -494,6 +498,27 @@ public class ABD_TournamentMonster
         if ( toLearn.Count > 0 ) {
             monster.techniques += (uint) ( 1 << toLearn[ Random.Shared.Next() % toLearn.Count ] );
         }
+    }
+
+    /// <summary>
+    /// Promotes a Monster to a specifc rank, learning specials at D and A ranks. 
+    /// Relies on the order of the enum to work properly!
+    /// </summary>
+    /// <param name="rank"></param>
+    public void PromoteToRank ( EMonsterRanks rank ) {
+        if ( rank >= _monsterRank ) { _monsterRank = rank; return; }
+
+        else {
+            while ( _monsterRank != rank ) {
+                _monsterRank--;
+                if ( _monsterRank == EMonsterRanks.A ) { LearnBattleSpecial(); }
+                if ( _monsterRank == EMonsterRanks.D ) { LearnBattleSpecial(); }
+            }
+        }
+    }
+
+    public void LearnBattleSpecial() {
+        monster.battle_specials |= (ushort) ( 1 << TournamentData.GrowthRNG.Next() % 13 );
     }
 
     public byte[] ToSaveFile() {

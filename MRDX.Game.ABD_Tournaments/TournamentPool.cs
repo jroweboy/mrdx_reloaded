@@ -77,6 +77,8 @@ namespace MRDX.Game.ABD_Tournaments
             promoted.LearnTechnique();
             promoted._monsterRank = newPool._monsterRank;
 
+
+
             MonsterRemove( promoted );
             newPool.MonsterAdd( promoted );
             TournamentData._mod.DebugLog( 1, promoted.monster.name + " promoted.", Color.LightBlue );
@@ -191,8 +193,8 @@ namespace MRDX.Game.ABD_Tournaments
             abdm.monster.stat_int = 40;
 
             abdm.monster.per_nature = (byte) ( Random.Shared.Next() % 255 );
-            abdm.monster.per_fear = (byte) ( Random.Shared.Next() % 100 );
-            abdm.monster.per_spoil = (byte) ( Random.Shared.Next() % 100 );
+            abdm.monster.per_fear = (byte) ( Random.Shared.Next() % 25 );
+            abdm.monster.per_spoil = (byte) ( Random.Shared.Next() % 25 );
 
             abdm.monster.arena_movespeed = (byte) ( Random.Shared.Next() % 4 ); // TODO: Where does this come from?
             abdm.monster.arena_gutsrate = (byte) ( 7 + Random.Shared.Next() % 14 ); // 7 - 20?
@@ -221,9 +223,9 @@ namespace MRDX.Game.ABD_Tournaments
                 abdm.lifespan = 6;
             }
 
-            abdm._monsterRank = _monsterRank;
-
-            TournamentData._mod.DebugLog( 2, "TP: Complete", Color.AliceBlue );
+            abdm.PromoteToRank( _monsterRank );
+            
+                TournamentData._mod.DebugLog( 2, "TP: Complete", Color.AliceBlue );
             tournamentData.monsters.Add( abdm );
             this.MonsterAdd( abdm );
         }

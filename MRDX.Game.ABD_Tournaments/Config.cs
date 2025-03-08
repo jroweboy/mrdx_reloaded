@@ -94,16 +94,16 @@ public class Config : Configurable<Config>
     [DisplayName( "Average Monthly Growth" )]
     [Description( "The average monthly growth rate for trainer monsters in their prime.\n" +
         "This value can be impacted by multiple factors including breed, variance, and age." )]
-    [DefaultValue( 48 )]
-    public int _confABD_growth_monthly { get; set; } = 48;
+    [DefaultValue( 40 )]
+    public int _confABD_growth_monthly { get; set; } = 40;
 
     [Category( "Advanced - Monster Growths" )]
     [DisplayName( "Monthly Growth Variance" )]
     [Description( "The general variance for trainer monster growth rates in prime.\n" +
         "Higher variance will result in some opponent tournament monsters being powerful for their class.\n" +
         "Higher variance will result in the appearance of more stragglers (monsters stuck or lagging for their class.")]
-    [DefaultValue( 12 )]
-    public int _confABD_growth_monthlyvariance { get; set; } = 12;
+    [DefaultValue( 10 )]
+    public int _confABD_growth_monthlyvariance { get; set; } = 10;
 
     [Category("Advanced - Mod Debugging")]
     [DisplayName("Reloaded Message Verbosity")]
