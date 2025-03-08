@@ -208,7 +208,7 @@ public class Mod : ModBase // <= Do not Remove.
             var ulp = GetUnlockedMonsters_Player( unlockAddress );
 
             // This uses some special logic for Unique Monsters. I do not respect the player unlock flag here (which is always true). Otherwise, it's just if either case is true they will show up.
-            for ( var i = 0; i <= 38; i++ ) {
+            for ( var i = 0; i < 38; i++ ) {
                 unlocks[ i ] = (byte) ( unlocks[ i ] | ulp[ i ] );
             }
         }
