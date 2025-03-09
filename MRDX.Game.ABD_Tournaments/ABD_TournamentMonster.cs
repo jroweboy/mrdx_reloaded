@@ -62,8 +62,6 @@ namespace MRDX.Game.ABD_Tournaments
 
             growth_group = (growth_groups) ( TournamentData.GrowthRNG.Next() % 6 );
 
-
-
             TournamentData._mod.DebugLog( 2, "Monster Created: " + m.name + ", " + m.breed_main + "/" + m.breed_sub + ", LIFE: " + lifespan + ", GROWTH: " + growth_rate, Color.Lime );
 
             SetupGrowthOptions();
@@ -106,9 +104,11 @@ namespace MRDX.Game.ABD_Tournaments
             lifespan--;
             if ( lifespan == 0 ) { alive = false; }
 
-            if ( ( lifetotal - lifespan ) > 8 ) { agegroup++; }
-            if ( ( lifetotal - lifespan ) > 16 ) { agegroup += 2; }
-            if ( lifespan < 18 ) { agegroup--; }
+            // Added an additonal prime grouping. This can result in a situation where a monster gets like, 2-3 months of optimal growth for ultra short life creatures but whatever, that's the price they pay. Longer life is better in this world objectively. Sorry! :(
+            if ( ( lifetotal - lifespan ) > 9 ) { agegroup++; }
+            if ( ( lifetotal - lifespan ) > 15 ) { agegroup++; }
+            if ( ( lifetotal - lifespan ) > 22 ) { agegroup++; }
+            if ( lifespan < 16 ) { agegroup--; }
             if ( lifespan < 6 ) { agegroup -= 2; }
 
             agegroup *= growth_rate;
