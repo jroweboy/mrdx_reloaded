@@ -44,49 +44,49 @@ public class Config : Configurable<Config>
     [Description( "The Soft Stat Cap to promote from M4 to Legend Status.\n" +
         "Note: This currently has no effect on the player." )]
     [DefaultValue( 4600 )]
-    public int _confABD_tournament_rank_m4 { get; set; } = 4600;
+    public int _confABD_tournament_rank_m4 { get; set; } = 4500;
 
     [Category( "Tournament Ranks" )]
     [DisplayName( "Stat Cap - S Rank" )]
     [Description( "The Soft Stat Cap to promote from S into M4.\n" +
         "Note: This currently has no effect on the player." )]
-    [DefaultValue( 3900 )]
-    public int _confABD_tournament_rank_s { get; set; } = 3900;
+    [DefaultValue( 3500 )]
+    public int _confABD_tournament_rank_s { get; set; } = 3500;
 
     [Category( "Tournament Ranks" )]
     [DisplayName( "Stat Cap - A Rank" )]
     [Description( "The Soft Stat Cap to promote from A into S.\n" +
     "Note: This currently has no effect on the player." )]
-    [DefaultValue( 3300 )]
-    public int _confABD_tournament_rank_a { get; set; } = 3300;
+    [DefaultValue( 2700 )]
+    public int _confABD_tournament_rank_a { get; set; } = 2700;
 
     [Category( "Tournament Ranks" )]
     [DisplayName( "Stat Cap - B Rank" )]
     [Description( "The Soft Stat Cap to promote from B into A.\n" +
     "Note: This currently has no effect on the player." )]
-    [DefaultValue( 2700 )]
-    public int _confABD_tournament_rank_b { get; set; } = 2700;
+    [DefaultValue( 2100 )]
+    public int _confABD_tournament_rank_b { get; set; } = 2100;
 
     [Category( "Tournament Ranks" )]
     [DisplayName( "Stat Cap - C Rank" )]
     [Description( "The Soft Stat Cap to promote from C into B.\n" +
     "Note: This currently has no effect on the player." )]
-    [DefaultValue( 2000 )]
-    public int _confABD_tournament_rank_c { get; set; } = 2000;
+    [DefaultValue( 1600 )]
+    public int _confABD_tournament_rank_c { get; set; } = 1600;
 
     [Category( "Tournament Ranks" )]
     [DisplayName( "Stat Cap - D Rank" )]
     [Description( "The Soft Stat Cap to promote from D into C.\n" +
     "Note: This currently has no effect on the player." )]
-    [DefaultValue( 1500 )]
-    public int _confABD_tournament_rank_d { get; set; } = 1500;
+    [DefaultValue( 1200 )]
+    public int _confABD_tournament_rank_d { get; set; } = 1200;
 
     [Category( "Tournament Ranks" )]
     [DisplayName( "Stat Cap - E Rank" )]
     [Description( "The Soft Stat Cap to promote from E into D.\n" +
     "Note: This currently has no effect on the player." )]
-    [DefaultValue( 1000 )]
-    public int _confABD_tournament_rank_e { get; set; } = 1000;
+    [DefaultValue( 1200 )]
+    public int _confABD_tournament_rank_e { get; set; } = 900;
 
     //[Category("Advanced - Tournament Ranks") ]
     //[DisplayName("")]
@@ -94,16 +94,16 @@ public class Config : Configurable<Config>
     [DisplayName( "Average Monthly Growth" )]
     [Description( "The average monthly growth rate for trainer monsters in their prime.\n" +
         "This value can be impacted by multiple factors including breed, variance, and age." )]
-    [DefaultValue( 40 )]
-    public int _confABD_growth_monthly { get; set; } = 40;
+    [DefaultValue( 36 )]
+    public int _confABD_growth_monthly { get; set; } = 36;
 
     [Category( "Advanced - Monster Growths" )]
     [DisplayName( "Monthly Growth Variance" )]
     [Description( "The general variance for trainer monster growth rates in prime.\n" +
         "Higher variance will result in some opponent tournament monsters being powerful for their class.\n" +
         "Higher variance will result in the appearance of more stragglers (monsters stuck or lagging for their class.")]
-    [DefaultValue( 10 )]
-    public int _confABD_growth_monthlyvariance { get; set; } = 10;
+    [DefaultValue( 12 )]
+    public int _confABD_growth_monthlyvariance { get; set; } = 12;
 
     [Category("Advanced - Mod Debugging")]
     [DisplayName("Reloaded Message Verbosity")]

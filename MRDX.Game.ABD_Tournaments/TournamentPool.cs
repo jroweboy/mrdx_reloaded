@@ -55,8 +55,14 @@ namespace MRDX.Game.ABD_Tournaments
             }
         }
 
-        public void MonsterPromoteToNewPool ( TournamentPool newPool ) {
-            TournamentData._mod.DebugLog( 1, "Promoting monster from " + _name + " to " + newPool._name, Color.LightBlue );
+        /// <summary>
+        /// This function promotes two sets of monsters. 
+        /// 1. A random monster from the class, extremely weighted towards any monsters approaching the top of the soft stat cap.
+        /// 2. Any monsters remaining in the class that are over the soft stat cap by a small amount.
+        /// </summary>
+        /// <param name="newPool"></param>
+        public void MonstersPromoteToNewPool ( TournamentPool newPool ) {
+            TournamentData._mod.DebugLog( 1, "Promoting monsters from " + _name + " to " + newPool._name, Color.LightBlue );
             int stattotal = 0; ABD_TournamentMonster promoted;
             promoted = monsters[ 0 ];
 
@@ -74,14 +80,22 @@ namespace MRDX.Game.ABD_Tournaments
                 if ( stattotal <= 0 ) { break; }
             }
 
-            promoted.LearnTechnique();
-            promoted._monsterRank = newPool._monsterRank;
+            MonsterPromoteToNewPool( promoted, newPool );
 
+            for ( var i = monsters.Count() - 1; i >= 0; i-- ) { 
+                if ( monsters[i].monster.stat_total - 100 > stat_end ) {
+                    MonsterPromoteToNewPool( monsters[ i ], newPool );
+                }
+            }
+        }
 
+        private void MonsterPromoteToNewPool( ABD_TournamentMonster monster, TournamentPool newPool ) {
+            monster.LearnTechnique();
+            monster._monsterRank = newPool._monsterRank;
 
-            MonsterRemove( promoted );
-            newPool.MonsterAdd( promoted );
-            TournamentData._mod.DebugLog( 1, promoted.monster.name + " promoted.", Color.LightBlue );
+            MonsterRemove( monster );
+            newPool.MonsterAdd( monster );
+            TournamentData._mod.DebugLog( 1, monster.monster.name + " promoted.", Color.LightBlue );
         }
 
         public void GenerateNewValidMonster ( List<MonsterGenus> available ) {
@@ -162,7 +176,6 @@ namespace MRDX.Game.ABD_Tournaments
                 for ( var i = 0; i < 100; i++ ) {
                     breed = MonsterBreed.AllBreeds[ Random.Shared.Next() % MonsterBreed.AllBreeds.Count ];
                     if ( available.Contains( breed.breed_id ) && available.Contains( breed.sub_id ) ) {
-                        
                         break;
                     }
                 }
