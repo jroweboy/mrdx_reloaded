@@ -59,14 +59,14 @@ public class TournamentData
         TournamentData._logger = logger;
         TournamentData._configuration = config;
 
-        tournamentPools.Add( ETournamentPools.L, new TournamentPool( this, EMonsterRanks.L, ETournamentPools.L, "Legend", 2, 52, 53,     _configuration._confABD_tournament_rank_m4, 9999, 10 ) );
-        tournamentPools.Add( ETournamentPools.M, new TournamentPool( this, EMonsterRanks.M, ETournamentPools.M, "Major 4", 8, 54, 61,    _configuration._confABD_tournament_rank_s,  _configuration._confABD_tournament_rank_m4 - 1, 8 ) );
-        tournamentPools.Add( ETournamentPools.S, new TournamentPool( this, EMonsterRanks.S, ETournamentPools.S, "S Rank", 8, 1, 8,       _configuration._confABD_tournament_rank_a,  _configuration._confABD_tournament_rank_s - 1, 6));
-        tournamentPools.Add( ETournamentPools.A, new TournamentPool( this, EMonsterRanks.A, ETournamentPools.A, "A Rank", 8, 9, 16,      _configuration._confABD_tournament_rank_b,  _configuration._confABD_tournament_rank_a - 1, 5));
-        tournamentPools.Add( ETournamentPools.B, new TournamentPool( this, EMonsterRanks.B, ETournamentPools.B, "B Rank", 10, 17, 26,    _configuration._confABD_tournament_rank_c,  _configuration._confABD_tournament_rank_b - 1, 4));
-        tournamentPools.Add( ETournamentPools.C, new TournamentPool( this, EMonsterRanks.C, ETournamentPools.C, "C Rank", 10, 27, 36,    _configuration._confABD_tournament_rank_d,  _configuration._confABD_tournament_rank_c - 1, 2));
-        tournamentPools.Add( ETournamentPools.D, new TournamentPool( this, EMonsterRanks.D, ETournamentPools.D, "D Rank", 8, 37, 44,     _configuration._confABD_tournament_rank_e,  _configuration._confABD_tournament_rank_d - 1, 1));
-        tournamentPools.Add( ETournamentPools.E, new TournamentPool( this, EMonsterRanks.E, ETournamentPools.E, "E Rank", 6, 45, 50,     750,                                        _configuration._confABD_tournament_rank_e - 1, 0));
+        tournamentPools.Add( ETournamentPools.L, new TournamentPool( this, EMonsterRanks.L, ETournamentPools.L, "Legend", 2, 52, 53,     _configuration._confABD_tournament_rank_m4,        9999, 10 ) );
+        tournamentPools.Add( ETournamentPools.M, new TournamentPool( this, EMonsterRanks.M, ETournamentPools.M, "Major 4", 8, 54, 61,    _configuration._confABD_tournament_rank_s,         _configuration._confABD_tournament_rank_m4 - 1, 8 ) );
+        tournamentPools.Add( ETournamentPools.S, new TournamentPool( this, EMonsterRanks.S, ETournamentPools.S, "S Rank", 8, 1, 8,       _configuration._confABD_tournament_rank_a,         _configuration._confABD_tournament_rank_s - 1, 6));
+        tournamentPools.Add( ETournamentPools.A, new TournamentPool( this, EMonsterRanks.A, ETournamentPools.A, "A Rank", 8, 9, 16,      _configuration._confABD_tournament_rank_b,         _configuration._confABD_tournament_rank_a - 1, 5));
+        tournamentPools.Add( ETournamentPools.B, new TournamentPool( this, EMonsterRanks.B, ETournamentPools.B, "B Rank", 10, 17, 26,    _configuration._confABD_tournament_rank_c,         _configuration._confABD_tournament_rank_b - 1, 4));
+        tournamentPools.Add( ETournamentPools.C, new TournamentPool( this, EMonsterRanks.C, ETournamentPools.C, "C Rank", 10, 27, 36,    _configuration._confABD_tournament_rank_d,         _configuration._confABD_tournament_rank_c - 1, 2));
+        tournamentPools.Add( ETournamentPools.D, new TournamentPool( this, EMonsterRanks.D, ETournamentPools.D, "D Rank", 8, 37, 44,     _configuration._confABD_tournament_rank_e,         _configuration._confABD_tournament_rank_d - 1, 1));
+        tournamentPools.Add( ETournamentPools.E, new TournamentPool( this, EMonsterRanks.E, ETournamentPools.E, "E Rank", 6, 45, 50,     _configuration._confABD_tournament_rank_e - 250,   _configuration._confABD_tournament_rank_e - 1, 0));
 
 
         tournamentPools.Add( ETournamentPools.A_Phoenix, new TournamentPool( this, EMonsterRanks.A,     ETournamentPools.A_Phoenix, "A - Phoenix", 3, 62, 64, _configuration._confABD_tournament_rank_b, _configuration._confABD_tournament_rank_a, 6 ) );
