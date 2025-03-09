@@ -1,6 +1,6 @@
 {
     "ModId": "MRDX.Game.ABD_Tournaments",
-    "ModName": "ABD Tournaments",
+    "ModName": "Dynamic Tournament Progression",
     "ModAuthor": "ArchbishopDave",
     "ModVersion": "{{ MOD_VERSION }}",
     "ModDescription": "Dynamically updates tournament data as time passes. New monsters are introduced into tournament brackets and grow over time.",
