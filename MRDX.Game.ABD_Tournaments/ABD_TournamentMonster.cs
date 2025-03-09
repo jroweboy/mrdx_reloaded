@@ -44,12 +44,7 @@ namespace MRDX.Game.ABD_Tournaments
             growth_rate = Math.Clamp( growth_rate, (ushort) ( TournamentData._configuration._confABD_growth_monthly / 2 ), (ushort) ( TournamentData._configuration._confABD_growth_monthly * 1.66 ) );
             TournamentData._mod.DebugLog( 3, "Growth Post Variance" + growth_rate, Color.Lime );
 
-            growth_rate = (ushort) ( 1 + ( growth_rate / 4 ) ); // Account for Prime Bonus, 4x
-            TournamentData._mod.DebugLog( 3, "Growth Post Prime" + growth_rate, Color.Lime );
-
-            growth_group = (growth_groups) ( TournamentData.GrowthRNG.Next() % 6 );
-
-            // This section applies special bonuses to monster breeds. Dragons are in both groups, and a pure Dragon/Dragon gets +6/+4 to its growth rate. A Tiger/Gali would only get +0/+2 as Gali is only in one group and only the sub.
+            // This section applies special bonuses to monster breeds. These numbers needed to be way lower. Double Rare species were busted.
             List<MonsterGenus> bonuses = new List<MonsterGenus>(); List<MonsterGenus> bonuses2 = new List<MonsterGenus>();
             bonuses.AddRange( [MonsterGenus.Dragon, MonsterGenus.Centaur, MonsterGenus.Beaclon, MonsterGenus.Henger, MonsterGenus.Wracky, MonsterGenus.Durahan, MonsterGenus.Gali, MonsterGenus.Zilla, MonsterGenus.Bajarl, MonsterGenus.Phoenix,
             MonsterGenus.Metalner, MonsterGenus.Jill, MonsterGenus.Joker, MonsterGenus.Undine, MonsterGenus.Mock, MonsterGenus.Unknown1, MonsterGenus.Unknown2, MonsterGenus.Unknown3, MonsterGenus.Unknown4, MonsterGenus.Unknown5, MonsterGenus.Unknown6] );
@@ -61,6 +56,13 @@ namespace MRDX.Game.ABD_Tournaments
             if ( bonuses2.Contains( monster.breed_main ) ) { growth_rate += 3; }
             if ( bonuses.Contains( monster.breed_sub ) ) { growth_rate += 2; }
             if ( bonuses2.Contains( monster.breed_sub ) ) { growth_rate += 2; }
+
+            growth_rate = (ushort) ( 1 + ( growth_rate / 4 ) ); // Account for Prime Bonus, 4x
+            TournamentData._mod.DebugLog( 3, "Growth Post Prime" + growth_rate, Color.Lime );
+
+            growth_group = (growth_groups) ( TournamentData.GrowthRNG.Next() % 6 );
+
+
 
             TournamentData._mod.DebugLog( 2, "Monster Created: " + m.name + ", " + m.breed_main + "/" + m.breed_sub + ", LIFE: " + lifespan + ", GROWTH: " + growth_rate, Color.Lime );
 
