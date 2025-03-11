@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <Nullable>enable</Nullable>
-        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <TargetFramework>net9.0</TargetFramework>
         <Version Condition="'$(BaseExtractBinInterfaceVersion)' == ''">9.9.9.9</Version>
         <Version Condition="'$(BaseExtractBinInterfaceVersion)' != ''">$(BaseExtractBinInterfaceVersion)</Version>
         <AssemblyVersion Condition="'$(BaseExtractBinInterfaceVersion)' == ''">9.9.9.9</AssemblyVersion>

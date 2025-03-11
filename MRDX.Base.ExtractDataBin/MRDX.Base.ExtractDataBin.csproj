@@ -13,7 +13,7 @@
              If you set this to true, trimming will be enabled when you publish the mod.
              Test trimming with: `BuildLinked.ps1` in PowerShell. -->
         <ReloadedILLink>false</ReloadedILLink>
-        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <TargetFramework>net9.0</TargetFramework>
         <!-- Use a default version for development -->
         <Version Condition="'$(Version)' == ''">9.9.9.9</Version>
         <AssemblyVersion Condition="'$(AssemblyVersion)' == ''">9.9.9.9</AssemblyVersion>
