@@ -48,9 +48,7 @@ jobs:
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: |
-          5.0.x
-          6.0.x
-          7.0.x
+          9.0.x
 
     - name: Build
       run: ./PublishAll.ps1 -ChangelogPath "$env:PUBLISH_CHANGELOG_PATH"
