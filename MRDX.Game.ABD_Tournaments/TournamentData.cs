@@ -20,7 +20,7 @@ public enum EMonsterRanks { L, M, S, A, B, C, D, E };
 public enum ETournamentPools { L, M, S, A, B, C, D, E,
     A_Phoenix, A_DEdge, B_Dragon, F_Hero, F_Heel, F_Elder,
     S_FIMBA, A_FIMBA, B_FIMBA, C_FIMBA, D_FIMBA,
-    S_FIMBA2, A_FIMBA2, B_FIMBA2, C_FIMBA2, D_FIMBA2,
+    S_FIMBA2, A_FIMBA2, B_FIMBA2, C_FIMBA2, D_FIMBA2, X_MOO
 }
 public class TournamentData
 {
@@ -68,6 +68,7 @@ public class TournamentData
         tournamentPools.Add( ETournamentPools.D, new TournamentPool( this, EMonsterRanks.D, ETournamentPools.D, "D Rank", 8, 37, 44,     _configuration._confABD_tournament_rank_e,         _configuration._confABD_tournament_rank_d - 1, 1));
         tournamentPools.Add( ETournamentPools.E, new TournamentPool( this, EMonsterRanks.E, ETournamentPools.E, "E Rank", 6, 45, 50,     _configuration._confABD_tournament_rank_e - 250,   _configuration._confABD_tournament_rank_e - 1, 0));
 
+        tournamentPools.Add( ETournamentPools.X_MOO, new TournamentPool( this, EMonsterRanks.L, ETournamentPools.X_MOO, "L - Moo", 6, 51, 51, _configuration._confABD_tournament_rank_m4 + 250, 9999, 10 ) );
 
         tournamentPools.Add( ETournamentPools.A_Phoenix, new TournamentPool( this, EMonsterRanks.A,     ETournamentPools.A_Phoenix, "A - Phoenix", 3, 62, 64, _configuration._confABD_tournament_rank_b, _configuration._confABD_tournament_rank_a, 6 ) );
         tournamentPools.Add( ETournamentPools.A_DEdge, new TournamentPool( this, EMonsterRanks.A,       ETournamentPools.A_DEdge,   "A - Double Edge", 1, 66, 66, _configuration._confABD_tournament_rank_b, _configuration._confABD_tournament_rank_a, 6 ) );
@@ -101,28 +102,29 @@ public class TournamentData
         else if ( id >= 37 && id <= 44 )    { pool = ETournamentPools.D; }
         else if ( id >= 45 && id <= 50 )    { pool = ETournamentPools.E; }
 
-        else if ( id >= 52 && id <= 53 ) { pool = ETournamentPools.L; }
-        else if ( id >= 54 && id <= 61 ) { pool = ETournamentPools.M; }
+        else if ( id >= 51 && id <= 51 )    { pool = ETournamentPools.X_MOO; } 
+        else if ( id >= 52 && id <= 53 )    { pool = ETournamentPools.L; }
+        else if ( id >= 54 && id <= 61 )    { pool = ETournamentPools.M; }
 
-        else if ( id >= 62 && id <= 64 ) { pool = ETournamentPools.A_Phoenix; }
-        else if ( id >= 65 && id <= 65 ) { pool = ETournamentPools.B_Dragon; }
-        else if ( id >= 66 && id <= 66 ) { pool = ETournamentPools.A_DEdge; }
-        
-        else if ( id >= 67 && id <= 71 ) { pool = ETournamentPools.F_Hero; }
-        else if ( id >= 72 && id <= 76 ) { pool = ETournamentPools.F_Heel; }
-        else if ( id >= 77 && id <= 79 ) { pool = ETournamentPools.F_Elder; }
+        else if ( id >= 62 && id <= 64 )    { pool = ETournamentPools.A_Phoenix; }
+        else if ( id >= 65 && id <= 65 )    { pool = ETournamentPools.B_Dragon; }
+        else if ( id >= 66 && id <= 66 )    { pool = ETournamentPools.A_DEdge; }
 
-        else if ( id >= 80 && id <= 83 ) { pool = ETournamentPools.S_FIMBA; }
-        else if ( id >= 84 && id <= 87 ) { pool = ETournamentPools.A_FIMBA; }
-        else if ( id >= 88 && id <= 91 ) { pool = ETournamentPools.B_FIMBA; }
-        else if ( id >= 92 && id <= 95 ) { pool = ETournamentPools.C_FIMBA; }
-        else if ( id >= 96 && id <= 99 ) { pool = ETournamentPools.D_FIMBA; }
+        else if ( id >= 67 && id <= 71 )    { pool = ETournamentPools.F_Hero; }
+        else if ( id >= 72 && id <= 76 )    { pool = ETournamentPools.F_Heel; }
+        else if ( id >= 77 && id <= 79 )    { pool = ETournamentPools.F_Elder; }
 
-        else if ( id >= 100 && id <= 103 ) { pool = ETournamentPools.S_FIMBA2; }
-        else if ( id >= 104 && id <= 107 ) { pool = ETournamentPools.A_FIMBA2; }
-        else if ( id >= 108 && id <= 111 ) { pool = ETournamentPools.B_FIMBA2; }
-        else if ( id >= 112 && id <= 115 ) { pool = ETournamentPools.C_FIMBA2; }
-        else if ( id >= 116 && id <= 118 ) { pool = ETournamentPools.D_FIMBA2; }
+        else if ( id >= 80 && id <= 83 )    { pool = ETournamentPools.S_FIMBA; }
+        else if ( id >= 84 && id <= 87 )    { pool = ETournamentPools.A_FIMBA; }
+        else if ( id >= 88 && id <= 91 )    { pool = ETournamentPools.B_FIMBA; }
+        else if ( id >= 92 && id <= 95 )    { pool = ETournamentPools.C_FIMBA; }
+        else if ( id >= 96 && id <= 99 )    { pool = ETournamentPools.D_FIMBA; }
+
+        else if ( id >= 100 && id <= 103 )  { pool = ETournamentPools.S_FIMBA2; }
+        else if ( id >= 104 && id <= 107 )  { pool = ETournamentPools.A_FIMBA2; }
+        else if ( id >= 108 && id <= 111 )  { pool = ETournamentPools.B_FIMBA2; }
+        else if ( id >= 112 && id <= 115 )  { pool = ETournamentPools.C_FIMBA2; }
+        else if ( id >= 116 && id <= 119 )  { pool = ETournamentPools.D_FIMBA2; }
 
         abdm._monsterRank = tournamentPools[ pool ]._monsterRank;
 
