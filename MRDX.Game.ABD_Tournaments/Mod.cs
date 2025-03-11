@@ -169,6 +169,7 @@ public class Mod : ModBase // <= Do not Remove.
             string bytes = ""; for ( var z = 0; z < 60; z++ ) { bytes += rawmonster[ z ] + ","; }
             DebugLog( 2, "Monster " + i + " Parsed: " + tm, Color.Lime );
         }
+        fs.Close();
 
         tournamentData._initialized = true;
 
