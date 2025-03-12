@@ -68,7 +68,7 @@ jobs:
           ./mrdx_reloaded.r2pack
 
     - name: Upload Latest Prerelease to GitHub Releases
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v2
       with:
         # Overwrite the previous prerelease tag
         prerelease: true
@@ -81,7 +81,7 @@ jobs:
           ./mrdx_reloaded.r2pack
 
     - name: Release if tagged version
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v2
       if: github.ref_type == 'tag'
       with:
         # Newline-delimited list of path globs for asset files to upload
