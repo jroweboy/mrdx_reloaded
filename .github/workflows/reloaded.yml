@@ -33,9 +33,18 @@ env:
   #RELEASE_TAG: ${{ github.ref_name }}
 
 jobs:
-  setup-release-tag:
+  build:
     runs-on: windows-latest
+    defaults:
+      run:
+        shell: pwsh
+
     steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        submodules: 'recursive'
+
     - name: Export RELEASE_TAG depending on build type
       shell: bash
       run: |
@@ -44,18 +53,6 @@ jobs:
         else
           echo "RELEASE_TAG=prerelease" >> $GITHUB_ENV
         fi
-  
-  build:
-    runs-on: windows-latest
-    defaults:
-      run:
-        shell: pwsh
-
-    steps:
-    - uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
-        submodules: 'recursive'
 
     - name: Setup .NET Core SDK (5.0/6.0/7.0)
       uses: actions/setup-dotnet@v3
