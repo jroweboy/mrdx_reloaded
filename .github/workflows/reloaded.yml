@@ -13,6 +13,7 @@
 
 name: Build and Publish Reloaded Mod
 permissions:
+  packages: write
   contents: write
 on:
   push:
