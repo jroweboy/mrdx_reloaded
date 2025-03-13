@@ -12,6 +12,10 @@
 #   - Upload to Reloaded NuGet Repository
 
 name: Build and Publish Reloaded Mod
+permissions:
+  packages: write
+  contents: write
+  deployments: write
 on:
   push:
     branches: [ main ]
