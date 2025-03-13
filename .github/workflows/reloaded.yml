@@ -48,7 +48,7 @@ jobs:
     - name: Export RELEASE_TAG depending on build type
       shell: bash
       run: |
-        if [ $IS_RELEASE ]; then
+        if [ ${{ env.IS_RELEASE }} ]; then
           echo "RELEASE_TAG=${{ github.ref_name }}" >> $GITHUB_ENV
         else
           echo "RELEASE_TAG=prerelease" >> $GITHUB_ENV
