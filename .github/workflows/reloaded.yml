@@ -37,6 +37,7 @@ jobs:
     runs-on: windows-latest
     steps:
     - name: Export RELEASE_TAG depending on build type
+      shell: bash
       run: |
         if [ $IS_RELEASE ]; then
           echo "RELEASE_TAG=${{ github.ref_name }}" >> $GITHUB_ENV
