@@ -70,6 +70,7 @@ jobs:
 
     - name: Upload Latest Prerelease to GitHub Releases
       uses: softprops/action-gh-release@v2
+      if: !startsWith(github.ref, 'refs/tags/')
       with:
         # Overwrite the previous prerelease tag
         prerelease: true
@@ -83,7 +84,7 @@ jobs:
 
     - name: Release if tagged version
       uses: softprops/action-gh-release@v2
-      if: github.ref_type == 'tag'
+      if: startsWith(github.ref, 'refs/tags/')
       with:
         # Newline-delimited list of path globs for asset files to upload
         files: |
