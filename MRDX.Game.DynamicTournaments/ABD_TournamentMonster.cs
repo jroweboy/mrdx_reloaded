@@ -19,7 +19,7 @@ namespace MRDX.Game.DynamicTournaments
         ushort growth_rate = 0;
         private byte growth_intensity;
         private byte[] growth_options;
-        private byte growth_option_total;
+        private byte growth_options_total;
 
         public EMonsterRanks _monsterRank;
 
@@ -133,8 +133,8 @@ namespace MRDX.Game.DynamicTournaments
                 else if ( growth_intensity == 2 ) { growth_options = [ 6, 5, 8, 18, 2, 4 ]; }
             }
 
-            growth_option_total = 0;
-            for ( var i = 0; i < growth_options.Length; i++ ) { growth_option_total += growth_options[ i ]; }
+            growth_options_total = 0;
+            for ( var i = 0; i < growth_options.Length; i++ ) { growth_options_total += growth_options[ i ]; }
         }
 
         public void AdvanceMonth () {
@@ -154,7 +154,7 @@ namespace MRDX.Game.DynamicTournaments
             TournamentData._mod.DebugLog( 2, "Monster " + monster.name + " Advancing Month: [STATS: " + monster.stat_total + ", GROWTH:" + growth_rate + " CGROW: " + agegroup + ", LIFE: " + lifespan + "]", Color.Yellow );
 
             for ( var i = 0; i < agegroup; i++ ) {
-                var ranStat = growth_options[ TournamentData.GrowthRNG.Next() % growth_options.Length ];
+                var ranStat = TournamentData.GrowthRNG.Next() % growth_options_total;
                 var stat = 0;
                 for ( stat = 0; ranStat >= 0; stat++ ) { ranStat -= growth_options[ stat ]; }
 
@@ -223,7 +223,8 @@ namespace MRDX.Game.DynamicTournaments
             // 0-1, Lifetotal
             // 2-3, Current Remaining Lifespan
             // 4-5, Growth Rate Per Months
-            // 6-7, Growth Group (Enum)
+            // 6, Growth Group (Enum)
+            // 7, Growth Intensity (Enum)
             // 8-9, Monster Rank (Enum)
             // 10-13, TournamentPools (Enums)
             // 14-39, UNUSED
@@ -234,6 +235,7 @@ namespace MRDX.Game.DynamicTournaments
             data[ 2 ] = (byte) lifespan;
             data[ 4 ] = (byte) growth_rate;
             data[ 6 ] = (byte) growth_group;
+            data[ 7 ] = (byte) growth_intensity;
             data[ 8 ] = (byte) _monsterRank;
 
             data[ 10 ] = 0xFF; data[ 11 ] = 0xFF; data[ 12 ] = 0xFF; data[ 13 ] = 0xFF;

@@ -17,6 +17,7 @@ using Reloaded.Memory.SigScan.ReloadedII.Interfaces;
 //using IReloadedHooks = Reloaded.Hooks.ReloadedII.Interfaces.IReloadedHooks;
 
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Diagnostics;
 
 //using static MRDX.Base.Mod.Interfaces.TournamentData;
 //using IReloadedHooks = Reloaded.Hooks.ReloadedII.Interfaces.IReloadedHooks;
@@ -146,6 +147,9 @@ public class Mod : ModBase // <= Do not Remove.
         // startupScanner.TryGetTarget(out var scanner)) SetupCheckShrineUnlockRequirementsHookX(scanner);
         //else
         //_logger.WriteLine($"[{_modConfig.ModId}] Could not load startup scanner!");
+
+        Debugger.Launch();
+
     }
 
     private void SetupMonsterBreeds() {
