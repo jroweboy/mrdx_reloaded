@@ -17,7 +17,9 @@ namespace MRDX.Game.DynamicTournaments
         public ushort lifespan = 0;
 
         ushort growth_rate = 0;
+        private byte growth_intensity;
         private byte[] growth_options;
+        private byte growth_option_total;
 
         public EMonsterRanks _monsterRank;
 
@@ -41,7 +43,7 @@ namespace MRDX.Game.DynamicTournaments
                 growth_rate += (ushort) ( TournamentData.GrowthRNG.Next() % ( 2 * TournamentData._configuration._confABD_growth_monthlyvariance ) );
             }
 
-            growth_rate = Math.Clamp( growth_rate, (ushort) ( TournamentData._configuration._confABD_growth_monthly / 2 ), (ushort) ( TournamentData._configuration._confABD_growth_monthly * 1.66 ) );
+            growth_rate = Math.Clamp( growth_rate, (ushort) ( TournamentData._configuration._confABD_growth_monthly / 2.4 ), (ushort) ( TournamentData._configuration._confABD_growth_monthly * 1.8 ) );
             TournamentData._mod.DebugLog( 3, "Growth Post Variance" + growth_rate, Color.Lime );
 
             // This section applies special bonuses to monster breeds. These numbers needed to be way lower. Double Rare species were busted.
@@ -60,9 +62,10 @@ namespace MRDX.Game.DynamicTournaments
             growth_rate = (ushort) ( 1 + ( growth_rate / 4 ) ); // Account for Prime Bonus, 4x
             TournamentData._mod.DebugLog( 3, "Growth Post Prime" + growth_rate, Color.Lime );
 
-            growth_group = (growth_groups) ( TournamentData.GrowthRNG.Next() % 6 );
-
             TournamentData._mod.DebugLog( 2, "Monster Created: " + m.name + ", " + m.breed_main + "/" + m.breed_sub + ", LIFE: " + lifespan + ", GROWTH: " + growth_rate, Color.Lime );
+
+            growth_group = (growth_groups) ( TournamentData.GrowthRNG.Next() % 6 );
+            growth_intensity = (byte) ( TournamentData.GrowthRNG.Next() % 3 );
 
             SetupGrowthOptions();
         }
@@ -79,6 +82,7 @@ namespace MRDX.Game.DynamicTournaments
             lifespan = rawabd[ 2 ];
             growth_rate = rawabd[ 4 ];
             growth_group = (growth_groups) rawabd[ 6 ];
+            growth_intensity = rawabd[ 7 ];
 
             _monsterRank = (EMonsterRanks) rawabd[ 8 ];
 
@@ -91,12 +95,46 @@ namespace MRDX.Game.DynamicTournaments
         }
 
         private void SetupGrowthOptions () {
-            if ( growth_group == growth_groups.balanced ) { growth_options = [ 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5 ]; }
-            else if ( growth_group == growth_groups.power ) { growth_options = [ 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 4, 4, 4, 4, 4, 5 ]; }
-            else if ( growth_group == growth_groups.intel ) { growth_options = [ 0, 0, 0, 0, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5 ]; }
-            else if ( growth_group == growth_groups.defend ) { growth_options = [ 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 2, 2, 2, 2, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5 ]; }
-            else if ( growth_group == growth_groups.wither ) { growth_options = [ 0, 0, 0, 0, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 5, 5, 5, 5, 5 ]; }
-            else if ( growth_group == growth_groups.speedy ) { growth_options = [ 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 5, 5 ]; }
+            // Life, Pow, Skill, Speed, Def, Int
+            if ( growth_group == growth_groups.balanced ) { growth_options = [ 1, 1, 1, 1, 1, 1 ]; }
+
+            else if ( growth_group == growth_groups.power ) {
+                growth_options = [ 5, 8, 5, 2, 5, 3 ];
+
+                if ( growth_intensity == 1 ) { growth_options = [ 9, 12, 6, 2, 6, 3 ]; }
+                else if ( growth_intensity == 2 ) { growth_options = [ 12, 20, 7, 2, 7, 3 ]; }
+            }
+
+            else if ( growth_group == growth_groups.intel ) { 
+                growth_options = [ 4, 2, 6, 5, 2, 8 ];
+
+                if ( growth_intensity == 1 ) { growth_options = [ 6, 2, 8, 5, 3, 12 ]; }
+                else if ( growth_intensity == 2 ) { growth_options = [ 9, 2, 10, 6, 3, 18 ]; }
+            }
+
+            else if ( growth_group == growth_groups.defend ) { 
+                growth_options = [ 8, 3, 4, 2, 9, 2 ];
+
+                if ( growth_intensity == 1 ) { growth_options = [ 10, 4, 4, 2, 14, 3 ]; }
+                else if ( growth_intensity == 2 ) { growth_options = [ 13, 4, 5, 2, 18, 4 ]; }
+            }
+
+            else if ( growth_group == growth_groups.wither ) { 
+                growth_options = [ 4, 2, 7, 5, 2, 5 ];
+
+                if ( growth_intensity == 1 ) { growth_options = [ 5, 2, 12, 7, 2, 5 ]; }
+                else if ( growth_intensity == 2 ) { growth_options = [ 6, 3, 16, 8, 2, 6 ]; }
+            }
+
+            else if ( growth_group == growth_groups.speedy ) { 
+                growth_options = [ 4, 4, 5, 8, 2, 3 ];
+
+                if ( growth_intensity == 1 ) { growth_options = [ 5, 5, 6, 14, 2, 3 ]; }
+                else if ( growth_intensity == 2 ) { growth_options = [ 6, 5, 8, 18, 2, 4 ]; }
+            }
+
+            growth_option_total = 0;
+            for ( var i = 0; i < growth_options.Length; i++ ) { growth_option_total += growth_options[ i ]; }
         }
 
         public void AdvanceMonth () {
@@ -116,7 +154,10 @@ namespace MRDX.Game.DynamicTournaments
             TournamentData._mod.DebugLog( 2, "Monster " + monster.name + " Advancing Month: [STATS: " + monster.stat_total + ", GROWTH:" + growth_rate + " CGROW: " + agegroup + ", LIFE: " + lifespan + "]", Color.Yellow );
 
             for ( var i = 0; i < agegroup; i++ ) {
-                var stat = growth_options[ TournamentData.GrowthRNG.Next() % growth_options.Length ];
+                var ranStat = growth_options[ TournamentData.GrowthRNG.Next() % growth_options.Length ];
+                var stat = 0;
+                for ( stat = 0; ranStat >= 0; stat++ ) { ranStat -= growth_options[ stat ]; }
+
                 if ( stat == 0 && monster.stat_lif <= 999 ) { monster.stat_lif++; }
                 else if ( stat == 1 && monster.stat_pow <= 999 ) { monster.stat_pow++; }
                 else if ( stat == 2 && monster.stat_ski <= 999 ) { monster.stat_ski++; }
@@ -139,14 +180,15 @@ namespace MRDX.Game.DynamicTournaments
             for ( var i = 0; i < 24; i++ ) {
                 var type = breedInfo.technique_types[ i ];
                 if ( type != 6 && ( ( monster.techniques >> i ) & 1 ) == 0 ) {
-                    if ( growth_group == growth_groups.power && type == 2 ) { toLearn.Add( (byte) i ); }
-                    else if ( growth_group == growth_groups.intel && type == 1 ) { toLearn.Add( (byte) i ); }
-                    else if ( growth_group == growth_groups.wither && type == 3 ) { toLearn.Add( (byte) i ); }
-                    else if ( growth_group == growth_groups.speedy && type == 4 ) { toLearn.Add( (byte) i ); }
+                    if ( growth_group == growth_groups.power && type == 2 ) { toLearn.Add( (byte) i ); toLearn.Add( (byte) i ); toLearn.Add( (byte) i ); }
+                    else if ( growth_group == growth_groups.intel && type == 1 ) { toLearn.Add( (byte) i ); toLearn.Add( (byte) i ); toLearn.Add( (byte) i ); }
+                    else if ( growth_group == growth_groups.wither && type == 3 ) { toLearn.Add( (byte) i ); toLearn.Add( (byte) i ); toLearn.Add( (byte) i ); }
+                    else if ( growth_group == growth_groups.speedy && type == 4 ) { toLearn.Add( (byte) i ); toLearn.Add( (byte) i ); toLearn.Add( (byte) i ); }
 
                     if ( breedInfo.technique_types[ i ] == 5 ) {
                         if ( ( _monsterRank == EMonsterRanks.S || _monsterRank == EMonsterRanks.A || _monsterRank == EMonsterRanks.B ) ) { toLearn.Add( (byte) i ); toLearn.Add( (byte) i ); }
                     }
+
                     else { toLearn.Add( (byte) i ); }
                 }
             }

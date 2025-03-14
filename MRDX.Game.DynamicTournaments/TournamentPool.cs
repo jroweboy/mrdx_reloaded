@@ -184,7 +184,6 @@ namespace MRDX.Game.DynamicTournaments
         }
         private void GenerateNewValidMonster ( MonsterBreed breed ) {
             TournamentData._mod.DebugLog( 2, "TP: Generating", Color.AliceBlue );
-            //byte[] nmraw = [ 181, 0, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 215, 0, 72, 1, 228, 0, 233, 0, 184, 0, 216, 0, 50, 50, 50, 0, 255, 104, 9, 0, 3, 13, 0, 0, 65, 0, 0, 0, 0, 0, 255, 255 ];
             byte[] nmraw = new byte[ 60 ];// This doesn't matter, it gets completely overwritten below anyways.
             TournamentMonster nm = new TournamentMonster( nmraw );
 
@@ -197,11 +196,11 @@ namespace MRDX.Game.DynamicTournaments
 
             abdm.monster.name = TournamentData._random_name_list[ Random.Shared.Next() % TournamentData._random_name_list.Length ];
             abdm.monster.stat_lif = 90;
-            abdm.monster.stat_pow = 40;
-            abdm.monster.stat_ski = 70;
+            abdm.monster.stat_pow = 50;
+            abdm.monster.stat_ski = 50;
             abdm.monster.stat_spd = 50;
-            abdm.monster.stat_def = 60;
-            abdm.monster.stat_int = 40;
+            abdm.monster.stat_def = 50;
+            abdm.monster.stat_int = 50;
 
             abdm.monster.per_nature = (byte) ( Random.Shared.Next() % 255 );
             abdm.monster.per_fear = (byte) ( Random.Shared.Next() % 25 );

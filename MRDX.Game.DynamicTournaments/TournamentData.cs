@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections;
+using System.Diagnostics.Metrics;
 using System.Diagnostics.Tracing;
 using System.Drawing;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.JavaScript;
 using System.Runtime.InteropServices.Marshalling;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using MRDX.Base.ExtractDataBin.Interface;
 using MRDX.Base.Mod;
@@ -27,8 +29,8 @@ public class TournamentData
     public static Mod _mod;
     public static ILogger _logger;
     public static Config _configuration;
-    
-    public static string[] _random_name_list = ["Cimasio", "Kyrades", "Ambroros", "Teodeus", "Lazan", "Pegetus", "Perseos", "Asandrou", "Agametrios", 
+
+    public static string[] _random_name_list = ["Cimasio", "Kyrades", "Ambroros", "Teodeus", "Lazan", "Pegetus", "Perseos", "Asandrou", "Agametrios",
         "Lazion", "Morphosyne", "Gelantinos", "Narkelous", "Taloclus", "Baltsalus", "Hypnaeon", "Atrol", "Alexede", "Baccinos", "Idastos", "Ophyroe","Larissa", "Asperata",
         "Alnifolia","Dentala","Celsa","Hempera","Laurel","Haldiphe","Saffronea", "Quinn",
         "Poplarbush","Snowdrop","Funnyfluff","Firo","Limespice","Herb","Twinklespa","Spring","Shinyglade",
@@ -38,7 +40,10 @@ public class TournamentData
         "Tepua","Uvle","Ujay","Surlul","Razsa","Dezunu","Urabu","Sholgokoh","Abedin","Yetsi","Jaedrey",
         "Leadeth","Baudr","Araldyng","Gilparymr","Sawah","Mazraeh",
         "Aayuh","Grimstriker","Twistmight","Pyregaze","Heatmarch","Omega","Dalton","Alpha","Beta","Gamma","Zeta","Phi","Jaeger",
-        "Dimbranch","Raindust","Hillbrace","Storm","Sohish","Sunhol","Ehtae","Lilsof","Ghostsign","Snowlock","Mystic","Nevi","Azahz","Owen","Denzel","Robinson"];
+        "Dimbranch","Raindust","Hillbrace","Storm","Sohish","Sunhol","Ehtae","Lilsof","Ghostsign","Snowlock","Mystic","Nevi","Azahz","Owen","Denzel","Robinson",
+        "Blossom","Yarn","Skitter","Mercy","Firj","Blubber","Dribble","Angel","Tank","Dottie","Taugh","Liberi",
+        "Thespia","Pirene","Isonei","Harrow","Bakano","Polo","Okal","Ochen","Mhina","Siaka","Tamba","Savane","Boukary","Traore","Yaya","Dia","Dio","Aaron","Prizo","Dimitri","Dashaco",
+        "Mathis","Calamity","Buve","Hosho","Zimba","Tsun","Mawere","Rufaro","Emoger","Fida","Thorns","Saffron","Teddago","Skelyte","Chilleni","Slowhawk","Jagola"];
 
     public bool _initialized = false;
     public bool _firstweek = false;
@@ -66,7 +71,7 @@ public class TournamentData
         tournamentPools.Add( ETournamentPools.B, new TournamentPool( this, EMonsterRanks.B, ETournamentPools.B, "B Rank", 10, 17, 26,    _configuration._confABD_tournament_rank_c,         _configuration._confABD_tournament_rank_b - 1, 4));
         tournamentPools.Add( ETournamentPools.C, new TournamentPool( this, EMonsterRanks.C, ETournamentPools.C, "C Rank", 10, 27, 36,    _configuration._confABD_tournament_rank_d,         _configuration._confABD_tournament_rank_c - 1, 2));
         tournamentPools.Add( ETournamentPools.D, new TournamentPool( this, EMonsterRanks.D, ETournamentPools.D, "D Rank", 8, 37, 44,     _configuration._confABD_tournament_rank_e,         _configuration._confABD_tournament_rank_d - 1, 1));
-        tournamentPools.Add( ETournamentPools.E, new TournamentPool( this, EMonsterRanks.E, ETournamentPools.E, "E Rank", 6, 45, 50,     _configuration._confABD_tournament_rank_e - 250,   _configuration._confABD_tournament_rank_e - 1, 0));
+        tournamentPools.Add( ETournamentPools.E, new TournamentPool( this, EMonsterRanks.E, ETournamentPools.E, "E Rank", 6, 45, 50,     _configuration._confABD_tournament_rank_z,         _configuration._confABD_tournament_rank_e - 1, 0));
 
         tournamentPools.Add( ETournamentPools.X_MOO, new TournamentPool( this, EMonsterRanks.L, ETournamentPools.X_MOO, "L - Moo", 6, 51, 51, _configuration._confABD_tournament_rank_m4 + 250, 9999, 10 ) );
 

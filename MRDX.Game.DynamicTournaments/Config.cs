@@ -43,7 +43,7 @@ public class Config : Configurable<Config>
     [DisplayName( "Stat Cap - Major 4" )]
     [Description( "The Soft Stat Cap to promote from M4 to Legend Status.\n" +
         "Note: This currently has no effect on the player." )]
-    [DefaultValue( 4600 )]
+    [DefaultValue( 4500 )]
     public int _confABD_tournament_rank_m4 { get; set; } = 4500;
 
     [Category( "Tournament Ranks" )]
@@ -71,22 +71,29 @@ public class Config : Configurable<Config>
     [DisplayName( "Stat Cap - C Rank" )]
     [Description( "The Soft Stat Cap to promote from C into B.\n" +
     "Note: This currently has no effect on the player." )]
-    [DefaultValue( 1600 )]
-    public int _confABD_tournament_rank_c { get; set; } = 1600;
+    [DefaultValue( 1700 )]
+    public int _confABD_tournament_rank_c { get; set; } = 1700;
 
     [Category( "Tournament Ranks" )]
     [DisplayName( "Stat Cap - D Rank" )]
     [Description( "The Soft Stat Cap to promote from D into C.\n" +
     "Note: This currently has no effect on the player." )]
-    [DefaultValue( 1200 )]
-    public int _confABD_tournament_rank_d { get; set; } = 1200;
+    [DefaultValue( 1300 )]
+    public int _confABD_tournament_rank_d { get; set; } = 1300;
 
     [Category( "Tournament Ranks" )]
     [DisplayName( "Stat Cap - E Rank" )]
     [Description( "The Soft Stat Cap to promote from E into D.\n" +
     "Note: This currently has no effect on the player." )]
-    [DefaultValue( 1200 )]
-    public int _confABD_tournament_rank_e { get; set; } = 900;
+    [DefaultValue( 1000 )]
+    public int _confABD_tournament_rank_e { get; set; } = 1000;
+
+    [Category( "Tournament Ranks" )]
+    [DisplayName( "Stat Cap - Minimum" )]
+    [Description( "The lower bounds for the weakest of E Rank Mosters.\n" +
+    "Note: This currently has no effect on the player." )]
+    [DefaultValue( 800 )]
+    public int _confABD_tournament_rank_z { get; set; } = 800;
 
     //[Category("Advanced - Tournament Ranks") ]
     //[DisplayName("")]
