@@ -18,8 +18,7 @@ namespace MRDX.Game.DynamicTournaments
 
         ushort growth_rate = 0;
         private byte growth_intensity;
-        private byte[] growth_options;
-        private byte growth_options_total;
+        private List<byte> growth_options;
 
         public EMonsterRanks _monsterRank;
 
@@ -96,56 +95,64 @@ namespace MRDX.Game.DynamicTournaments
 
         private void SetupGrowthOptions () {
             // Life, Pow, Skill, Speed, Def, Int
-            if ( growth_group == growth_groups.balanced ) { 
-                growth_options = [ 1, 1, 1, 1, 1, 1 ];
+            // TODO: Make Growth Options static and tie to to ABDTM class
 
-                if ( growth_intensity == 1 )        { growth_options = [ 4, 3, 3, 3, 4, 3 ]; }
-                else if ( growth_intensity == 2 )   { growth_options = [ 3, 4, 3, 4, 3, 3 ]; }
-                else if ( growth_intensity == 3 )   { growth_options = [ 3, 3, 4, 3, 3, 4 ]; }
+            growth_options = new List<byte>();
+            byte[] gopts = [0];
+
+            if ( growth_group == growth_groups.balanced ) { 
+                gopts = [ 1, 1, 1, 1, 1, 1 ];
+
+                if ( growth_intensity == 1 )        { gopts = [ 4, 3, 3, 3, 4, 3 ]; }
+                else if ( growth_intensity == 2 )   { gopts = [ 3, 4, 3, 4, 3, 3 ]; }
+                else if ( growth_intensity == 3 )   { gopts = [ 3, 3, 4, 3, 3, 4 ]; }
             }
 
             else if ( growth_group == growth_groups.power ) {
-                growth_options = [ 4, 5, 3, 1, 3, 2 ];
+                gopts = [ 4, 5, 3, 1, 3, 2 ];
 
-                if ( growth_intensity == 1 )      { growth_options = [ 8, 11, 6, 2, 6, 3 ]; }
-                else if ( growth_intensity == 2 ) { growth_options = [ 10, 14, 7, 2, 6, 3 ]; }
-                else if ( growth_intensity == 3 ) { growth_options = [ 12, 20, 8, 2, 7, 2 ]; }
+                if ( growth_intensity == 1 )      { gopts = [ 8, 11, 6, 2, 6, 3 ]; }
+                else if ( growth_intensity == 2 ) { gopts = [ 10, 14, 7, 2, 6, 3 ]; }
+                else if ( growth_intensity == 3 ) { gopts = [ 12, 20, 8, 2, 7, 2 ]; }
             }
 
             else if ( growth_group == growth_groups.intel ) { 
-                growth_options = [ 3, 1, 3, 4, 1, 5 ];
+                gopts = [ 3, 1, 3, 4, 1, 5 ];
 
-                if ( growth_intensity == 1 ) { growth_options = [ 5, 2, 6, 5, 3, 9 ]; }
-                else if ( growth_intensity == 2 ) { growth_options = [ 8, 2, 9, 6, 3, 12 ]; }
-                else if ( growth_intensity == 3 ) { growth_options = [ 12, 2, 12, 8, 3, 18 ]; }
+                if ( growth_intensity == 1 ) { gopts = [ 5, 2, 6, 5, 3, 9 ]; }
+                else if ( growth_intensity == 2 ) { gopts = [ 8, 2, 9, 6, 3, 12 ]; }
+                else if ( growth_intensity == 3 ) { gopts = [ 12, 2, 12, 8, 3, 18 ]; }
             }
 
             else if ( growth_group == growth_groups.defend ) { 
-                growth_options = [ 4, 2, 3, 2, 4, 2 ];
+                gopts = [ 4, 2, 3, 2, 4, 2 ];
 
-                if ( growth_intensity == 1 ) { growth_options = [ 5, 2, 3, 2, 6, 2 ]; }
-                else if ( growth_intensity == 2 ) { growth_options = [ 13, 4, 5, 2, 15, 4 ]; }
-                else if ( growth_intensity == 3 ) { growth_options = [ 18, 4, 8, 3, 18, 4 ]; }
+                if ( growth_intensity == 1 ) { gopts = [ 5, 2, 3, 2, 6, 2 ]; }
+                else if ( growth_intensity == 2 ) { gopts = [ 13, 4, 5, 2, 15, 4 ]; }
+                else if ( growth_intensity == 3 ) { gopts = [ 16, 4, 8, 3, 18, 4 ]; }
             }
 
             else if ( growth_group == growth_groups.wither ) { 
-                growth_options = [ 4, 3, 6, 5, 2, 4 ];
+                gopts = [ 4, 3, 6, 5, 2, 4 ];
 
-                if ( growth_intensity == 1 ) { growth_options = [ 5, 3, 9, 7, 2, 5 ]; }
-                else if ( growth_intensity == 2 ) { growth_options = [ 6, 4, 13, 8, 2, 5 ]; }
-                else if ( growth_intensity == 3 ) { growth_options = [ 7, 4, 15, 9, 3, 5 ]; }
+                if ( growth_intensity == 1 ) { gopts = [ 5, 3, 9, 7, 2, 5 ]; }
+                else if ( growth_intensity == 2 ) { gopts = [ 6, 4, 13, 8, 2, 5 ]; }
+                else if ( growth_intensity == 3 ) { gopts = [ 7, 4, 15, 9, 3, 5 ]; }
             }
 
             else if ( growth_group == growth_groups.speedy ) { 
-                growth_options = [ 4, 4, 5, 6, 2, 3 ];
+                gopts = [ 4, 4, 5, 6, 2, 3 ];
 
-                if ( growth_intensity == 1 ) { growth_options = [ 5, 4, 5, 8, 2, 3 ]; }
-                else if ( growth_intensity == 2 ) { growth_options = [ 6, 4, 7, 10, 2, 4 ]; }
-                else if ( growth_intensity == 3 ) { growth_options = [ 6, 5, 9, 14, 2, 4 ]; }
+                if ( growth_intensity == 1 ) { gopts = [ 5, 4, 5, 8, 2, 3 ]; }
+                else if ( growth_intensity == 2 ) { gopts = [ 6, 4, 7, 10, 2, 4 ]; }
+                else if ( growth_intensity == 3 ) { gopts = [ 6, 5, 9, 14, 2, 4 ]; }
             }
 
-            growth_options_total = 0;
-            for ( var i = 0; i < growth_options.Length; i++ ) { growth_options_total += growth_options[ i ]; }
+            for ( var i = 0; i < gopts.Length; i++ ) {
+                for ( var j = 0; j < gopts[ i ]; j++ ) {
+                    growth_options.Add( (byte) i );
+                }
+            }
         }
 
         public void AdvanceMonth () {
@@ -165,10 +172,7 @@ namespace MRDX.Game.DynamicTournaments
             TournamentData._mod.DebugLog( 2, "Monster " + monster.name + " Advancing Month: [STATS: " + monster.stat_total + ", GROWTH:" + growth_rate + " CGROW: " + agegroup + ", LIFE: " + lifespan + "]", Color.Yellow );
 
             for ( var i = 0; i < agegroup; i++ ) {
-                var ranStat = (TournamentData.GrowthRNG.Next() % growth_options_total) - growth_options[0];
-                var stat = 0;
-                for ( stat = 0; ranStat >= 0; stat++ ) { ranStat -= growth_options[ stat ]; }
-
+                var stat = growth_options[ ( TournamentData.GrowthRNG.Next() % growth_options.Count() )];
 
                 if ( stat == 0 && monster.stat_lif <= 999 ) { monster.stat_lif++; }
                 else if ( stat == 1 && monster.stat_pow <= 999 ) { monster.stat_pow++; }
