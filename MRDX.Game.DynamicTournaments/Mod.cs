@@ -148,7 +148,7 @@ public class Mod : ModBase // <= Do not Remove.
         //else
         //_logger.WriteLine($"[{_modConfig.ModId}] Could not load startup scanner!");
 
-        Debugger.Launch();
+        // Debugger.Launch();
 
     }
 

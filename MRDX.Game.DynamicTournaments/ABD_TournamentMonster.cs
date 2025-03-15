@@ -65,7 +65,7 @@ namespace MRDX.Game.DynamicTournaments
             TournamentData._mod.DebugLog( 2, "Monster Created: " + m.name + ", " + m.breed_main + "/" + m.breed_sub + ", LIFE: " + lifespan + ", GROWTH: " + growth_rate, Color.Lime );
 
             growth_group = (growth_groups) ( TournamentData.GrowthRNG.Next() % 6 );
-            growth_intensity = (byte) ( TournamentData.GrowthRNG.Next() % 3 );
+            growth_intensity = (byte) ( TournamentData.GrowthRNG.Next() % 4 );
 
             SetupGrowthOptions();
         }
@@ -96,41 +96,52 @@ namespace MRDX.Game.DynamicTournaments
 
         private void SetupGrowthOptions () {
             // Life, Pow, Skill, Speed, Def, Int
-            if ( growth_group == growth_groups.balanced ) { growth_options = [ 1, 1, 1, 1, 1, 1 ]; }
+            if ( growth_group == growth_groups.balanced ) { 
+                growth_options = [ 1, 1, 1, 1, 1, 1 ];
+
+                if ( growth_intensity == 1 )        { growth_options = [ 4, 3, 3, 3, 4, 3 ]; }
+                else if ( growth_intensity == 2 )   { growth_options = [ 3, 4, 3, 4, 3, 3 ]; }
+                else if ( growth_intensity == 3 )   { growth_options = [ 3, 3, 4, 3, 3, 4 ]; }
+            }
 
             else if ( growth_group == growth_groups.power ) {
-                growth_options = [ 5, 8, 5, 2, 5, 3 ];
+                growth_options = [ 4, 5, 3, 1, 3, 2 ];
 
-                if ( growth_intensity == 1 ) { growth_options = [ 9, 12, 6, 2, 6, 3 ]; }
-                else if ( growth_intensity == 2 ) { growth_options = [ 12, 20, 7, 2, 7, 3 ]; }
+                if ( growth_intensity == 1 )      { growth_options = [ 8, 11, 6, 2, 6, 3 ]; }
+                else if ( growth_intensity == 2 ) { growth_options = [ 10, 14, 7, 2, 6, 3 ]; }
+                else if ( growth_intensity == 3 ) { growth_options = [ 12, 20, 8, 2, 7, 2 ]; }
             }
 
             else if ( growth_group == growth_groups.intel ) { 
-                growth_options = [ 4, 2, 6, 5, 2, 8 ];
+                growth_options = [ 3, 1, 3, 4, 1, 5 ];
 
-                if ( growth_intensity == 1 ) { growth_options = [ 6, 2, 8, 5, 3, 12 ]; }
-                else if ( growth_intensity == 2 ) { growth_options = [ 9, 2, 10, 6, 3, 18 ]; }
+                if ( growth_intensity == 1 ) { growth_options = [ 5, 2, 6, 5, 3, 9 ]; }
+                else if ( growth_intensity == 2 ) { growth_options = [ 8, 2, 9, 6, 3, 12 ]; }
+                else if ( growth_intensity == 3 ) { growth_options = [ 12, 2, 12, 8, 3, 18 ]; }
             }
 
             else if ( growth_group == growth_groups.defend ) { 
-                growth_options = [ 8, 3, 4, 2, 9, 2 ];
+                growth_options = [ 4, 2, 3, 2, 4, 2 ];
 
-                if ( growth_intensity == 1 ) { growth_options = [ 10, 4, 4, 2, 14, 3 ]; }
-                else if ( growth_intensity == 2 ) { growth_options = [ 13, 4, 5, 2, 18, 4 ]; }
+                if ( growth_intensity == 1 ) { growth_options = [ 5, 2, 3, 2, 6, 2 ]; }
+                else if ( growth_intensity == 2 ) { growth_options = [ 13, 4, 5, 2, 15, 4 ]; }
+                else if ( growth_intensity == 3 ) { growth_options = [ 18, 4, 8, 3, 18, 4 ]; }
             }
 
             else if ( growth_group == growth_groups.wither ) { 
-                growth_options = [ 4, 2, 7, 5, 2, 5 ];
+                growth_options = [ 4, 3, 6, 5, 2, 4 ];
 
-                if ( growth_intensity == 1 ) { growth_options = [ 5, 2, 12, 7, 2, 5 ]; }
-                else if ( growth_intensity == 2 ) { growth_options = [ 6, 3, 16, 8, 2, 6 ]; }
+                if ( growth_intensity == 1 ) { growth_options = [ 5, 3, 9, 7, 2, 5 ]; }
+                else if ( growth_intensity == 2 ) { growth_options = [ 6, 4, 13, 8, 2, 5 ]; }
+                else if ( growth_intensity == 3 ) { growth_options = [ 7, 4, 15, 9, 3, 5 ]; }
             }
 
             else if ( growth_group == growth_groups.speedy ) { 
-                growth_options = [ 4, 4, 5, 8, 2, 3 ];
+                growth_options = [ 4, 4, 5, 6, 2, 3 ];
 
-                if ( growth_intensity == 1 ) { growth_options = [ 5, 5, 6, 14, 2, 3 ]; }
-                else if ( growth_intensity == 2 ) { growth_options = [ 6, 5, 8, 18, 2, 4 ]; }
+                if ( growth_intensity == 1 ) { growth_options = [ 5, 4, 5, 8, 2, 3 ]; }
+                else if ( growth_intensity == 2 ) { growth_options = [ 6, 4, 7, 10, 2, 4 ]; }
+                else if ( growth_intensity == 3 ) { growth_options = [ 6, 5, 9, 14, 2, 4 ]; }
             }
 
             growth_options_total = 0;
@@ -154,9 +165,10 @@ namespace MRDX.Game.DynamicTournaments
             TournamentData._mod.DebugLog( 2, "Monster " + monster.name + " Advancing Month: [STATS: " + monster.stat_total + ", GROWTH:" + growth_rate + " CGROW: " + agegroup + ", LIFE: " + lifespan + "]", Color.Yellow );
 
             for ( var i = 0; i < agegroup; i++ ) {
-                var ranStat = TournamentData.GrowthRNG.Next() % growth_options_total;
+                var ranStat = (TournamentData.GrowthRNG.Next() % growth_options_total) - growth_options[0];
                 var stat = 0;
                 for ( stat = 0; ranStat >= 0; stat++ ) { ranStat -= growth_options[ stat ]; }
+
 
                 if ( stat == 0 && monster.stat_lif <= 999 ) { monster.stat_lif++; }
                 else if ( stat == 1 && monster.stat_pow <= 999 ) { monster.stat_pow++; }
@@ -164,7 +176,7 @@ namespace MRDX.Game.DynamicTournaments
                 else if ( stat == 3 && monster.stat_spd <= 999 ) { monster.stat_spd++; }
                 else if ( stat == 4 && monster.stat_def <= 999 ) { monster.stat_def++; }
                 else if ( stat == 5 && monster.stat_int <= 999 ) { monster.stat_int++; }
-                else { i -= TournamentData.GrowthRNG.Next() % 2; }
+                else { i -= ( TournamentData.GrowthRNG.Next() % 5 > 0 ? 1 : 0 ); }
             }
 
             if ( monster.per_fear < 100 ) { monster.per_fear += (byte) ( TournamentData.GrowthRNG.Next() % 2 ); }
@@ -179,17 +191,18 @@ namespace MRDX.Game.DynamicTournaments
             List<byte> toLearn = new List<byte>();
             for ( var i = 0; i < 24; i++ ) {
                 var type = breedInfo.technique_types[ i ];
+                int bonusTech = 1;
                 if ( type != 6 && ( ( monster.techniques >> i ) & 1 ) == 0 ) {
-                    if ( growth_group == growth_groups.power && type == 2 ) { toLearn.Add( (byte) i ); toLearn.Add( (byte) i ); toLearn.Add( (byte) i ); }
-                    else if ( growth_group == growth_groups.intel && type == 1 ) { toLearn.Add( (byte) i ); toLearn.Add( (byte) i ); toLearn.Add( (byte) i ); }
-                    else if ( growth_group == growth_groups.wither && type == 3 ) { toLearn.Add( (byte) i ); toLearn.Add( (byte) i ); toLearn.Add( (byte) i ); }
-                    else if ( growth_group == growth_groups.speedy && type == 4 ) { toLearn.Add( (byte) i ); toLearn.Add( (byte) i ); toLearn.Add( (byte) i ); }
+                    if ( growth_group == growth_groups.power && type == 2 ) { bonusTech += growth_intensity + 1; }
+                    else if ( growth_group == growth_groups.intel && type == 1 ) { bonusTech += growth_intensity + 1; }
+                    else if ( growth_group == growth_groups.wither && type == 3 ) { bonusTech += growth_intensity + 1; }
+                    else if ( growth_group == growth_groups.speedy && type == 4 ) { bonusTech += growth_intensity + 1; }
 
                     if ( breedInfo.technique_types[ i ] == 5 ) {
-                        if ( ( _monsterRank == EMonsterRanks.S || _monsterRank == EMonsterRanks.A || _monsterRank == EMonsterRanks.B ) ) { toLearn.Add( (byte) i ); toLearn.Add( (byte) i ); }
+                        if ( ( _monsterRank == EMonsterRanks.S || _monsterRank == EMonsterRanks.A || _monsterRank == EMonsterRanks.B ) ) { bonusTech = 3; }
                     }
 
-                    else { toLearn.Add( (byte) i ); }
+                    for ( var t = 0; t < bonusTech; t++ ) { toLearn.Add( (byte) i ); }
                 }
             }
 
