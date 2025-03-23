@@ -13,11 +13,13 @@ using Reloaded.Hooks.Definitions;
 using Reloaded.Hooks.Definitions.X86;
 using Reloaded.Mod.Interfaces;
 using Reloaded.Memory.SigScan.ReloadedII.Interfaces;
+using Reloaded.Memory.SigScan;
 
 //using IReloadedHooks = Reloaded.Hooks.ReloadedII.Interfaces.IReloadedHooks;
 
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Diagnostics;
+using Reloaded.Memory.Sigscan.Definitions;
 
 //using static MRDX.Base.Mod.Interfaces.TournamentData;
 //using IReloadedHooks = Reloaded.Hooks.ReloadedII.Interfaces.IReloadedHooks;
@@ -75,6 +77,9 @@ public class Mod : ModBase // <= Do not Remove.
     private IHook<CheckShrineUnlockRequirementHook>? _shrineUnlockHook;
     private bool monsterUnlockCheckDefaults = false;
 
+    private IStartupScanner _startupScanner;
+    private IScanner _memoryScanner;
+
     private string _gamePath = "";
     private nuint gameAddress = 0;
     private nuint _address_tournamentmonsters = 0;
@@ -101,32 +106,28 @@ public class Mod : ModBase // <= Do not Remove.
         _modLoader.GetController<IHooks>().TryGetTarget(out var hooks);
 
         var startupScanner = _modLoader.GetController<IStartupScanner>();
+        //var memscanner = _modLoader.GetController<IScanner>();
+        //_startupScanner = startupScanner;
 
         gameAddress = (nuint) Base.Mod.Base.ExeBaseAddress;
 
         _address_unlockedmonsters = gameAddress + 0x3795A2;
         _address_tournamentmonsters = gameAddress + 0x548D10;
+        //548CD0
         _address_currentweek = gameAddress + 0x379444;
 
         _unlockedmonsters = new List<MonsterGenus>();
 
-        if (extract == null) {
-            _logger.WriteLine($"[{_modConfig.ModId}] Failed to get extract data bin controller.", Color.Red);
-            return; }
+        if ( extract == null ) { _logger.WriteLine( $"[{_modConfig.ModId}] Failed to get extract data bin controller.", Color.Red ); return; }
+        else { _gamePath = extract.ExtractedPath; }
 
         _redirector.TryGetTarget(out var redirect);
-        if (redirect == null) {
-            _logger.WriteLine($"[{_modConfig.ModId}] Failed to get redirection controller.", Color.Red);
-            return; }
-        else {
-            redirect.Loading += _saveFileManager.SaveDataMonitor;
-        }
+        if ( redirect == null ) { _logger.WriteLine($"[{_modConfig.ModId}] Failed to get redirection controller.", Color.Red); return; }
+        else { redirect.Loading += ProcessReloadedFileLoad; }
 
-        _gamePath = extract.ExtractedPath;
+        
 
-        if (hooks == null) {
-            _logger.WriteLine($"[{_modConfig.ModId}] Could not get hook controller.", Color.Red);
-            return; }
+        if ( hooks == null ) { _logger.WriteLine($"[{_modConfig.ModId}] Could not get hook controller.", Color.Red); return; }
 
         hooks.AddHook<UpdateGenericState>(SetupUpdateHook)
             .ContinueWith(result => _updateHook = result.Result.Activate());
@@ -137,25 +138,36 @@ public class Mod : ModBase // <= Do not Remove.
             SetupCheckShrineUnlockRequirementsHookX(scanner);
         }
 
+        _modLoader.GetController<IScannerFactory>().TryGetTarget( out var sf );
+        _memoryScanner = sf.CreateScanner( Process.GetCurrentProcess(), Process.GetCurrentProcess().MainModule );
+        
+
         tournamentData = new TournamentData(this, _logger, _configuration);
         SetupMonsterBreeds();
         SetupTournamentParticipantsFromTaikai();
 
-        //hooks.AddHook<CheckShrineUnlockRequirementHook>(SetupCheckShrineUnlockRequirementsHook)
-        //    .ContinueWith(result => _shrineUnlockHook = result.Result.Activate());
-        //_logger.WriteLine(sm.ToString(), Color.Blue);
-        // startupScanner.TryGetTarget(out var scanner)) SetupCheckShrineUnlockRequirementsHookX(scanner);
-        //else
-        //_logger.WriteLine($"[{_modConfig.ModId}] Could not load startup scanner!");
+        
 
-        // Debugger.Launch();
+
+
+        Debugger.Launch();
 
     }
 
+    private void ProcessReloadedFileLoad(string filename) {
+        _saveFileManager.SaveDataMonitor( filename );
+    }
+
+    /// <summary>
+    /// Parses data folders looking for monster texture files. This is how we build our valid breed list for generating tournament monsters.
+    /// </summary>
     private void SetupMonsterBreeds() {
         MonsterBreed.SetupMonsterBreedList(_gamePath);
     }
 
+    /// <summary>
+    ///  Loads the taikai_en.flk file and generates the TournamentData from it. Is loaded at startup and when a new save without save data is loaded.
+    /// </summary>
     private void SetupTournamentParticipantsFromTaikai() {
 
         tournamentData.ClearAllData();
@@ -176,7 +188,6 @@ public class Mod : ModBase // <= Do not Remove.
         fs.Close();
 
         tournamentData._initialized = true;
-
     }
 
     private void SetupUpdateHook(nint parent)
@@ -317,15 +328,17 @@ public class Mod : ModBase // <= Do not Remove.
     /// <summary>  </summary>
     private void UpdateMemoryTournamentData(nuint tournamentAddress)
     {
-        // We are looking for a header of '0600 0000 0000 0000 2000 0000 F404 0000'
-        Memory.Instance.ReadRaw(tournamentAddress, out byte[] header, 64);
-        if (header[0] == 0x06 && header[8] == 0x20 && header[12] == 0xF4 && header[13] == 0x04)
-        {
-            var enemyAddresses = tournamentAddress + 0xA8C;
-            List<ABD_TournamentMonster> monsters = tournamentData.GetTournamentMembers(1, 50);
-            for ( var i = 1; i <= 50; i++ )
-            {
-                Memory.Instance.WriteRaw(enemyAddresses + ((nuint)(i * 60)), monsters[i-1].monster.raw_bytes);
+        var checkPattern = true;
+        nuint taddr = 0;
+        while ( checkPattern ) {
+            taddr = (nuint) _memoryScanner.FindPattern( "06 00 00 00 00 00 00 00 20 00 00 00 F4 04 00 00", (int) taddr + 1 ).Offset;
+
+            if ( taddr == 0xffffffff ) { checkPattern = false; break; }
+
+            var enemyAddresses = gameAddress + taddr + 0xA8C;
+            List<ABD_TournamentMonster> monsters = tournamentData.GetTournamentMembers( 1, 118 );
+            for ( var i = 1; i <= 118; i++ ) {
+                Memory.Instance.WriteRaw( enemyAddresses + ( (nuint) ( i * 60 ) ), monsters[ i - 1 ].monster.raw_bytes );
             }
         }
     }
