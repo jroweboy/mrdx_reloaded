@@ -88,7 +88,7 @@ public class Mod : ModBase // <= Do not Remove.
 
     private List<MonsterGenus> _unlockedmonsters;
 
-    
+    private LearningTesting _LT;
 
     public Mod(ModContext context)
     {
@@ -135,7 +135,8 @@ public class Mod : ModBase // <= Do not Remove.
         
         if (startupScanner != null) {
             startupScanner.TryGetTarget(out var scanner);
-            SetupCheckShrineUnlockRequirementsHookX(scanner);
+            AlterCode_CheckShrineUnlockRequirements(scanner);
+            AlterCode_TournamentLifespanIndex( scanner );
         }
 
         _modLoader.GetController<IScannerFactory>().TryGetTarget( out var sf );
@@ -146,11 +147,11 @@ public class Mod : ModBase // <= Do not Remove.
         SetupMonsterBreeds();
         SetupTournamentParticipantsFromTaikai();
 
-        
+
+        _LT = new LearningTesting( hooks );
 
 
-
-        Debugger.Launch();
+        //Debugger.Launch();
 
     }
 
@@ -354,7 +355,7 @@ public class Mod : ModBase // <= Do not Remove.
     /// other mods restrict the main breeds available to each player, (i.e., disabling access to Pixie by setting the flag to 0 instead of the 1 it defaults to).
     /// </summary>
     /// <param name="scanner"></param>
-    private void SetupCheckShrineUnlockRequirementsHookX(IStartupScanner scanner)
+    private void AlterCode_CheckShrineUnlockRequirements(IStartupScanner scanner)
     {
         scanner.AddMainModuleScan("55 8B EC 53 8B 5D 08 8A C3 24 03 02 C0 56 57 8B F9 BE 01 00 00 00 B1 07", result =>
         {
@@ -362,6 +363,22 @@ public class Mod : ModBase // <= Do not Remove.
             Memory.Instance.SafeWrite(addr + 0x2f, (ushort)37008);
         });
     }
+
+    // +0x13E is where the first compare to 3 happens
+    // 03 C2
+    // 8D 04 40
+    // 0x13E - 83 F8 03
+    // 7D 07
+    // 0x143 - B8 03000000
+
+    private void AlterCode_TournamentLifespanIndex(IStartupScanner scanner) {
+        scanner.AddMainModuleScan( "55 8B EC 81 EC D0 00 00 00 A1 ?? ?? ?? ?? 33 C5 89 45 ?? A1 ?? ?? ?? ?? 53", result => {
+            var addr = (nuint) ( Base.Mod.Base.ExeBaseAddress + result.Offset );
+            Memory.Instance.SafeWrite( addr + 0x13E + 0x2, (byte) 01);
+            Memory.Instance.SafeWrite( addr + 0x143 + 0x1, (byte) 01);
+        } );
+    }
+
 
     public void DebugLog(int verbosity, string message) {
         DebugLog( verbosity, message, Color.White );
