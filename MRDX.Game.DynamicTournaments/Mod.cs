@@ -74,8 +74,8 @@ public class Mod : ModBase // <= Do not Remove.
 
     private SaveFileManager _saveFileManager;
 
-    private IHook<CheckShrineUnlockRequirementHook>? _shrineUnlockHook;
-    private bool monsterUnlockCheckDefaults = false;
+    //private IHook<CheckShrineUnlockRequirementHook>? _shrineUnlockHook;
+    //private bool monsterUnlockCheckDefaults = false;
 
     private IStartupScanner _startupScanner;
     private IScanner _memoryScanner;
@@ -148,7 +148,7 @@ public class Mod : ModBase // <= Do not Remove.
         SetupTournamentParticipantsFromTaikai();
 
 
-        _LT = new LearningTesting( hooks );
+        _LT = new LearningTesting( hooks, _address_currentweek );
 
 
         //Debugger.Launch();
