@@ -1,5 +1,6 @@
 ﻿using System;
 using MRDX.Base.Mod.Interfaces;
+using MRDX.Game.DynamicTournaments;
 
 public class MonsterBreed
 {
@@ -12,13 +13,11 @@ public class MonsterBreed
     public MonsterGenus sub_id;
     public string breed_identifier;
 
-    public byte[] technique_types;
-    public uint technique_scaling;
-    public uint technique_basics;
+    public List<MonsterTechnique> _techniques;
 
     public byte _rarity;
 
-    public MonsterBreed (string n, string nshort, byte bid, byte sid, string identifier, byte[] techniques) {
+    public MonsterBreed (string n, string nshort, byte bid, byte sid, string identifier, List<MonsterTechnique> techs) {
         name = n;
         name_short = nshort;
 
@@ -26,13 +25,7 @@ public class MonsterBreed
         sub_id = (MonsterGenus) sid;
         breed_identifier = identifier;
 
-        technique_types = new byte[ 24 ];
-        for ( var t = 0; t < 24; t++ ) {
-            technique_types[ t ]  = techniques[ t ];
-            if ( techniques[ t ] == 0 ) {
-                technique_basics += (uint) (1 << ( t ));
-            }
-        }
+        _techniques = techs;
 
         // Calculate Monster Rarity based upon breed and subbreeds.
     }
@@ -50,8 +43,11 @@ public class MonsterBreed
                 // Build a singular tech list. This will be the same for every breed until I do the right now and actually check errantry (no thanks :( )
                 FileStream fs = File.OpenRead( techniqueFile );
 
+                List<MonsterTechnique> techniqueList = MonsterTechnique.ParseTechniqueFile( fs );
+
                 //Console.Write( "\nReading Techniques for " + info.Name + ": " );
-                byte [] techniqueList = ParseTechniqueFile( fs );
+                
+                //byte [] techniqueList = ParseTechniqueFile( fs );
 
                 // Enumerate through each species tex file and generate the final breeds.
                 foreach ( string currentFile in textureFiles ) {

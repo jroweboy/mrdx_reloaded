@@ -43,15 +43,15 @@ public class Config : Configurable<Config>
     [DisplayName( "Stat Cap - Major 4" )]
     [Description( "The Soft Stat Cap to promote from M4 to Legend Status.\n" +
         "Note: This currently has no effect on the player." )]
-    [DefaultValue( 4500 )]
-    public int _confABD_tournament_rank_m4 { get; set; } = 4500;
+    [DefaultValue( 4200 )]
+    public int _confABD_tournament_rank_m4 { get; set; } = 4200;
 
     [Category( "Tournament Ranks" )]
     [DisplayName( "Stat Cap - S Rank" )]
     [Description( "The Soft Stat Cap to promote from S into M4.\n" +
         "Note: This currently has no effect on the player." )]
-    [DefaultValue( 3500 )]
-    public int _confABD_tournament_rank_s { get; set; } = 3500;
+    [DefaultValue( 3400 )]
+    public int _confABD_tournament_rank_s { get; set; } = 3400;
 
     [Category( "Tournament Ranks" )]
     [DisplayName( "Stat Cap - A Rank" )]
@@ -95,6 +95,34 @@ public class Config : Configurable<Config>
     [DefaultValue( 800 )]
     public int _confABD_tournament_rank_z { get; set; } = 800;
 
+    [Category( "Gameplay Adjustments" )]
+    [DisplayName( "Tournament Stat Growths" )]
+    [Description( "This modifier changes the amount maximum stat growths a monster earns for participating in a tounrmanet\n" +
+    "Game Default: 0, Recommended: 5" )]
+    [DefaultValue( 5 )]
+    public int _confDTP_tournament_stat_growth { get; set; } = 5;
+
+    [Category( "Gameplay Adjustments" )]
+    [DisplayName( "Tournament Lifespan Index" )]
+    [Description( "The minimum lifespan applied to a monster that enters a tournament. Still affected by other factors such as fatigue, etc.\n" +
+    "Game Default: 3, Recommended: 1\n" +
+    "Note: Be extremely careful with this value.")]
+    [SliderControlParams(
+        minimum: 0.0,
+        maximum: 24,
+        smallChange: 1.0,
+        largeChange: 4,
+        tickFrequency: 1,
+        isSnapToTickEnabled: true,
+        tickPlacement: SliderControlTickPlacement.BottomRight,
+        showTextField: true,
+        isTextFieldEditable: true,
+        textValidationRegex: "\\d{1-24}" )]
+    [DefaultValue( 1 )]
+    
+    public int _confDTP_tournament_lifespan { get; set; } = 1;
+
+
     //[Category("Advanced - Tournament Ranks") ]
     //[DisplayName("")]
     [ Category( "Advanced - Monster Growths" )]
@@ -111,6 +139,17 @@ public class Config : Configurable<Config>
         "Higher variance will result in the appearance of more stragglers (monsters stuck or lagging for their class.")]
     [DefaultValue( 12 )]
     public int _confABD_growth_monthlyvariance { get; set; } = 12;
+
+    [Category( "Advanced - Monster Growths" )]
+    [DisplayName( "Technique Growth Intelligence" )]
+    [Description( "Determines the behavior of how techniques are learned by tournament monsters.\n" +
+     "Minimal - Uses extremely simple decision making for choosing techs. Almost the wild west for making choices.\n" +
+     "Average - Will attempt to focus on the correct scaling type (Pow vs Int).\n" +
+     "Smart - Will both account for scaling type and relative tech strength.\n" +
+     "Genius - Will not only focus on powerful, relevant techniques, but will also occasionally cheat and prune bad techniques from their monsters." )]
+    [DefaultValue( E_ConfABD_TechInt.Smart )]
+    public E_ConfABD_TechInt _confABD_techIntelligence { get; set; } = E_ConfABD_TechInt.Smart;
+    public enum E_ConfABD_TechInt { Minimal, Average, Smart, Genius }
 
     [Category("Advanced - Mod Debugging")]
     [DisplayName("Reloaded Message Verbosity")]

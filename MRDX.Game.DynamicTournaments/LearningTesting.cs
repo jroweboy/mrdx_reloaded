@@ -46,15 +46,15 @@ public delegate uint LH_StatGain_Int ( nuint self, uint value );
 
 
 [HookDef( BaseGame.Mr2, Region.Us, "55 8B EC 81 EC 80 00 00 00" )]
-[Function( CallingConventions.Stdcall )]
-public delegate void LH_TournamentComplete ( int value ); // This function isn't right.
+[Function( CallingConventions.Cdecl )]
+public delegate void LH_TournamentComplete ( int value );
 
 [HookDef( BaseGame.Mr2, Region.Us, "55 8B EC 83 EC 18 8B D1" )]
 [Function( CallingConventions.MicrosoftThiscall )]
 public delegate void LH_DrillPerform_ChangeStats ( nuint self, nuint value );
 
 [HookDef( BaseGame.Mr2, Region.Us, "55 8B EC 81 EC D0 00 00 00 A1 ?? ?? ?? ?? 33 C5 89 45 ?? A1 ?? ?? ?? ?? 53" )]
-[Function( CallingConventions.Stdcall )]
+[Function( CallingConventions.Cdecl )]
 public delegate void LH_TournamentLifeIndex ( nuint self ); // This function isn't right.
 
 
@@ -81,7 +81,7 @@ namespace MRDX.Game.DynamicTournaments
         private uint _currentWeek;
 
         public bool _tournamentEntered = false;
-        private int _tournamentStatBonus = 3;
+        public int _tournamentStatBonus = 5; // A number between 0-X, not inclusive, is added to all tournament growths. 5 -> 0-4
 
         public LearningTesting ( IHooks hooks, nuint currentWeekAddress ) {
             _address_currentweek = currentWeekAddress;
@@ -114,65 +114,79 @@ namespace MRDX.Game.DynamicTournaments
             _hooks.AddHook<LH_StatGain_Int>( SetupLHStatGainIntHook )
                 .ContinueWith( result => _statGainInt = result.Result.Activate() );
 
-            /*_hooks.AddHook<LH_TournamentComplete>( SetupLHTournamentComplete )
-                .ContinueWith( result => _LHTournamentComplete = result.Result.Activate() );*/
+            //_hooks.AddHook<LH_TournamentComplete>( SetupLHTournamentComplete ).ContinueWith( result => _LHTournamentComplete = result.Result.Activate() );
 
             /*_hooks.AddHook<LH_DrillPerform_ChangeStats>( SetupLHDPCS )
                 .ContinueWith( result => _LHDPCS = result.Result.Activate() );*/
         }
 
+        /// <summary>
+        /// Called regularly from many places.
+        /// This function keeps track of the current week, and if the week progresses forward, resets the tournamentEntered flag.
+        /// The forward direction is required as for some reason, at the end of tournaments, the current date is rewound one week.
+        /// </summary>
         private void SetupGenericUpdateHook ( nint parent ) {
             _hookGenericUpdate!.OriginalFunction( parent );
-
+            
             Memory.Instance.Read<uint>( _address_currentweek, out uint currentWeek );
-            if ( _currentWeek != currentWeek ) {
+
+            if ( _currentWeek < currentWeek || _currentWeek == 0 ) { 
                 _currentWeek = currentWeek; _tournamentEntered = false;
             }
+            
         }
 
+        /// <summary>
+        /// This function is called when a battle is intially setup.
+        /// At this point, it is guaranteed that the player is participating in a tournament and sets the tournamentEntered flag.
+        /// </summary>
+        /// <param name="parent"></param>
         private void SetupCCtrlBattleHook ( nuint parent ) {
+            Debug.WriteLine( "Battle TEnt: " + _tournamentEntered );
             _hookBattle!.OriginalFunction( parent );
             _tournamentEntered = true;
         }
 
+        // These functions all attempt to add an additional 0-TSB for all stat gains. Only called if the tournamentEntered flag is set.
         private uint SetupLHStatGainLifHook ( nuint self, uint value ) {
-            Debug.WriteLine( "Lif Gain Hook: " + self + ", Val: " + value );
-            if ( _tournamentEntered ) value = value + (uint) _tournamentStatBonus;
+            Debug.WriteLine( "Lif Gain Hook: " + self + ", Val: " + value + ", TEnt: " + _tournamentEntered );
+
+            if ( _tournamentEntered ) value = value + (uint) ( Random.Shared.Next() %  _tournamentStatBonus );
             var ret = _statGainLif!.OriginalFunction( self, value );
             return ret;
         }
 
         private uint SetupLHStatGainPowHook ( nuint self, uint value ) {
-            Debug.WriteLine( "Pow Gain Hook: " + self + ", Val: " + value );
-            if ( _tournamentEntered ) value = value + (uint) _tournamentStatBonus;
+            Debug.WriteLine( "Pow Gain Hook: " + self + ", Val: " + value + ", TEnt: " + _tournamentEntered );
+            if ( _tournamentEntered ) value = value + (uint) ( Random.Shared.Next() % _tournamentStatBonus );
             var ret = _statGainPow!.OriginalFunction( self, value );
             return ret;
         }
 
         private uint SetupLHStatGainDefHook ( nuint self, uint value ) {
-            Debug.WriteLine( "Def Gain Hook: " + self + ", Val: " + value );
-            if ( _tournamentEntered ) value = value + (uint) _tournamentStatBonus;
+            Debug.WriteLine( "Def Gain Hook: " + self + ", Val: " + value + ", TEnt: " + _tournamentEntered );
+            if ( _tournamentEntered ) value = value + (uint) ( Random.Shared.Next() % _tournamentStatBonus );
             var ret = _statGainDef!.OriginalFunction( self, value );
             return ret;
         }
 
         private uint SetupLHStatGainSkiHook ( nuint self, uint value ) {
-            Debug.WriteLine( "Ski Gain Hook: " + self + ", Val: " + value );
-            if ( _tournamentEntered ) value = value + (uint) _tournamentStatBonus;
+            Debug.WriteLine( "Ski Gain Hook: " + self + ", Val: " + value + ", TEnt: " + _tournamentEntered );
+            if ( _tournamentEntered ) value = value + (uint) ( Random.Shared.Next() % _tournamentStatBonus );
             var ret = _statGainSki!.OriginalFunction( self, value );
             return ret;
         }
 
         private uint SetupLHStatGainSpdHook ( nuint self, uint value ) {
-            Debug.WriteLine( "Spd Gain Hook: " + self + ", Val: " + value );
-            if ( _tournamentEntered ) value = value + (uint) _tournamentStatBonus;
+            Debug.WriteLine( "Spd Gain Hook: " + self + ", Val: " + value + ", TEnt: " + _tournamentEntered );
+            if ( _tournamentEntered ) value = value + (uint) ( Random.Shared.Next() % _tournamentStatBonus );
             var ret = _statGainSpd!.OriginalFunction( self, value );
             return ret;
         }
 
         private uint SetupLHStatGainIntHook ( nuint self, uint value ) {
-            Debug.WriteLine( "Int Gain Hook: " + self + ", Val: " + value );
-            if ( _tournamentEntered ) value = value + (uint) _tournamentStatBonus;
+            Debug.WriteLine( "Int Gain Hook: " + self + ", Val: " + value + ", TEnt: " + _tournamentEntered );
+            if ( _tournamentEntered ) value = value + (uint) ( Random.Shared.Next() % _tournamentStatBonus );
             var ret = _statGainInt!.OriginalFunction( self, value );
             return ret;
         }

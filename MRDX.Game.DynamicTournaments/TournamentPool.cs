@@ -211,11 +211,19 @@ namespace MRDX.Game.DynamicTournaments
 
             abdm.monster.battle_specials = (byte) (Random.Shared.Next() % 4);
 
-            // Assign the first two basics, then 25% for each additional basic.
-            var firstbasic = 0;
-            for ( var j = 0; j < 24; j++ ) {
-                if ( ( ( abdm.breedInfo.technique_basics >> j ) & 1 ) == 1 ) { 
-                    if ( firstbasic < 2 || Random.Shared.Next() % 4 == 0 ) { firstbasic++; abdm.monster.techniques = abdm.monster.techniques + (uint) ( 1 << j ); }
+            // Attempt to assign three basics, weighted generally towards worse basic techs with variance.
+            for ( var tc = 0; tc < 3; tc++ ) {
+                MonsterTechnique tech = abdm.breedInfo._techniques[ 0 ];
+
+                for ( var j = 0; j < abdm.breedInfo._techniques.Count; j++ ) {
+                    var nt = abdm.breedInfo._techniques[ j ];
+                    if ( nt._errantry == ErrantryType.Basic ) {
+                        if ( nt._techValue + Random.Shared.Next() % 15 < tech._techValue ) {
+                            tech = nt;
+                        }
+                    }
+
+                    abdm.monster.techniques = abdm.monster.techniques | (uint) ( 1 << tech._id );
                 }
             }
             TournamentData._mod.DebugLog( 3, "TP: Basics Setup", Color.AliceBlue );

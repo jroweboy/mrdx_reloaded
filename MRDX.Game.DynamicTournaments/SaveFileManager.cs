@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -20,11 +21,15 @@ namespace MRDX.Game.DynamicTournaments
         public byte _saveData_readCount = 0;
         public bool _saveData_gameLoaded = false;
 
+        private string _saveData_folder = "";
+
         public SaveFileManager(Mod master, IModLoader loader, IModConfig config, ILogger logger) {
             _modMaster = master;
             _modLoader = loader;
             _modConfig = config;
             _logger = logger;
+
+            _saveData_folder = _modLoader.GetDirectoryForModId( _modConfig.ModId ) + "\\SaveData\\";
         }
 
         /// <summary>
@@ -44,6 +49,8 @@ namespace MRDX.Game.DynamicTournaments
                 if ( _saveData_readCount >= 4 ) {
                     _saveData_gameLoaded = true;
                 }
+
+                _saveData_folder = filename.Substring(0, filename.Length - 14 );
             }
 
             else if ( filename.Contains( "psdata001.bin" ) ) {
@@ -65,7 +72,9 @@ namespace MRDX.Game.DynamicTournaments
             string modDir = _modLoader.GetDirectoryForModId( _modConfig.ModId );
             Directory.CreateDirectory( modDir + "\\SaveData\\" );
 
-            string savefile = modDir + "\\SaveData\\monsters_" + _saveData_slot + ".bin";
+            string savefile = modDir + "\\SaveData\\dtp_monsters_" + _saveData_slot + ".bin";
+
+            savefile = _saveData_folder + "dtp_monsters_" + _saveData_slot + ".bin";
 
             FileStream fs = new FileStream( savefile, FileMode.Create );
             for ( var i = 0; i < _modMaster.tournamentData.monsters.Count; i++ ) {
@@ -76,11 +85,14 @@ namespace MRDX.Game.DynamicTournaments
             _logger.WriteLine( savefile + " successfully written.", Color.OrangeRed );
         }
 
+
         public List<ABD_TournamentMonster> LoadABDTournamentData() {
             List<ABD_TournamentMonster> monsters = new List<ABD_TournamentMonster>();
 
             string modDir = _modLoader.GetDirectoryForModId( _modConfig.ModId );
-            string savefile = modDir + "\\SaveData\\monsters_" + _saveData_slot + ".bin";
+            string savefile = modDir + "\\SaveData\\dtp_monsters_" + _saveData_slot + ".bin";
+            savefile = _saveData_folder + "dtp_monsters_" + _saveData_slot + ".bin";
+
             if ( File.Exists( savefile ) ) {
                 byte[] rawabd = new byte[ 100 ];
                 

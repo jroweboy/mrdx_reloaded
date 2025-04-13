@@ -149,6 +149,7 @@ public class Mod : ModBase // <= Do not Remove.
 
 
         _LT = new LearningTesting( hooks, _address_currentweek );
+        _LT._tournamentStatBonus = _configuration._confDTP_tournament_stat_growth;
 
 
         //Debugger.Launch();
@@ -164,6 +165,7 @@ public class Mod : ModBase // <= Do not Remove.
     /// </summary>
     private void SetupMonsterBreeds() {
         MonsterBreed.SetupMonsterBreedList(_gamePath);
+        ABD_TournamentMonster._configuration = _configuration;
     }
 
     /// <summary>
@@ -374,8 +376,8 @@ public class Mod : ModBase // <= Do not Remove.
     private void AlterCode_TournamentLifespanIndex(IStartupScanner scanner) {
         scanner.AddMainModuleScan( "55 8B EC 81 EC D0 00 00 00 A1 ?? ?? ?? ?? 33 C5 89 45 ?? A1 ?? ?? ?? ?? 53", result => {
             var addr = (nuint) ( Base.Mod.Base.ExeBaseAddress + result.Offset );
-            Memory.Instance.SafeWrite( addr + 0x13E + 0x2, (byte) 01);
-            Memory.Instance.SafeWrite( addr + 0x143 + 0x1, (byte) 01);
+            Memory.Instance.SafeWrite( addr + 0x13E + 0x2, (byte) _configuration._confDTP_tournament_lifespan);
+            Memory.Instance.SafeWrite( addr + 0x143 + 0x1, (byte) _configuration._confDTP_tournament_lifespan );
         } );
     }
 

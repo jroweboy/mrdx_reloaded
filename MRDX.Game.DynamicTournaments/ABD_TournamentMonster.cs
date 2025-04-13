@@ -2,12 +2,16 @@
 using System.Collections.Generic;
 using System.Drawing;
 using MRDX.Base.Mod.Interfaces;
+using Config = MRDX.Game.DynamicTournaments.Configuration.Config;
 
 namespace MRDX.Game.DynamicTournaments
 {
     public class ABD_TournamentMonster {
+        public static Config _configuration;
+
         public TournamentMonster monster;
         public MonsterBreed breedInfo;
+        public List<MonsterTechnique> techniques = new List<MonsterTechnique>();
 
         public List<TournamentPool> pools = new List<TournamentPool>();
         public byte[] _rawpools;
@@ -18,7 +22,17 @@ namespace MRDX.Game.DynamicTournaments
 
         ushort growth_rate = 0;
         private byte growth_intensity;
+
+        private byte _growth_lif;
+        private byte _growth_pow;
+        private byte _growth_ski;
+        private byte _growth_spd;
+        private byte _growth_def;
+        private byte _growth_int;
+
         private List<byte> growth_options;
+
+        private Config.E_ConfABD_TechInt _trainer_intelligence;
 
         public EMonsterRanks _monsterRank;
 
@@ -67,6 +81,20 @@ namespace MRDX.Game.DynamicTournaments
             growth_intensity = (byte) ( TournamentData.GrowthRNG.Next() % 4 );
 
             SetupGrowthOptions();
+
+            _trainer_intelligence = _configuration._confABD_techIntelligence;
+            if ( Random.Shared.Next() % 10 == 0 ) { _trainer_intelligence = (Config.E_ConfABD_TechInt) (Random.Shared.Next() % 4);  }
+
+            // Read through the techniques uint to add the correct technique IDs. TODO: I should have just done a static list and had an invalid tech slot in the empty ones.
+            for ( var i = 0; i < 24; i++ ) {
+                if ( (monster.techniques << i) % 2 == 1 ) {
+                    for ( var j = 0; j < breedInfo._techniques.Count; j++ ) {
+                        if ( breedInfo._techniques[j]._id == i ) { 
+                            techniques.Add( breedInfo._techniques[ j ] ); 
+                        }
+                    }
+                }
+            }
         }
 
         public ABD_TournamentMonster ( byte[] rawabd ) {
@@ -90,12 +118,37 @@ namespace MRDX.Game.DynamicTournaments
                 _rawpools[ i ] = rawabd[ 10 + i ];
             }
 
-            SetupGrowthOptions();
+            _growth_lif = rawabd[ 14 ];
+            _growth_pow = rawabd[ 15 ];
+            _growth_ski = rawabd[ 16 ];
+            _growth_spd = rawabd[ 17 ];
+            _growth_def = rawabd[ 18 ];
+            _growth_int = rawabd[ 19 ];
+
+            growth_options = new List<byte>();
+            for ( var i = 14; i < 19; i++ ) {
+                if ( rawabd[ i ] == 0 ) rawabd[ i ] = 1;
+                for ( var j = 0; j < rawabd[ i ]; j++ ) {
+                    growth_options.Add( (byte) (i - 14) );
+                }
+            }
+
+            _trainer_intelligence = (Config.E_ConfABD_TechInt) rawabd[ 20 ];
+
+            // Read through the techniques uint to add the correct technique IDs. TODO: I should have just done a static list and had an invalid tech slot in the empty ones.
+            for ( var i = 0; i < 24; i++ ) {
+                if ( ( monster.techniques << i ) % 2 == 1 ) {
+                    for ( var j = 0; j < breedInfo._techniques.Count; j++ ) {
+                        if ( breedInfo._techniques[ j ]._id == i ) { 
+                            techniques.Add( breedInfo._techniques[ j ] ); 
+                        }
+                    }
+                }
+            }
         }
 
         private void SetupGrowthOptions () {
             // Life, Pow, Skill, Speed, Def, Int
-            // TODO: Make Growth Options static and tie to to ABDTM class
 
             growth_options = new List<byte>();
             byte[] gopts = [0];
@@ -148,6 +201,24 @@ namespace MRDX.Game.DynamicTournaments
                 else if ( growth_intensity == 3 ) { gopts = [ 6, 5, 9, 14, 2, 4 ]; }
             }
 
+            // This is some fun variance. 16% chance of a stat (1 on average) getting a slight penalty or boost.
+            // 5% chance of a stat being effectively completely randomized with no rhyme or reason.
+            for ( var i = 0; i < gopts.Length; i++ ) {
+                if ( Random.Shared.Next() % 6 == 0 ) { gopts[ i ] = (byte) ( gopts[ i ] - 1 + ( Random.Shared.Next() % 5 ) ); }
+                if ( Random.Shared.Next() % 20 == 0 ) {
+                    if ( i == 0 ) { gopts[ i ] = (byte) ( 4 + Random.Shared.Next() % 17 ); }
+                    else { gopts[ i ] = (byte) ( 1 + Random.Shared.Next() % 20 ); }
+                }
+                if ( gopts[i] == 0 ) { gopts[ i ] = 1; }
+            }
+
+            _growth_lif = gopts[ 0 ];
+            _growth_pow = gopts[ 1 ];
+            _growth_ski = gopts[ 2 ];
+            _growth_spd = gopts[ 3 ];
+            _growth_def = gopts[ 4 ];
+            _growth_int = gopts[ 5 ];
+
             for ( var i = 0; i < gopts.Length; i++ ) {
                 for ( var j = 0; j < gopts[ i ]; j++ ) {
                     growth_options.Add( (byte) i );
@@ -191,8 +262,69 @@ namespace MRDX.Game.DynamicTournaments
 
         public void LearnTechnique () { // TODO: Smarter Logic About which tech to get
             TournamentData._mod.DebugLog( 2, "Monster " + monster.name + " attempting to learn technique.", Color.Orange );
-            // 0 = Basic, 1 Hit, 2 Heavy, 3 Withering, 4 Sharp, 5 Special, 6 Invalid
-            List<byte> toLearn = new List<byte>();
+
+            Config.E_ConfABD_TechInt techint = _trainer_intelligence;
+            MonsterTechnique tech = breedInfo._techniques[ 0 ];
+            var techvariance = 25;  
+            if ( techint == Config.E_ConfABD_TechInt.Minimal ) { techvariance = 30; }
+            else if ( techint == Config.E_ConfABD_TechInt.Average ) { techvariance = 25; }
+            else if ( techint == Config.E_ConfABD_TechInt.Smart ) { techvariance = 15; }
+            else if ( techint == Config.E_ConfABD_TechInt.Genius ) { techvariance = 10; }
+
+            List<int> weightedLearnPool = new List<int>();
+
+            for ( var i = 0; i < breedInfo._techniques.Count; i++ ) {
+                tech = breedInfo._techniques[ i ];
+
+                if ( !techniques.Contains( tech ) ) {
+                    var techval = tech._techValue + ( Random.Shared.Next() % techvariance );
+
+                    
+
+                    if ( techint != Config.E_ConfABD_TechInt.Minimal ) {
+                        if ( tech._scaling == TechType.Power && ( monster.stat_pow < monster.stat_int ) ) {
+                            techval = (int) ( techval * 0.8 * ( monster.stat_pow / monster.stat_int ) );
+                        }
+
+                        else if ( tech._scaling == TechType.Intelligence && ( monster.stat_int < monster.stat_pow ) ) {
+                            techval = (int) ( techval * 0.8 * ( monster.stat_int / monster.stat_pow ) );
+                        }
+                    }
+
+                    if ( tech._errantry == ErrantryType.Basic ) { techval *= 2; }
+                    if ( growth_group == growth_groups.power && tech._errantry == ErrantryType.Heavy ) { techval *= 2; }
+                    else if ( growth_group == growth_groups.intel && tech._errantry == ErrantryType.Skill ) { techval *= 2; }
+                    else if ( growth_group == growth_groups.wither && tech._errantry == ErrantryType.Withering ) { techval *= 2; }
+                    else if ( growth_group == growth_groups.speedy && tech._errantry == ErrantryType.Sharp ) { techval *= 2; }
+
+                    if ( tech._errantry == ErrantryType.Special ) {
+                        if ( ( _monsterRank == EMonsterRanks.S || _monsterRank == EMonsterRanks.A || _monsterRank == EMonsterRanks.B ) ) { techval *= 2; }
+                        else { techval *= (int) 0.2; }
+                    }
+
+                    if ( techint == Config.E_ConfABD_TechInt.Smart || techint == Config.E_ConfABD_TechInt.Genius ) { techval = (int) (techval * 1.5); }
+
+                    for ( var j = 0; j < techval; j++ ) {
+                        weightedLearnPool.Add( tech._id );
+                    }
+                }
+            }
+
+            if ( weightedLearnPool.Count > 0 ) {
+                var chosen = weightedLearnPool[ Random.Shared.Next() % weightedLearnPool.Count ];
+                for ( var i = 0; i < breedInfo._techniques.Count; i++ ) { if ( breedInfo._techniques[ i ]._id == chosen ) { tech = breedInfo._techniques[ i ]; } }
+                monster.techniques += (uint) ( 1 << tech._id );
+                techniques.Add( tech );
+                TournamentData._mod.DebugLog( 2, "Monster " + monster.name + " has learned " + tech._name + " with value of " + tech._techValue, Color.Orange );
+            }
+
+            if ( techint == Config.E_ConfABD_TechInt.Genius && techniques.Count > 4 && Random.Shared.Next() % 10 < techniques.Count ) {
+                UnlearnTechnique();
+            }
+
+            
+
+            /*List<byte> toLearn = new List<byte>();
             for ( var i = 0; i < 24; i++ ) {
                 var type = breedInfo.technique_types[ i ];
                 int bonusTech = 1;
@@ -212,8 +344,37 @@ namespace MRDX.Game.DynamicTournaments
 
             if ( toLearn.Count > 0 ) {
                 monster.techniques += (uint) ( 1 << toLearn[ Random.Shared.Next() % toLearn.Count ] );
+            }*/
+        }
+
+        public void UnlearnTechnique () {
+            TournamentData._mod.DebugLog( 2, "Monster " + monster.name + " is attempting an unlearn a tech.", Color.Orange );
+            if ( techniques.Count < 4 ) { return; }
+
+            List<int> weightedPool = new List<int>();
+            var minVal = 1000;
+            var tech = techniques[ 0 ];
+
+            for ( var i = 0; i < techniques.Count; i++ ) {
+                tech = techniques[ i ];
+                if ( minVal > tech._techValue ) { minVal = tech._techValue; }
+            }
+
+            for ( var i = 0; i < techniques.Count; i++ ) {
+                tech = techniques[ i ];
+                var weight = 100 - ( tech._techValue - minVal );
+                for ( var j = 0; j < weight; j++ ) { weightedPool.Add( tech._id ); }
+            }
+
+            if ( weightedPool.Count > 0 ) {
+                var chosen = weightedPool[ Random.Shared.Next() % weightedPool.Count ];
+                for ( var i = 0; i < breedInfo._techniques.Count; i++ ) { if ( breedInfo._techniques[ i ]._id == chosen ) { tech = breedInfo._techniques[ i ]; } }
+                monster.techniques -= (uint) ( 1 << tech._id );
+                techniques.Remove( tech );
+                TournamentData._mod.DebugLog( 2, "Monster " + monster.name + " has unlearned " + tech._name + " wtih value of " + tech._techValue, Color.Orange );
             }
         }
+
 
         /// <summary>
         /// Promotes a Monster to a specifc rank, learning specials at D and A ranks. 
@@ -244,7 +405,8 @@ namespace MRDX.Game.DynamicTournaments
             // 7, Growth Intensity (Enum)
             // 8-9, Monster Rank (Enum)
             // 10-13, TournamentPools (Enums)
-            // 14-39, UNUSED
+            // 14-19, Growth Weights (Generated from 6/7)
+            // 20, Trainer Intelligence
 
             byte[] data = new byte[ 40 + 60 ];
 
@@ -259,6 +421,15 @@ namespace MRDX.Game.DynamicTournaments
             for ( var i = 0; ( i < pools.Count() && i < 4 ); i++ ) {
                 data[ 10 + i ] = (byte) pools[ i ]._tournamentPool;
             }
+
+            data[ 14 ] = _growth_lif;
+            data[ 15 ] = _growth_pow;
+            data[ 16 ] = _growth_ski;
+            data[ 17 ] = _growth_spd;
+            data[ 18 ] = _growth_def;
+            data[ 19 ] = _growth_int;
+
+            data[ 20 ] = (byte) _trainer_intelligence;
 
             for ( var i = 0; i < 60; i++ ) {
                 data[ i + 40 ] = monster.raw_bytes[ i ];
