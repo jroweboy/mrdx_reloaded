@@ -149,10 +149,10 @@ public class Mod : ModBase // <= Do not Remove.
 
 
         _LT = new LearningTesting( hooks, _address_currentweek );
-        _LT._tournamentStatBonus = ((double) _configuration._confDTP_tournament_stat_growth) / 100.0;
+        _LT._tournamentStatBonus = _configuration._confDTP_tournament_stat_growth > 0 ? _configuration._confDTP_tournament_stat_growth + 1 : 0;
 
 
-        //Debugger.Launch();
+        Debugger.Launch();
 
     }
 
