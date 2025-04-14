@@ -1,9 +1,9 @@
 {
     "ModId": "MRDX.Game.DynamicTournaments",
-    "ModName": "Dynamic Tournament Progression",
+    "ModName": "Dynamic Tournament Progression (Beta)",
     "ModAuthor": "ArchbishopDave",
     "ModVersion": "{{ MOD_VERSION }}",
-    "ModDescription": "Dynamically updates tournament data as time passes. New monsters are introduced into tournament brackets and grow over time.",
+    "ModDescription": "Dynamically updates tournament opponents as time passes. New monsters are introduced into tournament brackets and grow over time.",
     "ModDll": "MRDX.Game.DynamicTournaments.dll",
     "ModIcon": "Preview.png",
     "ModR2RManagedDll32": "x86/MRDX.Game.DynamicTournaments.dll",
