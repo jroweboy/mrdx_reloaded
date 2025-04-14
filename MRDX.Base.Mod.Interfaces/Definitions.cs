@@ -276,7 +276,7 @@ public enum TechType : byte
     Intelligence
 }
 
-public enum ErrantyType : byte
+public enum ErrantryType : byte
 {
     Basic = 0,
     Skill = 1,

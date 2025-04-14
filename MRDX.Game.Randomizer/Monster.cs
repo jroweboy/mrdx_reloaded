@@ -85,7 +85,7 @@ public record MonsterAttack
         Name = atkName;
         Slot = slot;
         JpnName = dat[..16];
-        Type = (ErrantyType)dat[16];
+        Type = (ErrantryType)dat[16];
         Range = (TechRange)dat[17];
         Nature = (TechNature)dat[18];
         Scaling = (TechType)dat[19];
@@ -108,7 +108,7 @@ public record MonsterAttack
 
     public byte[] JpnName { get; set; }
     public string Name { get; set; }
-    public ErrantyType Type { get; set; }
+    public ErrantryType Type { get; set; }
     public TechRange Range { get; set; }
     public TechNature Nature { get; set; }
     public TechType Scaling { get; set; }
