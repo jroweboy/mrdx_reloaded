@@ -97,16 +97,15 @@ public class Config : Configurable<Config>
 
     [Category( "Gameplay Adjustments" )]
     [DisplayName( "Tournament Stat Growths" )]
-    [Description( "This modifier changes the amount maximum stat growths a monster earns for participating in a tounrmanet\n" +
-    "Game Default: 0, Recommended: 5" )]
-    [DefaultValue( 5 )]
-    public int _confDTP_tournament_stat_growth { get; set; } = 5;
+    [Description( "A multiplier for stat growths when completing a tournament. 100 represents 100% of the regular growth values.\n" +
+    "Game Default: 100, Recommended: 135" )]
+    [DefaultValue( 135 )]
+    public int _confDTP_tournament_stat_growth { get; set; } = 135;
 
     [Category( "Gameplay Adjustments" )]
     [DisplayName( "Tournament Lifespan Index" )]
     [Description( "The minimum lifespan applied to a monster that enters a tournament. Still affected by other factors such as fatigue, etc.\n" +
-    "Game Default: 3, Recommended: 1\n" +
-    "Note: Be extremely careful with this value.")]
+    "Game Default: 3, Recommended: 1\n")]
     [SliderControlParams(
         minimum: 0.0,
         maximum: 24,

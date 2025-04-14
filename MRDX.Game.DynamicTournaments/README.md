@@ -3,6 +3,8 @@
 ### Changelog
 
 * v0.1.0 - Initial Pre-release
+* v0.2.0 - Initial Beta Release
+* General Improvements
 
 ### Future Updates and Features
 
