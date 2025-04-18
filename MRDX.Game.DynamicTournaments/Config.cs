@@ -38,6 +38,15 @@ public class Config : Configurable<Config>
     public E_ConfABD_TournamentBreeds _confABD_tournamentBreeds { get; set; } = E_ConfABD_TournamentBreeds.PlayerOnlyRealistic;
     public enum E_ConfABD_TournamentBreeds { PlayerOnly, Realistic, PlayerOnlyRealistic, WildWest }
 
+    [Category( "Tournament Opponents" )]
+    [DisplayName( "Unique Species" )]
+    [Description( "A multiplier for how often unique species are added to tournaments once available.\n" +
+     "Valid values are from 0.01 - 1.0, 1% as common to 100% as common.\n" +
+     "Note: Unique species make up a significant portion of the monsters in MR2." )]
+    [DefaultValue( 0.25 )]
+    [SliderControlParams( minimum: 0.01, maximum: 1.0, showTextField: true, isTextFieldEditable: true )]
+    public double _confDTP_species_unique { get; set; } = 0.25;
+
 
     [Category( "Tournament Ranks" )]
     [DisplayName( "Stat Cap - Major 4" )]
@@ -139,6 +148,15 @@ public class Config : Configurable<Config>
         "Higher variance will result in the appearance of more stragglers (monsters stuck or lagging for their class.")]
     [DefaultValue( 12 )]
     public int _confABD_growth_monthlyvariance { get; set; } = 12;
+
+    [Category( "Advanced - Monster Growths" )]
+    [DisplayName( "Wildcard Stats" )]
+    [Description( "The odds of a stat being 'wildcard'.\n" +
+    "Lower values will result in significantly less 'cohesive' monsters.\n" +
+    "Higher variance will result in the appearance of more stragglers (monsters stuck or lagging for their class." )]
+    [SliderControlParams( minimum: 1, maximum: 500, showTextField: true, isTextFieldEditable: true )]
+    [DefaultValue( 300 )]
+    public int _confABD_growth_wildcardstat { get; set; } = 300;
 
     [Category( "Advanced - Monster Growths" )]
     [DisplayName( "Technique Growth Intelligence" )]

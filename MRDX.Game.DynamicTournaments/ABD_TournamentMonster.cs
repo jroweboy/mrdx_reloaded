@@ -207,10 +207,10 @@ namespace MRDX.Game.DynamicTournaments
             }
 
             // This is some fun variance. 16% chance of a stat (1 on average) getting a slight penalty or boost.
-            // ~0.5% chance of a stat being effectively completely randomized with no rhyme or reason. (Approximately 1/50 monsters have a stat altered in this way).
+            // CONFIG: Wildcard chance of a stat being effectively completely randomized with no rhyme or reason. (Approximately 1/50 monsters have a stat altered in this way at 300).
             for ( var i = 0; i < gopts.Length; i++ ) {
                 if ( Random.Shared.Next() % 6 == 0 ) { gopts[ i ] = (byte) ( gopts[ i ] - 1 + ( Random.Shared.Next() % 5 ) ); }
-                if ( Random.Shared.Next() % 300 == 0 ) {
+                if ( Random.Shared.Next() % TournamentData._configuration._confABD_growth_wildcardstat == 0 ) {
                     if ( i == 0 || i == 2 ) { gopts[ i ] = (byte) ( 4 + Random.Shared.Next() % 17 ); }
                     else { gopts[ i ] = (byte) ( 1 + Random.Shared.Next() % 20 ); }
                 }

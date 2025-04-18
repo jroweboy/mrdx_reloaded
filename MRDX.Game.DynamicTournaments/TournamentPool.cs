@@ -70,17 +70,18 @@ namespace MRDX.Game.DynamicTournaments
                 stattotal += Math.Max(abdm.monster.stat_total - (stat_end - 100), 1);
             }
 
-            if ( stattotal < 20 ) { TournamentData._mod.DebugLog( 1, "Tournament Stat Totals dangeorusly low. Growth rates may be too low.", Color.Yellow ); }
+            if ( stattotal > 50 ) {
+                stattotal = Random.Shared.Next() % stattotal;
+                for ( var i = 0; i < monsters.Count; i++ ) {
+                    int mvalue = Math.Max( monsters[ i ].monster.stat_total - ( stat_end - 100 ), 1 ); ;
+                    stattotal -= mvalue;
+                    promoted = monsters[ i ];
+                    if ( stattotal <= 0 ) { break; }
+                }
 
-            stattotal = Random.Shared.Next() % stattotal;
-            for ( var i = 0; i < monsters.Count; i++ ) {
-                int mvalue = Math.Max( monsters[ i ].monster.stat_total - ( stat_end - 100 ), 1 ); ;
-                stattotal -= mvalue;
-                promoted = monsters[ i ];
-                if ( stattotal <= 0 ) { break; }
+                MonsterPromoteToNewPool( promoted, newPool );
             }
-
-            MonsterPromoteToNewPool( promoted, newPool );
+            else { TournamentData._mod.DebugLog( 1, "Tournament Stat Totals dangeorusly low. Growth rates may be too low.", Color.Yellow ); } 
 
             for ( var i = monsters.Count() - 1; i >= 0; i-- ) { 
                 if ( monsters[i].monster.stat_total - 100 > stat_end ) {
@@ -108,7 +109,7 @@ namespace MRDX.Game.DynamicTournaments
             if ( _tournamentPool == ETournamentPools.A_Phoenix ) {
                 for ( var i = 0; i < 500; i++ ) {
                     breed = MonsterBreed.AllBreeds[ Random.Shared.Next() % MonsterBreed.AllBreeds.Count ];
-                    if ( breed.breed_id == MonsterGenus.Phoenix ) {
+                    if ( breed.breed_id == MonsterGenus.Phoenix || breed.sub_id == MonsterGenus.Phoenix ) {
                         break;
                     }
                 }
@@ -174,7 +175,12 @@ namespace MRDX.Game.DynamicTournaments
                 for ( var i = 0; i < 100; i++ ) {
                     breed = MonsterBreed.AllBreeds[ Random.Shared.Next() % MonsterBreed.AllBreeds.Count ];
                     if ( available.Contains( breed.breed_id ) && available.Contains( breed.sub_id ) ) {
-                        break;
+                        if ( breed.sub_id == MonsterGenus.Unknown1 || breed.sub_id == MonsterGenus.Unknown2 || breed.sub_id == MonsterGenus.Unknown3 ||
+                            breed.sub_id == MonsterGenus.Unknown4 || breed.sub_id == MonsterGenus.Unknown5 || breed.sub_id == MonsterGenus.Unknown6 ) {
+                            if ( Random.Shared.NextDouble() < TournamentData._configuration._confDTP_species_unique ) { break; }
+                        }
+
+                        else { break; }
                     }
                 }
             }

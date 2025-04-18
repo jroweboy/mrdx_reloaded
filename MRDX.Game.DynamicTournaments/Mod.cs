@@ -221,7 +221,9 @@ public class Mod : ModBase // <= Do not Remove.
 
         Memory.Instance.Read<uint>( _address_currentweek, out uint currentWeek );
         if ( _game_currentWeek != currentWeek ) { 
-            _game_currentWeek = currentWeek; currentWeek = 1; }
+            _game_currentWeek = currentWeek; 
+            currentWeek = 1; 
+        }
 
         // Unfortunately the ordering of these function calls matters so we have to do this shuffling depending on if the game week progressed.
         if ( currentWeek == 1 ) { GetUnlockedMonsters( _address_unlockedmonsters ); }

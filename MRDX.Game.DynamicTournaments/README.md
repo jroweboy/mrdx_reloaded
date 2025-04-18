@@ -11,6 +11,7 @@
 * v0.2.0 - Initial Beta Release
 * v0.2.1 - Technique Fixes, New Game Crash Fix, ExtractBin Crash Fix
 * v0.2.2 - Additional Technique Fixes, Tournament Growth Cap Fix, Lifespan Configuration Option
+* v0.2.3 - Promotion Rate Fixes, More Names, Unique and Wildcard Stat Configuration Option
 
 
 
