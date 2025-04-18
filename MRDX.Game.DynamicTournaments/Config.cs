@@ -151,6 +151,18 @@ public class Config : Configurable<Config>
     public E_ConfABD_TechInt _confABD_techIntelligence { get; set; } = E_ConfABD_TechInt.Smart;
     public enum E_ConfABD_TechInt { Minimal, Average, Smart, Genius }
 
+    [Category( "Advanced - Monster Lifespan" )]
+    [DisplayName( "Monster Lifespan Minimum" )]
+    [Description( "The minimum months a tournament monster will live.")]
+    [DefaultValue( 36 )]
+    public int _confABD_tm_lifespan_min { get; set; } = 36;
+
+    [Category( "Advanced - Monster Lifespan" )]
+    [DisplayName( "Monster Lifespan Maximum" )]
+    [Description( "The maximum months a tournament monster will live." )]
+    [DefaultValue( 84 )]
+    public int _confABD_tm_lifespan_max { get; set; } = 84;
+
     [Category("Advanced - Mod Debugging")]
     [DisplayName("Reloaded Message Verbosity")]
     [Description("Enables internal printouts to the Reloaded Log file to help debug issues.\n" +
