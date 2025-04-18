@@ -229,8 +229,7 @@ namespace MRDX.Game.DynamicTournaments
                     }
                 }
 
-                abdm.monster.techniques = abdm.monster.techniques | (uint) ( 1 << tech._id );
-                abdm.techniques.Add( tech );
+                abdm.MonsterAddTechnique( tech );
             }
             TournamentData._mod.DebugLog( 3, "TP: Basics Setup " + abdm.techniques.Count, Color.AliceBlue );
 

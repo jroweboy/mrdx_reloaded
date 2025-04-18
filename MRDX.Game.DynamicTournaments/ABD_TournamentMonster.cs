@@ -45,7 +45,9 @@ namespace MRDX.Game.DynamicTournaments
             monster = m;
             breedInfo = MonsterBreed.GetBreedInfo( monster.breed_main, monster.breed_sub );
 
-            lifetotal = (ushort) ( 40 + TournamentData.LifespanRNG.Next() % 31 ); // 40-70
+            var lifespanmin = TournamentData._configuration._confABD_tm_lifespan_min;
+
+            lifetotal = (ushort) ( lifespanmin + ( TournamentData.LifespanRNG.Next() % ( ( 1 + TournamentData._configuration._confABD_tm_lifespan_max ) - lifespanmin ) ) ); // Configuration File
 
             lifespan = lifetotal;
             lifespan -= (ushort) ( 4 * ( monster.stat_total / 500 ) ); // Take an arbitrary amount of life off for starting stats.
@@ -89,8 +91,8 @@ namespace MRDX.Game.DynamicTournaments
             for ( var i = 0; i < 24; i++ ) {
                 if ( (monster.techniques << i) % 2 == 1 ) {
                     for ( var j = 0; j < breedInfo._techniques.Count; j++ ) {
-                        if ( breedInfo._techniques[j]._id == i ) { 
-                            techniques.Add( breedInfo._techniques[ j ] ); 
+                        if ( breedInfo._techniques[j]._id == i ) {
+                            MonsterAddTechnique( breedInfo._techniques[ j ] );
                         }
                     }
                 }
@@ -139,8 +141,8 @@ namespace MRDX.Game.DynamicTournaments
             for ( var i = 0; i < 24; i++ ) {
                 if ( ( monster.techniques << i ) % 2 == 1 ) {
                     for ( var j = 0; j < breedInfo._techniques.Count; j++ ) {
-                        if ( breedInfo._techniques[ j ]._id == i ) { 
-                            techniques.Add( breedInfo._techniques[ j ] ); 
+                        if ( breedInfo._techniques[ j ]._id == i ) {
+                            MonsterAddTechnique( breedInfo._techniques[ j ] );
                         }
                     }
                 }
@@ -209,7 +211,7 @@ namespace MRDX.Game.DynamicTournaments
             for ( var i = 0; i < gopts.Length; i++ ) {
                 if ( Random.Shared.Next() % 6 == 0 ) { gopts[ i ] = (byte) ( gopts[ i ] - 1 + ( Random.Shared.Next() % 5 ) ); }
                 if ( Random.Shared.Next() % 20 == 0 ) {
-                    if ( i == 0 ) { gopts[ i ] = (byte) ( 4 + Random.Shared.Next() % 17 ); }
+                    if ( i == 0 || i == 2 ) { gopts[ i ] = (byte) ( 4 + Random.Shared.Next() % 17 ); }
                     else { gopts[ i ] = (byte) ( 1 + Random.Shared.Next() % 20 ); }
                 }
                 if ( gopts[i] == 0 ) { gopts[ i ] = 1; }
@@ -264,7 +266,7 @@ namespace MRDX.Game.DynamicTournaments
         }
 
         public void LearnTechnique () { // TODO: Smarter Logic About which tech to get
-            TournamentData._mod.DebugLog( 2, "Monster " + monster.name + " attempting to learn technique.", Color.Orange );
+            TournamentData._mod.DebugLog( 2, "Monster " + monster.name + " attempting to learn technique. They have " + techniques.Count + " | " + monster.techniques + " now.", Color.Orange );
 
             Config.E_ConfABD_TechInt techint = _trainer_intelligence;
             MonsterTechnique tech = breedInfo._techniques[ 0 ];
@@ -274,21 +276,25 @@ namespace MRDX.Game.DynamicTournaments
             else if ( techint == Config.E_ConfABD_TechInt.Smart ) { techvariance = 15; }
             else if ( techint == Config.E_ConfABD_TechInt.Genius ) { techvariance = 10; }
 
+            List<TechRange> missingRanges = new List<TechRange> { TechRange.Melee, TechRange.Short, TechRange.Medium, TechRange.Long };
             List<int> weightedLearnPool = new List<int>();
+
+            for ( var i = 0; i < techniques.Count; i++ ) { missingRanges.Remove( techniques[ i ]._range ); }
 
             for ( var i = 0; i < breedInfo._techniques.Count; i++ ) {
                 tech = breedInfo._techniques[ i ];
 
                 if ( !techniques.Contains( tech ) ) {
-                    var techval = tech._techValue + ( Random.Shared.Next() % techvariance );
+                    double techval = tech._techValue + ( Random.Shared.Next() % techvariance );
 
+                    if ( missingRanges.Contains(tech._range) ) { techval += 20; }
                     if ( techint != Config.E_ConfABD_TechInt.Minimal ) {
                         if ( tech._scaling == TechType.Power && ( monster.stat_pow < monster.stat_int ) ) {
-                            techval = (int) ( techval * 0.8 * ( monster.stat_pow / monster.stat_int ) );
+                            techval = ( ( techval * 0.8 ) * ( (float) monster.stat_pow / monster.stat_int ) );
                         }
 
                         else if ( tech._scaling == TechType.Intelligence && ( monster.stat_int < monster.stat_pow ) ) {
-                            techval = (int) ( techval * 0.8 * ( monster.stat_int / monster.stat_pow ) );
+                            techval = ( ( techval * 0.8 ) * ( (float) monster.stat_int / monster.stat_pow ) );
                         }
                     }
 
@@ -300,12 +306,13 @@ namespace MRDX.Game.DynamicTournaments
 
                     if ( tech._errantry == ErrantryType.Special ) {
                         if ( ( _monsterRank == EMonsterRanks.S || _monsterRank == EMonsterRanks.A || _monsterRank == EMonsterRanks.B ) ) { techval *= 2; }
-                        else { techval *= (int) 0.2; }
+                        else { techval *= 0.2; }
                     }
 
                     if ( techint == Config.E_ConfABD_TechInt.Smart || techint == Config.E_ConfABD_TechInt.Genius ) { techval = (int) (techval * 1.1); }
 
-                    for ( var j = 0; j < techval; j++ ) {
+                    TournamentData._mod.DebugLog( 3, techval + " TV: " + tech, Color.Beige );
+                    for ( var j = 10; j < techval; j++ ) {
                         weightedLearnPool.Add( tech._id );
                     }
                 }
@@ -314,43 +321,18 @@ namespace MRDX.Game.DynamicTournaments
             if ( weightedLearnPool.Count > 0 ) {
                 var chosen = weightedLearnPool[ Random.Shared.Next() % weightedLearnPool.Count ];
                 for ( var i = 0; i < breedInfo._techniques.Count; i++ ) { if ( breedInfo._techniques[ i ]._id == chosen ) { tech = breedInfo._techniques[ i ]; } }
-                monster.techniques += (uint) ( 1 << tech._id );
-                techniques.Add( tech );
-                TournamentData._mod.DebugLog( 2, "Monster " + monster.name + " learned " + tech, Color.Orange );
+                MonsterAddTechnique( tech );
+                TournamentData._mod.DebugLog( 2, "Monster " + monster.name + " learned " + tech + " they have " + techniques.Count + "|" + monster.techniques + " now.", Color.Orange );
             }
 
-            if ( techint == Config.E_ConfABD_TechInt.Genius && techniques.Count > 6 && Random.Shared.Next() % 20 < techniques.Count ) {
+            if ( techint == Config.E_ConfABD_TechInt.Genius && techniques.Count > 8 && Random.Shared.Next() % 20 < techniques.Count ) {
                 UnlearnTechnique();
             }
 
-            
-
-            /*List<byte> toLearn = new List<byte>();
-            for ( var i = 0; i < 24; i++ ) {
-                var type = breedInfo.technique_types[ i ];
-                int bonusTech = 1;
-                if ( type != 6 && ( ( monster.techniques >> i ) & 1 ) == 0 ) {
-                    if ( growth_group == growth_groups.power && type == 2 ) { bonusTech += growth_intensity + 1; }
-                    else if ( growth_group == growth_groups.intel && type == 1 ) { bonusTech += growth_intensity + 1; }
-                    else if ( growth_group == growth_groups.wither && type == 3 ) { bonusTech += growth_intensity + 1; }
-                    else if ( growth_group == growth_groups.speedy && type == 4 ) { bonusTech += growth_intensity + 1; }
-
-                    if ( breedInfo.technique_types[ i ] == 5 ) {
-                        if ( ( _monsterRank == EMonsterRanks.S || _monsterRank == EMonsterRanks.A || _monsterRank == EMonsterRanks.B ) ) { bonusTech = 3; }
-                    }
-
-                    for ( var t = 0; t < bonusTech; t++ ) { toLearn.Add( (byte) i ); }
-                }
-            }
-
-            if ( toLearn.Count > 0 ) {
-                monster.techniques += (uint) ( 1 << toLearn[ Random.Shared.Next() % toLearn.Count ] );
-            }*/
         }
 
         public void UnlearnTechnique () {
             TournamentData._mod.DebugLog( 2, "Monster " + monster.name + " is attempting an unlearn a tech.", Color.Orange );
-            if ( techniques.Count <= 6 ) { return; }
 
             List<int> weightedPool = new List<int>();
             var minVal = 1000;
@@ -358,6 +340,23 @@ namespace MRDX.Game.DynamicTournaments
 
             for ( var i = 0; i < techniques.Count; i++ ) {
                 tech = techniques[ i ];
+                double techval = tech._techValue;
+
+                if ( tech._scaling == TechType.Power && ( monster.stat_pow < monster.stat_int ) ) {
+                    techval = ( ( techval * 0.8 ) * ( (float) monster.stat_pow / monster.stat_int ) );
+                }
+
+                else if ( tech._scaling == TechType.Intelligence && ( monster.stat_int < monster.stat_pow ) ) {
+                    techval = ( ( techval * 0.8 ) * ( (float) monster.stat_int / monster.stat_pow ) );
+                }
+
+                if ( tech._errantry == ErrantryType.Special) { techval *= 1.25; }
+                else if ( growth_group == growth_groups.power && tech._errantry == ErrantryType.Heavy ) { techval *= 1.25; }
+                else if ( growth_group == growth_groups.intel && tech._errantry == ErrantryType.Skill ) { techval *= 1.25; }
+                else if ( growth_group == growth_groups.wither && tech._errantry == ErrantryType.Withering ) { techval *= 1.25; }
+                else if ( growth_group == growth_groups.speedy && tech._errantry == ErrantryType.Sharp ) { techval *= 1.25; }
+
+
                 if ( minVal > tech._techValue ) { minVal = tech._techValue; }
             }
 
@@ -370,12 +369,21 @@ namespace MRDX.Game.DynamicTournaments
             if ( weightedPool.Count > 0 ) {
                 var chosen = weightedPool[ Random.Shared.Next() % weightedPool.Count ];
                 for ( var i = 0; i < breedInfo._techniques.Count; i++ ) { if ( breedInfo._techniques[ i ]._id == chosen ) { tech = breedInfo._techniques[ i ]; } }
-                monster.techniques -= (uint) ( 1 << tech._id );
-                techniques.Remove( tech );
-                TournamentData._mod.DebugLog( 2, "Monster " + monster.name + " has unlearned " + tech, Color.Orange );
+                MonsterRemoveTechnique( tech );
+                TournamentData._mod.DebugLog( 2, "Monster " + monster.name + " has unlearned " + tech + " they have " + techniques.Count + " | " + monster.techniques + " now.", Color.Orange );
             }
         }
 
+        public void MonsterAddTechnique(MonsterTechnique tech) {
+            monster.techniques = monster.techniques | (uint) ( 1 << tech._id );
+            if ( !techniques.Contains(tech) ) techniques.Add( tech );
+        }
+
+        public void MonsterRemoveTechnique(MonsterTechnique tech) {
+            uint keep = 0xffff - (uint) (1 << tech._id);
+            monster.techniques = monster.techniques & keep;
+            techniques.Remove( tech );
+        }
 
         /// <summary>
         /// Promotes a Monster to a specifc rank, learning specials at D and A ranks. 

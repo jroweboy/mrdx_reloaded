@@ -98,7 +98,7 @@ public class Config : Configurable<Config>
     [Category( "Gameplay Adjustments" )]
     [DisplayName( "Tournament Stat Growths" )]
     [Description( "The modifier adds up to the provided value for each stat when participating in a tournament.\n" +
-    "A value of 5 would add between 0-5 points to each stat upon completion of a tournament.\n" +
+    "A value of 4 adds between 0-4 points to each stat upon completion of a tournament.\n" +
     "Game Default: 0, Recommended: 4" )]
     [DefaultValue( 4 )]
     public int _confDTP_tournament_stat_growth { get; set; } = 4;
@@ -150,6 +150,18 @@ public class Config : Configurable<Config>
     [DefaultValue( E_ConfABD_TechInt.Smart )]
     public E_ConfABD_TechInt _confABD_techIntelligence { get; set; } = E_ConfABD_TechInt.Smart;
     public enum E_ConfABD_TechInt { Minimal, Average, Smart, Genius }
+
+    [Category( "Advanced - Monster Lifespan" )]
+    [DisplayName( "Monster Lifespan Minimum" )]
+    [Description( "The minimum months a tournament monster will live.")]
+    [DefaultValue( 36 )]
+    public int _confABD_tm_lifespan_min { get; set; } = 36;
+
+    [Category( "Advanced - Monster Lifespan" )]
+    [DisplayName( "Monster Lifespan Maximum" )]
+    [Description( "The maximum months a tournament monster will live." )]
+    [DefaultValue( 84 )]
+    public int _confABD_tm_lifespan_max { get; set; } = 84;
 
     [Category("Advanced - Mod Debugging")]
     [DisplayName("Reloaded Message Verbosity")]
