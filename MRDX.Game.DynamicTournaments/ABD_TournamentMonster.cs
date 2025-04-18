@@ -45,7 +45,7 @@ namespace MRDX.Game.DynamicTournaments
             monster = m;
             breedInfo = MonsterBreed.GetBreedInfo( monster.breed_main, monster.breed_sub );
 
-            var lifespanmin = TournamentData._configuration._confABD_tm_lifespan_min
+            var lifespanmin = TournamentData._configuration._confABD_tm_lifespan_min;
 
             lifetotal = (ushort) ( lifespanmin + ( TournamentData.LifespanRNG.Next() % ( ( 1 + TournamentData._configuration._confABD_tm_lifespan_max ) - lifespanmin ) ) ); // Configuration File
 
