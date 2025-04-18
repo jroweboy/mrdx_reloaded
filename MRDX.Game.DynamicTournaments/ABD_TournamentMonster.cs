@@ -319,7 +319,7 @@ namespace MRDX.Game.DynamicTournaments
                 TournamentData._mod.DebugLog( 2, "Monster " + monster.name + " learned " + tech, Color.Orange );
             }
 
-            if ( techint == Config.E_ConfABD_TechInt.Genius && techniques.Count > 6 && Random.Shared.Next() % 10 < techniques.Count ) {
+            if ( techint == Config.E_ConfABD_TechInt.Genius && techniques.Count > 6 && Random.Shared.Next() % 20 < techniques.Count ) {
                 UnlearnTechnique();
             }
 

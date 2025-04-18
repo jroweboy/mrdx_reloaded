@@ -26,7 +26,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ReloadedLinkRoots Include="MRDX.Game.ABD_Tournaments" />
+    <ReloadedLinkRoots Include="MRDX.Game.DynamicTournaments" />
     <!-- Add assemblies to be trimmed. You might need to add their dependencies too!  -->
     <!-- <ReloadedLinkAssemblies Include="Reloaded.Memory" /> -->
   </ItemGroup>

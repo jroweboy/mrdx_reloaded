@@ -212,21 +212,27 @@ namespace MRDX.Game.DynamicTournaments
             abdm.monster.battle_specials = (byte) (Random.Shared.Next() % 4);
 
             // Attempt to assign three basics, weighted generally towards worse basic techs with variance.
+            if ( abdm.breedInfo._techniques[ 0 ]._errantry == ErrantryType.Basic ) { 
+                abdm.monster.techniques = abdm.monster.techniques | (uint) ( 1 << abdm.breedInfo._techniques[ 0 ]._id );
+                abdm.techniques.Add( abdm.breedInfo._techniques[ 0 ] );
+            }
+
             for ( var tc = 0; tc < 3; tc++ ) {
                 MonsterTechnique tech = abdm.breedInfo._techniques[ 0 ];
 
-                for ( var j = 0; j < abdm.breedInfo._techniques.Count; j++ ) {
+                for ( var j = 1; j < abdm.breedInfo._techniques.Count; j++ ) {
                     var nt = abdm.breedInfo._techniques[ j ];
                     if ( nt._errantry == ErrantryType.Basic ) {
-                        if ( nt._techValue + Random.Shared.Next() % 15 < tech._techValue ) {
+                        if ( nt._techValue - ( Random.Shared.Next() % 20 ) < tech._techValue ) {
                             tech = nt;
                         }
                     }
-
-                    abdm.monster.techniques = abdm.monster.techniques | (uint) ( 1 << tech._id );
                 }
+
+                abdm.monster.techniques = abdm.monster.techniques | (uint) ( 1 << tech._id );
+                abdm.techniques.Add( tech );
             }
-            TournamentData._mod.DebugLog( 3, "TP: Basics Setup", Color.AliceBlue );
+            TournamentData._mod.DebugLog( 3, "TP: Basics Setup " + abdm.techniques.Count, Color.AliceBlue );
 
             // This is significantly messing with growth rates across the board. Going to manually set the lifespan afterwards based upon the rank.
             while ( abdm.monster.stat_total < stat_start ) {
@@ -252,7 +258,7 @@ namespace MRDX.Game.DynamicTournaments
 
             abdm.PromoteToRank( _monsterRank );
             
-                TournamentData._mod.DebugLog( 2, "TP: Complete", Color.AliceBlue );
+            TournamentData._mod.DebugLog( 2, "TP: Complete", Color.AliceBlue );
             tournamentData.monsters.Add( abdm );
             this.MonsterAdd( abdm );
         }
