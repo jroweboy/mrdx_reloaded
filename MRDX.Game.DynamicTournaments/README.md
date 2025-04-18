@@ -10,6 +10,7 @@
 * v0.1.0 - Initial Pre-release
 * v0.2.0 - Initial Beta Release
 * v0.2.1 - Technique Fixes, New Game Crash Fix, ExtractBin Crash Fix
+* v0.2.2 - Additional Technique Fixes, Tournament Growth Cap Fix, Lifespan Configuration Option
 
 
 
