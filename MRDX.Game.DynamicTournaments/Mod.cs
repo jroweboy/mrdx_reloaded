@@ -146,7 +146,7 @@ public class Mod : ModBase // <= Do not Remove.
 
         HandleExtraction(extract);
 
-        //Debugger.Launch();
+        Debugger.Launch();
 
     }
 
@@ -174,7 +174,7 @@ public class Mod : ModBase // <= Do not Remove.
         SetupMonsterBreeds();
         SetupTournamentParticipantsFromTaikai();
 
-        _LT = new LearningTesting( _iHooks, _address_currentweek );
+        _LT = new LearningTesting( _iHooks, gameAddress );
         _LT._tournamentStatBonus = _configuration._confDTP_tournament_stat_growth > 0 ? _configuration._confDTP_tournament_stat_growth + 1 : 0;
     }
 

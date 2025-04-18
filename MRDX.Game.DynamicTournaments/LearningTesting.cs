@@ -57,6 +57,10 @@ public delegate void LH_DrillPerform_ChangeStats ( nuint self, nuint value );
 [Function( CallingConventions.Cdecl )]
 public delegate void LH_TournamentLifeIndex ( nuint self ); // This function isn't right.
 
+[HookDef( BaseGame.Mr2, Region.Us, "55 8B EC 83 EC 0C 53 56 57 8B 7D ?? 80 BF ?? ?? ?? ?? 01" )]
+[Function( CallingConventions.Cdecl )]
+public delegate void LH_ErrantryStatGains ( int value );
+
 
 namespace MRDX.Game.DynamicTournaments
 {
@@ -74,17 +78,28 @@ namespace MRDX.Game.DynamicTournaments
         private IHook<LH_StatGain_Ski>? _statGainSki;
         private IHook<LH_StatGain_Spd>? _statGainSpd;
         private IHook<LH_StatGain_Int>? _statGainInt;
+
         private IHook<LH_TournamentComplete> _LHTournamentComplete;
         private IHook<LH_DrillPerform_ChangeStats> _LHDPCS;
 
+        private IHook<LH_ErrantryStatGains> _hook_errantryStatGains;
+
+        private nuint _address_game;
         private nuint _address_currentweek;
+        private nuint _address_monsterdata;
+
+
         private uint _currentWeek;
 
         public bool _tournamentEntered = false;
         public int _tournamentStatBonus = 5; // A Number between 0 and X, 0-X is added to the stat gains.
 
-        public LearningTesting ( IHooks hooks, nuint currentWeekAddress ) {
-            _address_currentweek = currentWeekAddress;
+        public bool _errantryEntered = false;
+
+        public LearningTesting ( IHooks hooks, nuint gameAddress ) {
+            _address_game = gameAddress;
+            _address_currentweek = _address_game + 0x379444;
+            _address_monsterdata = _address_game + 0x37667C;
 
             _hooks = hooks;
 
@@ -118,6 +133,8 @@ namespace MRDX.Game.DynamicTournaments
 
             /*_hooks.AddHook<LH_DrillPerform_ChangeStats>( SetupLHDPCS )
                 .ContinueWith( result => _LHDPCS = result.Result.Activate() );*/
+
+            _hooks.AddHook<LH_ErrantryStatGains>( SetupHookErrantryStatGains ).ContinueWith( result => _hook_errantryStatGains = result.Result.Activate() );
         }
 
         /// <summary>
@@ -131,7 +148,9 @@ namespace MRDX.Game.DynamicTournaments
             Memory.Instance.Read<uint>( _address_currentweek, out uint currentWeek );
 
             if ( _currentWeek < currentWeek || _currentWeek == 0 ) { 
-                _currentWeek = currentWeek; _tournamentEntered = false;
+                _currentWeek = currentWeek; 
+                _tournamentEntered = false;
+                _errantryEntered = false;
             }
             
         }
@@ -151,42 +170,50 @@ namespace MRDX.Game.DynamicTournaments
         // These functions all attempt to add an additional 0-TSB for all stat gains. Only called if the tournamentEntered flag is set.
         private uint SetupLHStatGainLifHook ( nuint self, uint value ) {
             Debug.WriteLine( "Lif Gain Hook: " + self + ", Val: " + value + ", TEnt: " + _tournamentEntered );
-            if ( _tournamentEntered && _tournamentStatBonus > 0 ) { value = (uint) (value + (Random.Shared.Next() % _tournamentStatBonus) ); }
+            value = ApplyTournamentBonus( value );
             var ret = _statGainLif!.OriginalFunction( self, value );
             return ret;
         }
 
         private uint SetupLHStatGainPowHook ( nuint self, uint value ) {
             Debug.WriteLine( "Pow Gain Hook: " + self + ", Val: " + value + ", TEnt: " + _tournamentEntered );
-            if ( _tournamentEntered && _tournamentStatBonus > 0 ) { value = (uint) ( value + ( Random.Shared.Next() % _tournamentStatBonus ) ); }
+            value = ApplyTournamentBonus( value );
             var ret = _statGainPow!.OriginalFunction( self, value );
             return ret;
         }
 
         private uint SetupLHStatGainDefHook ( nuint self, uint value ) {
             Debug.WriteLine( "Def Gain Hook: " + self + ", Val: " + value + ", TEnt: " + _tournamentEntered );
-            if ( _tournamentEntered && _tournamentStatBonus > 0 ) { value = (uint) ( value + ( Random.Shared.Next() % _tournamentStatBonus ) ); }
+            value = ApplyTournamentBonus( value );
             var ret = _statGainDef!.OriginalFunction( self, value );
             return ret;
         }
 
         private uint SetupLHStatGainSkiHook ( nuint self, uint value ) {
             Debug.WriteLine( "Ski Gain Hook: " + self + ", Val: " + value + ", TEnt: " + _tournamentEntered );
-            if ( _tournamentEntered && _tournamentStatBonus > 0 ) { value = (uint) ( value + ( Random.Shared.Next() % _tournamentStatBonus ) ); }
+            value = ApplyTournamentBonus( value );
+            /*if (_errantryEntered ) { 
+                value += 20;
+
+                Memory.Instance.ReadRaw( _address_monsterdata + (nuint) ( 0x8 ), out byte[] life, 2 );
+                int l = life[ 0 ] + (life[ 1 ] << 8);
+                l += 20; life[ 0 ] = (byte) ( l & 0xff ); life[ 1 ] = (byte) ( ( l & 0xff00 ) >> 8 );
+                Memory.Instance.WriteRaw( _address_monsterdata + (nuint) ( 0x8 ), life );
+            }*/
             var ret = _statGainSki!.OriginalFunction( self, value );
             return ret;
         }
 
         private uint SetupLHStatGainSpdHook ( nuint self, uint value ) {
             Debug.WriteLine( "Spd Gain Hook: " + self + ", Val: " + value + ", TEnt: " + _tournamentEntered );
-            if ( _tournamentEntered && _tournamentStatBonus > 0 ) { value = (uint) ( value + ( Random.Shared.Next() % _tournamentStatBonus ) ); }
+            value = ApplyTournamentBonus( value );
             var ret = _statGainSpd!.OriginalFunction( self, value );
             return ret;
         }
 
         private uint SetupLHStatGainIntHook ( nuint self, uint value ) {
             Debug.WriteLine( "Int Gain Hook: " + self + ", Val: " + value + ", TEnt: " + _tournamentEntered );
-            if ( _tournamentEntered && _tournamentStatBonus > 0 ) { value = (uint) ( value + ( Random.Shared.Next() % _tournamentStatBonus ) ); }
+            value = ApplyTournamentBonus( value );
             var ret = _statGainInt!.OriginalFunction( self, value );
             return ret;
         }
@@ -202,6 +229,20 @@ namespace MRDX.Game.DynamicTournaments
             Debug.WriteLine( "Drill Stat?: " + value + " " + nval );
             
             _LHDPCS!.OriginalFunction( self, nval );
+        }
+
+        private void SetupHookErrantryStatGains ( int value ) {
+            _errantryEntered = true;
+            Debug.WriteLine( "ESG: " + value );
+
+            _hook_errantryStatGains!.OriginalFunction( value );
+        }
+
+        private uint ApplyTournamentBonus(uint value) {
+            if ( !_tournamentEntered || _tournamentStatBonus <= 0 ) { return value; }
+            value = (uint) ( value + ( Random.Shared.Next() % _tournamentStatBonus ) );
+            value = Math.Clamp( value, 1, 999 );
+            return value;
         }
     }
 }
