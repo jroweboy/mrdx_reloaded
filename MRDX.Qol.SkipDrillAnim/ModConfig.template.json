@@ -17,7 +17,7 @@
   "ReleaseMetadataFileName": "MRDX.Qol.SkipDrillAnim.ReleaseMetadata.json",
   "PluginData": {
     "GitHubRelease": {
-      "UserName": "jroweboy",
+      "UserName": "ranchercommunity",
       "RepositoryName": "mrdx_reloaded",
       "UseReleaseTag": false,
       "AssetFileName": "Mod.zip"
@@ -32,5 +32,5 @@
   "SupportedAppId": [
     "mf2.exe"
   ],
-  "ProjectUrl": "https://github.com/jroweboy/mrdx_reloaded"
+  "ProjectUrl": "https://github.com/ranchercommunity/mrdx_reloaded"
 }
