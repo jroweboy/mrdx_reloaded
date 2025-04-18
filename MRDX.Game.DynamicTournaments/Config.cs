@@ -98,7 +98,7 @@ public class Config : Configurable<Config>
     [Category( "Gameplay Adjustments" )]
     [DisplayName( "Tournament Stat Growths" )]
     [Description( "The modifier adds up to the provided value for each stat when participating in a tournament.\n" +
-    "A value of 5 would add between 0-5 points to each stat upon completion of a tournament.\n" +
+    "A value of 4 adds between 0-4 points to each stat upon completion of a tournament.\n" +
     "Game Default: 0, Recommended: 4" )]
     [DefaultValue( 4 )]
     public int _confDTP_tournament_stat_growth { get; set; } = 4;

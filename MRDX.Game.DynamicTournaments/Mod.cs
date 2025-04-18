@@ -144,18 +144,6 @@ public class Mod : ModBase // <= Do not Remove.
         _modLoader.GetController<IScannerFactory>().TryGetTarget( out var sf );
         _memoryScanner = sf.CreateScanner( Process.GetCurrentProcess(), Process.GetCurrentProcess().MainModule );
 
-        /*_logger.WriteLine( _gamePath + "GP", Color.Blue );
-        extract.ExtractComplete += ( string? path ) => {
-            _logger.WriteLine( path, Color.Blue );
-            tournamentData = new TournamentData( this, _logger, _configuration );
-            SetupMonsterBreeds();
-            SetupTournamentParticipantsFromTaikai();
-
-
-            _LT = new LearningTesting( hooks, _address_currentweek );
-            _LT._tournamentStatBonus = _configuration._confDTP_tournament_stat_growth > 0 ? _configuration._confDTP_tournament_stat_growth + 1 : 0;
-       };
-        */
         HandleExtraction(extract);
 
         //Debugger.Launch();
