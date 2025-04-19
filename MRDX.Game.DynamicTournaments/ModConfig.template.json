@@ -14,9 +14,10 @@
     "ReleaseMetadataFileName": "MRDX.Game.DynamicTournaments.ReleaseMetadata.json",
     "PluginData": {
         "GitHubRelease": {
-            "UserName": "archbishopdave",
+            "UserName": "ranchercommunity",
             "RepositoryName": "mrdx_reloaded",
-            "UseReleaseTag": false
+            "UseReleaseTag": false,
+            "AssetFileName": "Mod.zip"
         }
     },
     "IsUniversalMod": false,
@@ -31,5 +32,5 @@
     "SupportedAppId": [
         "mf2.exe"
     ],
-    "ProjectUrl": "https://github.com/ArchbishopDave/mrdx_reloaded"
+    "ProjectUrl": "https://github.com/ranchercommunity/mrdx_reloaded"
 }

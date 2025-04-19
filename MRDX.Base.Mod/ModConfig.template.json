@@ -14,7 +14,7 @@
   "ReleaseMetadataFileName": "MRDX.Base.Mod.ReleaseMetadata.json",
   "PluginData": {
     "GitHubRelease": {
-      "UserName": "jroweboy",
+      "UserName": "ranchercommunity",
       "RepositoryName": "mrdx_reloaded",
       "UseReleaseTag": false,
       "AssetFileName": "Mod.zip"
@@ -30,5 +30,5 @@
     "mf.exe",
     "mf2.exe"
   ],
-  "ProjectUrl": ""
+  "ProjectUrl": "https://github.com/ranchercommunity/mrdx_reloaded"
 }
