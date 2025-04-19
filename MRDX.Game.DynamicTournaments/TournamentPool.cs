@@ -103,9 +103,6 @@ namespace MRDX.Game.DynamicTournaments
             TournamentData._mod.DebugLog( 1, "TP: Getting Breed", Color.AliceBlue );
             MonsterBreed breed = MonsterBreed.AllBreeds[ 0 ];
 
-            // TODO: Smarter Logic for deciding which breed to make the monster!
-            // // // // // // 
-
             if ( _tournamentPool == ETournamentPools.A_Phoenix ) {
                 for ( var i = 0; i < 500; i++ ) {
                     breed = MonsterBreed.AllBreeds[ Random.Shared.Next() % MonsterBreed.AllBreeds.Count ];
@@ -201,12 +198,12 @@ namespace MRDX.Game.DynamicTournaments
             ABD_TournamentMonster abdm = new ABD_TournamentMonster( nm );
 
             abdm.monster.name = TournamentData._random_name_list[ Random.Shared.Next() % TournamentData._random_name_list.Length ];
-            abdm.monster.stat_lif = 90;
-            abdm.monster.stat_pow = 50;
-            abdm.monster.stat_ski = 50;
-            abdm.monster.stat_spd = 50;
-            abdm.monster.stat_def = 50;
-            abdm.monster.stat_int = 50;
+            abdm.monster.stat_lif = 80;
+            abdm.monster.stat_pow = 1;
+            abdm.monster.stat_ski = 1;
+            abdm.monster.stat_spd = 1;
+            abdm.monster.stat_def = 1;
+            abdm.monster.stat_int = 1;
 
             abdm.monster.per_nature = (byte) ( Random.Shared.Next() % 255 );
             abdm.monster.per_fear = (byte) ( Random.Shared.Next() % 25 );
@@ -251,11 +248,11 @@ namespace MRDX.Game.DynamicTournaments
             TournamentData._mod.DebugLog( 3, "TP: Techs", Color.AliceBlue );
 
             // Need this to account for bad growth rate monsters. At minimum monsters should be living for at least 8 months. Not a lot of time but enough to reduce churn.
-                    if ( _monsterRank == EMonsterRanks.L ) { abdm.lifespan = (ushort) ( 8 + ( TournamentData.LifespanRNG.Next() % 5 ) ); }
-            else    if ( _monsterRank == EMonsterRanks.M ) { abdm.lifespan = (ushort) ( 10 + ( TournamentData.LifespanRNG.Next() % 5 ) ); }
-            else    if ( _monsterRank == EMonsterRanks.S ) { abdm.lifespan = (ushort) ( 12 + ( TournamentData.LifespanRNG.Next() % 7 ) ); }
-            else    if ( _monsterRank == EMonsterRanks.A ) { abdm.lifespan = (ushort) ( 14 + ( TournamentData.LifespanRNG.Next() % 7 ) ); }
-            else    if ( _monsterRank == EMonsterRanks.B ) { abdm.lifespan = (ushort) ( abdm.lifetotal - ( 16 + ( TournamentData.LifespanRNG.Next() % 9 ) ) ); }
+                    if ( _monsterRank == EMonsterRanks.L ) { abdm.lifespan = (ushort) ( 12 + ( TournamentData.LifespanRNG.Next() % 5 ) ); }
+            else    if ( _monsterRank == EMonsterRanks.M ) { abdm.lifespan = (ushort) ( 16 + ( TournamentData.LifespanRNG.Next() % 5 ) ); }
+            else    if ( _monsterRank == EMonsterRanks.S ) { abdm.lifespan = (ushort) ( 20 + ( TournamentData.LifespanRNG.Next() % 7 ) ); }
+            else    if ( _monsterRank == EMonsterRanks.A ) { abdm.lifespan = (ushort) ( 24 + ( TournamentData.LifespanRNG.Next() % 7 ) ); }
+            else    if ( _monsterRank == EMonsterRanks.B ) { abdm.lifespan = (ushort) ( abdm.lifetotal - ( 14 + ( TournamentData.LifespanRNG.Next() % 9 ) ) ); }
             else    if ( _monsterRank == EMonsterRanks.C ) { abdm.lifespan = (ushort) ( abdm.lifetotal - ( 6 + ( TournamentData.LifespanRNG.Next() % 7 ) ) ); }
             else    if ( _monsterRank == EMonsterRanks.D ) { abdm.lifespan = (ushort) (abdm.lifetotal - ( 2 + ( TournamentData.LifespanRNG.Next() % 5 ) ) ); }
             else    if ( _monsterRank == EMonsterRanks.E ) { abdm.lifespan = abdm.lifetotal; }

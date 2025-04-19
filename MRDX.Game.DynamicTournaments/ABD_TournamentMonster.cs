@@ -58,7 +58,7 @@ namespace MRDX.Game.DynamicTournaments
                 growth_rate += (ushort) ( TournamentData.GrowthRNG.Next() % ( 2 * TournamentData._configuration._confABD_growth_monthlyvariance ) );
             }
 
-            growth_rate = Math.Clamp( growth_rate, (ushort) ( TournamentData._configuration._confABD_growth_monthly / 2.4 ), (ushort) ( TournamentData._configuration._confABD_growth_monthly * 1.8 ) );
+            growth_rate = Math.Clamp( growth_rate, (ushort) ( TournamentData._configuration._confABD_growth_monthly / 2 ), (ushort) ( TournamentData._configuration._confABD_growth_monthly * 3 ) );
             TournamentData._mod.DebugLog( 3, "Growth Post Variance" + growth_rate, Color.Lime );
 
             // This section applies special bonuses to monster breeds. These numbers needed to be way lower. Double Rare species were busted.
@@ -77,10 +77,10 @@ namespace MRDX.Game.DynamicTournaments
             growth_rate = (ushort) ( 1 + ( growth_rate / 4 ) ); // Account for Prime Bonus, 4x
             TournamentData._mod.DebugLog( 3, "Growth Post Prime" + growth_rate, Color.Lime );
 
-            TournamentData._mod.DebugLog( 2, "Monster Created: " + m.name + ", " + m.breed_main + "/" + m.breed_sub + ", LIFE: " + lifespan + ", GROWTH: " + growth_rate, Color.Lime );
+            TournamentData._mod.DebugLog( 1, "A new monster has entered the fray: " + m.name + ", " + m.breed_main + "/" + m.breed_sub + ", LIFE: " + lifespan + ", GROWTH: " + growth_rate, Color.Lime );
 
             growth_group = (growth_groups) ( TournamentData.GrowthRNG.Next() % 6 );
-            growth_intensity = (byte) ( TournamentData.GrowthRNG.Next() % 4 );
+            growth_intensity = (byte) ( TournamentData.GrowthRNG.Next() % 6 );
 
             SetupGrowthOptions();
 
@@ -100,7 +100,7 @@ namespace MRDX.Game.DynamicTournaments
         }
 
         public ABD_TournamentMonster ( byte[] rawabd ) {
-            TournamentData._mod.DebugLog( 1, "Loading monster from ABD Save File.", Color.Lime );
+            TournamentData._mod.DebugLog( 2, "Loading monster from ABD Save File.", Color.Lime );
             byte[] rawmonster = new byte[ 60 ];
             for ( var i = 0; i < 60; i++ ) { rawmonster[ i ] = rawabd[ i + 40 ]; }
 
@@ -159,19 +159,23 @@ namespace MRDX.Game.DynamicTournaments
             byte[] gopts = [0];
 
             if ( growth_group == growth_groups.balanced ) { 
-                gopts = [ 1, 1, 1, 1, 1, 1 ];
+                gopts = [ 5, 5, 5, 5, 5, 5 ];
 
-                if ( growth_intensity == 1 )        { gopts = [ 4, 3, 3, 3, 4, 3 ]; }
-                else if ( growth_intensity == 2 )   { gopts = [ 3, 4, 3, 4, 3, 3 ]; }
-                else if ( growth_intensity == 3 )   { gopts = [ 3, 3, 4, 3, 3, 4 ]; }
+                if ( growth_intensity == 1 )        { gopts = [ 6, 4, 6, 4, 4, 4 ]; }
+                else if ( growth_intensity == 2 )   { gopts = [ 4, 4, 4, 6, 6, 4 ]; }
+                else if ( growth_intensity == 3 )   { gopts = [ 4, 6, 4, 4, 4, 6 ]; }
+                else if ( growth_intensity == 4 )   { gopts = [ 5, 6, 4, 4, 4, 4 ]; }
+                else if ( growth_intensity == 5 )   { gopts = [ 5, 4, 4, 4, 4, 6 ]; }
             }
 
             else if ( growth_group == growth_groups.power ) {
                 gopts = [ 4, 5, 3, 1, 3, 2 ];
 
-                if ( growth_intensity == 1 )      { gopts = [ 8, 11, 6, 2, 6, 3 ]; }
-                else if ( growth_intensity == 2 ) { gopts = [ 10, 14, 7, 2, 6, 3 ]; }
-                else if ( growth_intensity == 3 ) { gopts = [ 12, 20, 8, 2, 7, 2 ]; }
+                if ( growth_intensity == 1 )      { gopts = [ 8, 11, 7, 2, 6, 3 ]; }
+                else if ( growth_intensity == 2 ) { gopts = [ 10, 14, 8, 2, 6, 3 ]; }
+                else if ( growth_intensity == 3 ) { gopts = [ 12, 18, 10, 2, 7, 2 ]; }
+                else if ( growth_intensity == 4 ) { gopts = [ 8, 2, 8, 2, 6, 11 ]; }
+                else if ( growth_intensity == 5 ) { gopts = [ 11, 2, 10, 4, 6, 18 ]; }
             }
 
             else if ( growth_group == growth_groups.intel ) { 
@@ -179,15 +183,19 @@ namespace MRDX.Game.DynamicTournaments
 
                 if ( growth_intensity == 1 ) { gopts = [ 5, 2, 6, 5, 3, 9 ]; }
                 else if ( growth_intensity == 2 ) { gopts = [ 8, 2, 9, 6, 3, 12 ]; }
-                else if ( growth_intensity == 3 ) { gopts = [ 12, 2, 12, 8, 3, 18 ]; }
+                else if ( growth_intensity == 3 ) { gopts = [ 12, 2, 12, 8, 3, 16 ]; }
+                else if ( growth_intensity == 4 ) { gopts = [ 8, 12, 9, 6, 3, 2 ]; }
+                else if ( growth_intensity == 5 ) { gopts = [ 12, 16, 12, 8, 3, 2 ]; }
             }
 
             else if ( growth_group == growth_groups.defend ) { 
-                gopts = [ 4, 2, 3, 2, 4, 2 ];
+                gopts = [ 5, 3, 4, 3, 5, 3 ];
 
-                if ( growth_intensity == 1 ) { gopts = [ 5, 2, 3, 2, 6, 2 ]; }
-                else if ( growth_intensity == 2 ) { gopts = [ 13, 4, 5, 2, 15, 4 ]; }
-                else if ( growth_intensity == 3 ) { gopts = [ 16, 4, 8, 3, 18, 4 ]; }
+                if ( growth_intensity == 1 ) { gopts = [ 7, 3, 5, 4, 6, 3 ]; }
+                else if ( growth_intensity == 2 ) { gopts = [ 10, 4, 8, 5, 11, 4 ]; }
+                else if ( growth_intensity == 3 ) { gopts = [ 12, 4, 10, 6, 13, 4 ]; }
+                else if ( growth_intensity == 4 ) { gopts = [ 10, 4, 8, 10, 10, 4 ]; }
+                else if ( growth_intensity == 5 ) { gopts = [ 12, 4, 10, 13, 13, 4 ]; }
             }
 
             else if ( growth_group == growth_groups.wither ) { 
@@ -195,7 +203,9 @@ namespace MRDX.Game.DynamicTournaments
 
                 if ( growth_intensity == 1 ) { gopts = [ 5, 3, 9, 7, 2, 5 ]; }
                 else if ( growth_intensity == 2 ) { gopts = [ 6, 4, 13, 8, 2, 5 ]; }
-                else if ( growth_intensity == 3 ) { gopts = [ 7, 4, 15, 9, 3, 5 ]; }
+                else if ( growth_intensity == 3 ) { gopts = [ 9, 4, 15, 9, 3, 5 ]; }
+                else if ( growth_intensity == 4 ) { gopts = [ 6, 4, 13, 8, 2, 5 ]; }
+                else if ( growth_intensity == 5 ) { gopts = [ 9, 4, 15, 9, 3, 5 ]; }
             }
 
             else if ( growth_group == growth_groups.speedy ) { 
@@ -203,7 +213,9 @@ namespace MRDX.Game.DynamicTournaments
 
                 if ( growth_intensity == 1 ) { gopts = [ 5, 4, 5, 8, 2, 3 ]; }
                 else if ( growth_intensity == 2 ) { gopts = [ 6, 4, 7, 10, 2, 4 ]; }
-                else if ( growth_intensity == 3 ) { gopts = [ 6, 5, 9, 14, 2, 4 ]; }
+                else if ( growth_intensity == 3 ) { gopts = [ 7, 5, 10, 14, 2, 4 ]; }
+                else if ( growth_intensity == 4 ) { gopts = [ 8, 2, 10, 13, 2, 8 ]; }
+                else if ( growth_intensity == 5 ) { gopts = [ 7, 8, 10, 13, 4, 2 ]; }
             }
 
             // This is some fun variance. 16% chance of a stat (1 on average) getting a slight penalty or boost.
@@ -245,7 +257,7 @@ namespace MRDX.Game.DynamicTournaments
 
             agegroup *= growth_rate;
 
-            TournamentData._mod.DebugLog( 3, "Monster " + monster.name + " Advancing Month: [STATS: " + monster.stat_total + ", GROWTH:" + growth_rate + " CGROW: " + agegroup + ", LIFE: " + lifespan + "]", Color.Yellow );
+            TournamentData._mod.DebugLog( 4, "Monster " + monster.name + " Advancing Month: [STATS: " + monster.stat_total + ", GROWTH:" + growth_rate + " CGROW: " + agegroup + ", LIFE: " + lifespan + "]", Color.Yellow );
 
             for ( var i = 0; i < agegroup; i++ ) {
                 var stat = growth_options[ ( TournamentData.GrowthRNG.Next() % growth_options.Count() )];
@@ -266,7 +278,7 @@ namespace MRDX.Game.DynamicTournaments
         }
 
         public void LearnTechnique () { // TODO: Smarter Logic About which tech to get
-            TournamentData._mod.DebugLog( 2, "Monster " + monster.name + " attempting to learn technique. They have " + techniques.Count + " | " + monster.techniques + " now.", Color.Orange );
+            TournamentData._mod.DebugLog( 3, "Monster " + monster.name + " attempting to learn technique. They have " + techniques.Count + " | " + monster.techniques + " now.", Color.Orange );
 
             Config.E_ConfABD_TechInt techint = _trainer_intelligence;
             MonsterTechnique tech = breedInfo._techniques[ 0 ];
@@ -276,9 +288,9 @@ namespace MRDX.Game.DynamicTournaments
             else if ( techint == Config.E_ConfABD_TechInt.Smart ) { techvariance = 15; }
             else if ( techint == Config.E_ConfABD_TechInt.Genius ) { techvariance = 10; }
 
-            List<TechRange> missingRanges = new List<TechRange> { TechRange.Melee, TechRange.Short, TechRange.Medium, TechRange.Long };
             List<int> weightedLearnPool = new List<int>();
 
+            List<TechRange> missingRanges = new List<TechRange> { TechRange.Melee, TechRange.Short, TechRange.Medium, TechRange.Long };
             for ( var i = 0; i < techniques.Count; i++ ) { missingRanges.Remove( techniques[ i ]._range ); }
 
             for ( var i = 0; i < breedInfo._techniques.Count; i++ ) {
@@ -311,7 +323,7 @@ namespace MRDX.Game.DynamicTournaments
 
                     if ( techint == Config.E_ConfABD_TechInt.Smart || techint == Config.E_ConfABD_TechInt.Genius ) { techval = (int) (techval * 1.1); }
 
-                    TournamentData._mod.DebugLog( 3, techval + " TV: " + tech, Color.Beige );
+                    TournamentData._mod.DebugLog( 4, techval + " TV: " + tech, Color.Beige );
                     for ( var j = 10; j < techval; j++ ) {
                         weightedLearnPool.Add( tech._id );
                     }
@@ -332,11 +344,16 @@ namespace MRDX.Game.DynamicTournaments
         }
 
         public void UnlearnTechnique () {
-            TournamentData._mod.DebugLog( 2, "Monster " + monster.name + " is attempting an unlearn a tech.", Color.Orange );
+            TournamentData._mod.DebugLog( 3, "Monster " + monster.name + " is attempting an unlearn a tech.", Color.Orange );
 
             List<int> weightedPool = new List<int>();
             var minVal = 1000;
             var tech = techniques[ 0 ];
+
+            int[] rangeCounts = [ 0, 0, 0, 0 ];
+            double[] techweights = new double[ techniques.Count ];
+
+            for ( var i = 0; i < techniques.Count; i++ ) { rangeCounts[ (int) techniques[ i ]._range ] += 1; }
 
             for ( var i = 0; i < techniques.Count; i++ ) {
                 tech = techniques[ i ];
@@ -356,13 +373,18 @@ namespace MRDX.Game.DynamicTournaments
                 else if ( growth_group == growth_groups.wither && tech._errantry == ErrantryType.Withering ) { techval *= 1.25; }
                 else if ( growth_group == growth_groups.speedy && tech._errantry == ErrantryType.Sharp ) { techval *= 1.25; }
 
+                if ( rangeCounts[(int) tech._range ] <= 1 ) { techval += 30; }
 
-                if ( minVal > tech._techValue ) { minVal = tech._techValue; }
+                if ( minVal > techval ) { minVal = (int) techval; }
+
+                techweights[ i ] = techval;
+                TournamentData._mod.DebugLog( 4, tech._id + " has a value of " + techval, Color.Orange );
+
             }
 
             for ( var i = 0; i < techniques.Count; i++ ) {
                 tech = techniques[ i ];
-                var weight = 25 - ( tech._techValue - minVal );
+                var weight = 30 - ( techweights[i] - minVal );
                 for ( var j = 0; j < weight; j++ ) { weightedPool.Add( tech._id ); }
             }
 

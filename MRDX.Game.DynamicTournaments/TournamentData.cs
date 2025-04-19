@@ -39,32 +39,32 @@ public class TournamentData
         "Voidbane","Voidsicle","Kingsmith","Kingly","Peasant","Pleasant","Swellow","Alexa","Luitgard","Ede","Medou","Branka","Devotee","Aura",
         "Outlaw","Jade","Nocturne","Jarvis","Beeps","Faint","Perkless","Yill","Quona","Washerguard","Eda","Rosery","Tapper","Undergrow","Ova",
         "Adamant","Silverlock","Dobby","Finx","Gar","Hope","Jewel","Kattery","Languish","Zephyr","Xilla","Cedar","Villa","Branx","Naught","Midas",
-        "Atronaph", "Argus", "Aideen", "Alias", "Adonay", "Anno", "Apollo",
+        "Atronaph", "Argus", "Aideen", "Alias", "Adonay", "Anno", "Apollo", "Aydin", "Asakoa", "Aviri", "Adelynn", "Arsonwheel", "Angerstomp",
         "Bajor", "Beekler", "Bobbles", "Buu", "Brainstorm", "Bracer", "Basselt", "Boggycreek", "Boggart", "Bahamut", "Baretree", "Birchbellow",
-        "Calaphyx", "Cawcaws", "Cix", "Cerrusio", "Creator", "Clipse", "Conjus", 
-        "David", "Dingus", "Dakadaka", "Dill", "Doodle", "Daydream", "Dreameater", "Diablo", "Diabolos",
-        "Eater", "Eo", "Endofall", "Exuberance", "Etresse", "Elan",
-        "Fargus", "Fillero", "Ferrus", "Faunus", "Feathers", "Fuzzball",
-        "Gronkula", "Gimmles", "Golox", "Gargamel", "Gutterman", "Gale", "Gemlashes", "Gotusloop",
-        "Hardness", "Herman", "Hillox", "Hundredyear", "Hurlante", "Hazel", "Hanzel",
-        "Io", "Iodine", "Iaz", "Illomens", "Incarnate", "Isaias", "Islecrusher",
-        "Jax", "Jack", "Jillian", "Jellyjam", "Julius", "Jasmine",
-        "Kawkaws", "Ki", "Kallus", "Keith", "Kevin", "Kitten", "Kedijah", "Keah",
-        "Larrius", "Lengeru", "Ludwiz", "Longboy", "Llij",
-        "Moparscape", "Mardok", "Mueller", "Mastodon", "Morphius", "Murph", "McNasty", "Mehret", "Mordheim", "Mors", "Magician",
-        "Nilus", "Neo", "Nevarine", "Nix", "Nemo",
-        "Ox", "Otherwilds", "Outerspace", "Oiler", "Officer", "Omexx", "Ocus",
+        "Calaphyx", "Cawcaws", "Cix", "Cerrusio", "Creator", "Clipse", "Conjus", "Chanceux", "Ciorliath", "Clearwish", 
+        "David", "Dingus", "Dakadaka", "Dill", "Doodle", "Daydream", "Dreameater", "Diablo", "Diabolos", "Dunker", "Dragonfly", 
+        "Eater", "Eo", "Endofall", "Exuberance", "Etresse", "Elan", "Entun", "Earthtender",
+        "Fargus", "Fillero", "Ferrus", "Faunus", "Feathers", "Fuzzball", "Foolcaller",
+        "Gronkula", "Gimmles", "Golox", "Gargamel", "Gutterman", "Gale", "Gemlashes", "Gotusloop", "Goldenboy",
+        "Hardness", "Herman", "Hillox", "Hundredyear", "Hurlante", "Hazel", "Hanzel", "Hatemonger",
+        "Io", "Iodine", "Iaz", "Illomens", "Incarnate", "Isaias", "Islecrusher", "Iaull", "Itong", "Iilos",
+        "Jax", "Jack", "Jillian", "Jellyjam", "Julius", "Jasmine", "Jazlynn",
+        "Kawkaws", "Ki", "Kallus", "Keith", "Kevin", "Kitten", "Kedijah", "Keah", "Kammi",
+        "Larrius", "Lengeru", "Ludwiz", "Longboy", "Llij", "Liyong", "Laylah",
+        "Moparscape", "Mardok", "Mueller", "Mastodon", "Morphius", "Murph", "McNasty", "Mehret", "Mordheim", "Mors", "Magician", "Morefather",
+        "Nilus", "Neo", "Nevarine", "Nix", "Nemo", "Nangara", "Neta", "Nontoun",
+        "Ox", "Otherwilds", "Outerspace", "Oiler", "Officer", "Omexx", "Ocus", "Oddball",
         "Parrix", "Pickle", "Piledriver", "Puffpuff", "Peachclaw", "Peargrinder", "Paraema", 
-        "Quizler", "Qix", "Quark", "Qidus",
-        "Roachest", "Rizz", "Rue", "Ramman", "Rammuh", 
-        "Savi", "Serenity", "Silverhand", "Sammy", "Soothsayer", "Swissmiss", "Sully", "Semere", "Spiris", "Splinter", "Sandytwist",
+        "Quizler", "Qix", "Quark", "Qidus", "Quid",
+        "Roachest", "Rizz", "Rue", "Ramman", "Rammuh", "Ragdoll", "Rose",
+        "Savi", "Serenity", "Silverhand", "Sammy", "Soothsayer", "Swissmiss", "Sully", "Semere", "Spiris", "Splinter", "Sandytwist", "Seatsaidh",
         "Tav", "Traveller", "Taximon", "Truegold", "Tuskies", "Tinkertot", "Terminus", "Tamil",
-        "Underway", "Uco",
+        "Underway", "Uco", "Unibrow",
         "Valiant", "Violence", "Vorton", "Voodoo", "Veuve", "Vexee", "Volance", 
         "Wabberjack", "Warbler", "Werebaby", "Wodyeith",
         "Xilla", "Xerces", 
         "Yoyo", "Yanger", "Yucca", "Yew", "Yewflower", 
-        "Zoro", "Zewdi", "Zaben"];
+        "Zoro", "Zewdi", "Zaben", "Zookeeper"];
 
     public bool _initialized = false;
     public bool _firstweek = false;
@@ -190,7 +190,7 @@ public class TournamentData
             }
         }
 
-        _mod.DebugLog( 1, "Finished Advancing Weeks, Checking Pools", Color.Yellow );
+        _mod.DebugLog( 2, "Finished Advancing Weeks, Checking Pools", Color.Yellow );
         foreach ( TournamentPool pool in tournamentPools.Values ) {
             while ( pool.monsters.Count < pool._minimumSize ) {
                 pool.GenerateNewValidMonster(_unlockedTournamentBreeds);
@@ -206,18 +206,17 @@ public class TournamentData
     }
     public void AdvanceMonth()
     {
-        _mod.DebugLog( 1, "Advancing month from TournamentData", Color.Blue );
+        _mod.DebugLog( 2, "Advancing month from TournamentData", Color.Blue );
         for (var i = monsters.Count - 1 ; i >= 0 ; i--) {
             var m = monsters[i];
 
             m.AdvanceMonth();
             if ( !m.alive ) {
-                _mod.DebugLog( 3, m.monster.name + " has died. Removing from pools.", Color.Blue );
+                _mod.DebugLog( 1, m.monster.name + " has died. Rest in peace.", Color.Blue );
                 for ( var j = m.pools.Count() - 1; j >= 0; j-- ) {
                     m.pools[j].MonsterRemove( m );
                 }
                 monsters.Remove( m );
-                _mod.DebugLog( 3, m.monster.name + " removed from master pool list.", Color.Blue );
             }
 
             // TODO CONFIG TECHNIQUE RATE

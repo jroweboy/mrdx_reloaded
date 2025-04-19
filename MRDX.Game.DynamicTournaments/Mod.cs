@@ -209,7 +209,7 @@ public class Mod : ModBase // <= Do not Remove.
             tournamentData.AddExistingMonster( tm, i );
 
             string bytes = ""; for ( var z = 0; z < 60; z++ ) { bytes += rawmonster[ z ] + ","; }
-            DebugLog( 2, "Monster " + i + " Parsed: " + tm, Color.Lime );
+            DebugLog( 3, "Monster " + i + " Parsed: " + tm, Color.Lime );
         }
         fs.Close();
 
@@ -232,7 +232,7 @@ public class Mod : ModBase // <= Do not Remove.
         if ( newWeek ) { AdvanceWeekUpdateTournamentMonsters( _unlockedmonsters ); }
         UpdateMemoryTournamentData(_address_tournamentmonsters);
         
-        DebugLog(3, "Hook Game Update", Color.Red);   
+        DebugLog(4, "Hook Game Update", Color.Red);   
     }
 
     private void GetUnlockedMonsters(nuint unlockAddress) {
@@ -265,7 +265,7 @@ public class Mod : ModBase // <= Do not Remove.
         for ( var i = 0; i < unlocks.Length; i++ ) {
             if ( unlocks[ i ] == 0x01 ) {
                 _unlockedmonsters.Add( (MonsterGenus) i );
-                DebugLog(3, "Unlocked Monster Check " + i + ",", Color.Pink );
+                DebugLog(3, "Unlocked Monster Check: " + i, Color.Pink );
             }
         }
     }
@@ -339,10 +339,10 @@ public class Mod : ModBase // <= Do not Remove.
             DebugLog( 1, "Game Load Detected", Color.Orange );
             List<ABD_TournamentMonster> monsters = _saveFileManager.LoadABDTournamentData();
             if ( monsters.Count == 0 ) {
-                DebugLog( 2, "No custom tournament data found. Loading taikai_en.", Color.Orange );
+                DebugLog( 3, "No custom tournament data found. Loading taikai_en.", Color.Orange );
                 SetupTournamentParticipantsFromTaikai();
             } else {
-                DebugLog( 2, "Found Data for " + monsters.Count + " monsters.", Color.Orange );
+                DebugLog( 3, "Found Data for " + monsters.Count + " monsters.", Color.Orange );
                 tournamentData.ClearAllData();
                 foreach(ABD_TournamentMonster abdm in monsters) {
                     tournamentData.AddExistingMonster( abdm );
@@ -350,7 +350,7 @@ public class Mod : ModBase // <= Do not Remove.
             }
             tournamentData._initialized = true;
             tournamentData._firstweek = true;
-            DebugLog( 2, "Initialization Complete", Color.Orange );
+            DebugLog( 1, "Initialization Complete", Color.Orange );
         }
     }
     /// <summary>  </summary>
@@ -372,7 +372,7 @@ public class Mod : ModBase // <= Do not Remove.
     }
 
     private void AdvanceWeekUpdateTournamentMonsters(List<MonsterGenus> unlockedmonsters) {
-        DebugLog( 2, "Advancing to week " + _game_currentWeek, Color.Blue );
+        DebugLog( 3, "Advancing to week " + _game_currentWeek, Color.Blue );
         tournamentData.AdvanceWeek(_game_currentWeek, unlockedmonsters);
     }
 
@@ -416,11 +416,14 @@ public class Mod : ModBase // <= Do not Remove.
         else if (verbosity == 1 && _configuration._confABD_debugging != Config.E_ConfABD_Debugging.Off ) {
             _logger.WriteLineAsync( "[ABDT High]: " + message, c );
         }
-        else if ( verbosity == 2 && ( _configuration._confABD_debugging == Config.E_ConfABD_Debugging.Medium || _configuration._confABD_debugging == Config.E_ConfABD_Debugging.Verbose ) ) {
+        else if ( verbosity == 2 && ( _configuration._confABD_debugging == Config.E_ConfABD_Debugging.Medium || _configuration._confABD_debugging == Config.E_ConfABD_Debugging.Verbose || _configuration._confABD_debugging == Config.E_ConfABD_Debugging.Developer ) ) {
             _logger.WriteLineAsync( "[ABDT Med]: " + message, c );
         }
-        else if ( verbosity == 3 && _configuration._confABD_debugging == Config.E_ConfABD_Debugging.Verbose ) {
+        else if ( verbosity == 3 && _configuration._confABD_debugging == Config.E_ConfABD_Debugging.Verbose || _configuration._confABD_debugging == Config.E_ConfABD_Debugging.Developer ) {
             _logger.WriteLineAsync( "[ABDT Low]: " + message, c );
+        }
+        else if ( verbosity == 4 && _configuration._confABD_debugging == Config.E_ConfABD_Debugging.Developer ) {
+            _logger.WriteLineAsync( "[ABDT Developer]: " + message, c );
         }
     }
 
