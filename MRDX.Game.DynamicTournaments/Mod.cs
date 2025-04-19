@@ -101,7 +101,7 @@ public class Mod : ModBase // <= Do not Remove.
         _configuration = context.Configuration;
         _modConfig = context.ModConfig;
 
-        _saveFileManager = new SaveFileManager( this, _modLoader, _modConfig, _logger );
+        _saveFileManager = new SaveFileManager( this, _modLoader, _modConfig, _logger, _configuration._confDTP_experimental_autosaves );
 
         _redirector = _modLoader.GetController<IRedirectorController>();
         _modLoader.GetController<IExtractDataBin>().TryGetTarget(out var extract);
@@ -115,8 +115,8 @@ public class Mod : ModBase // <= Do not Remove.
 
         _address_unlockedmonsters = gameAddress + 0x3795A2;
         _address_tournamentmonsters = gameAddress + 0x548D10;
-        //548CD0
         _address_currentweek = gameAddress + 0x379444;
+        //548CD0
 
         _unlockedmonsters = new List<MonsterGenus>();
 
@@ -146,7 +146,7 @@ public class Mod : ModBase // <= Do not Remove.
 
         HandleExtraction(extract);
 
-        Debugger.Launch();
+        //Debugger.Launch();
 
     }
 
@@ -159,6 +159,7 @@ public class Mod : ModBase // <= Do not Remove.
         try { FileStream fs = File.OpenRead( _gamePath + "\\mf2\\data\\mon\\kapi\\" + "ka_ka_wz.bin" ); fs.Close();
             ProcessExtractedData();
         }
+
         catch {
             extract.ExtractComplete += ( string? path ) => {
                 ProcessExtractedData();

@@ -22,12 +22,15 @@ namespace MRDX.Game.DynamicTournaments
         public bool _saveData_gameLoaded = false;
 
         private string _saveData_folder = "";
+        public bool _saveData_autosaves_enabled = false;
 
-        public SaveFileManager(Mod master, IModLoader loader, IModConfig config, ILogger logger) {
+        public SaveFileManager(Mod master, IModLoader loader, IModConfig config, ILogger logger, bool autosavesEnabled) {
             _modMaster = master;
             _modLoader = loader;
             _modConfig = config;
             _logger = logger;
+
+            _saveData_autosaves_enabled = autosavesEnabled;
 
             _saveData_folder = _modLoader.GetDirectoryForModId( _modConfig.ModId ) + "\\SaveData\\";
         }
@@ -38,8 +41,9 @@ namespace MRDX.Game.DynamicTournaments
         /// 3+ Access followed by a GameEventHook is for loading.
         /// </summary>
         public void SaveDataMonitor ( string filename ) {
-            if ( filename.Contains( "BISLPS-" ) && !filename.Contains("614") ) {
+            if ( filename.Contains( "BISLPS-" ) && ( !filename.Contains("614") || _saveData_autosaves_enabled ) ) {
                 var newSlot = filename.Substring( filename.Length - 2 );
+
                 if ( _saveData_slot != newSlot ) {
                     _saveData_slot = newSlot;
                     _saveData_readCount = 0;

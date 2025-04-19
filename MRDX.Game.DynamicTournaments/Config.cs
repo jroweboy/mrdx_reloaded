@@ -153,7 +153,7 @@ public class Config : Configurable<Config>
     [DisplayName( "Wildcard Stats" )]
     [Description( "The odds of a stat being 'wildcard'.\n" +
     "Lower values will result in significantly less 'cohesive' monsters.\n" +
-    "Higher variance will result in the appearance of more stragglers (monsters stuck or lagging for their class." )]
+    "Higher values will reduce the odds of monsters having 'wild' stats." )]
     [SliderControlParams( minimum: 1, maximum: 500, showTextField: true, isTextFieldEditable: true )]
     [DefaultValue( 300 )]
     public int _confABD_growth_wildcardstat { get; set; } = 300;
@@ -181,7 +181,15 @@ public class Config : Configurable<Config>
     [DefaultValue( 84 )]
     public int _confABD_tm_lifespan_max { get; set; } = 84;
 
-    [Category("Advanced - Mod Debugging")]
+    [Category("Advanced - Experimental Options")]
+    [DisplayName( "Enable Autosaves Integration" )]
+    [Description( "Allows the mod to save tournament data for autosaves.\n" +
+     "Considerably increases the number of concurrent file writes and was disabled due to early mod stability concerns.\n" +
+     "Will be evaluated over time and integreated into the mod proper if old issues were resolved.")]
+    [DefaultValue( false )]
+    public bool _confDTP_experimental_autosaves { get; set; } = false;
+
+    [ Category("Advanced - Mod Debugging")]
     [DisplayName("Reloaded Message Verbosity")]
     [Description("Enables internal printouts to the Reloaded Log file to help debug issues.\n" +
         "Off - No debug messages printed. For normal gameplay.\n" +
