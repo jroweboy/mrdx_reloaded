@@ -219,17 +219,17 @@ public class Mod : ModBase // <= Do not Remove.
     private void SetupUpdateHook(nint parent)
     {
         _updateHook!.OriginalFunction(parent);
-
+        bool newWeek = false;
         Memory.Instance.Read<uint>( _address_currentweek, out uint currentWeek );
         if ( _game_currentWeek != currentWeek ) { 
             _game_currentWeek = currentWeek; 
-            currentWeek = 1; 
+            newWeek = true; 
         }
 
         // Unfortunately the ordering of these function calls matters so we have to do this shuffling depending on if the game week progressed.
-        if ( currentWeek == 1 ) { GetUnlockedMonsters( _address_unlockedmonsters ); }
+        if ( newWeek ) { GetUnlockedMonsters( _address_unlockedmonsters ); }
         LoadGameUpdateTournamentData();
-        if ( currentWeek == 1 ) { AdvanceWeekUpdateTournamentMonsters( _unlockedmonsters ); }
+        if ( newWeek ) { AdvanceWeekUpdateTournamentMonsters( _unlockedmonsters ); }
         UpdateMemoryTournamentData(_address_tournamentmonsters);
         
         DebugLog(3, "Hook Game Update", Color.Red);   
