@@ -3,17 +3,18 @@ using MRDX.Qol.MagicBananaStatic.Template;
 using MRDX.Qol.MagicBananaStatic.Configuration;
 
 using MRDX.Base.Mod.Interfaces;
+using MRDX.Base.ExtractDataBin.Interface;
 
 using Reloaded.Memory.Sources;
 using Reloaded.Mod.Interfaces;
 using Reloaded.Hooks.Definitions;
+using Reloaded.Universal.Redirector.Interfaces;
 
 using System.Diagnostics;
 using System.Drawing;
 
 using Reloaded.Hooks.Definitions.X86;
 using CallingConventions = Reloaded.Hooks.Definitions.X86.CallingConventions;
-
 namespace MRDX.Qol.MagicBananaStatic;
 
 [HookDef( BaseGame.Mr2, Region.Us, "55 8B EC B9 01 00 00 00 83 EC 18" )]
@@ -57,6 +58,8 @@ public class Mod : ModBase // <= Do not Remove.
     private readonly IModConfig _modConfig;
     #endregion
 
+    private IRedirectorController _redirector;
+
     private IHooks _iHooks;
 
     private IHook<UpdateGenericState>? _hook_genericUpdate;
@@ -77,9 +80,12 @@ public class Mod : ModBase // <= Do not Remove.
     public bool _itemGivenSuccess = false;
 
     public bool _itemHandleMagicBananas = false;
-    public byte[] _magicBanana_preStats = new byte[ 5 ];
+
+    private readonly string? _modPath;
+    private readonly string? _dataPath;
 
     public Mod ( ModContext context ) {
+
         _modLoader = context.ModLoader;
         _hooks = context.Hooks;
         _logger = context.Logger;
@@ -87,13 +93,20 @@ public class Mod : ModBase // <= Do not Remove.
         _configuration = context.Configuration;
         _modConfig = context.ModConfig;
 
+        _modPath = _modLoader.GetDirectoryForModId( _modConfig.ModId );
+
+        _modLoader.GetController<IRedirectorController>().TryGetTarget(out _redirector );
         _modLoader.GetController<IHooks>().TryGetTarget( out _iHooks );
         _modLoader.GetController<IGame>().TryGetTarget( out var iGame );
+        _modLoader.GetController<IExtractDataBin>().TryGetTarget( out var extract );
+
+        if ( extract == null ) { _logger.WriteLine( $"[{_modConfig.ModId}] Failed to get extract data bin controller.", Color.Red ); return; }
 
         var thisProcess = Process.GetCurrentProcess();
         var module = thisProcess.MainModule!;
         _address_game = (nuint) module.BaseAddress.ToInt64();
 
+        if ( _redirector == null ) { _logger.WriteLine( $"[{_modConfig.ModId}] Could not get redirector controller.", Color.Red ); return; }
         if ( _iHooks == null ) { _logger.WriteLine( $"[{_modConfig.ModId}] Could not get hook controller.", Color.Red ); return; }
         if ( iGame == null ) { _logger.WriteLine( $"[{_modConfig.ModId}] Could not get iGame controller.", Color.Red ); return; }
 
@@ -103,7 +116,28 @@ public class Mod : ModBase // <= Do not Remove.
         _monsterCurrent = iGame.Monster;
         iGame.OnMonsterChanged += MonsterChanged;
 
+        _dataPath = extract.ExtractedPath;
+        RedirectorBananaTextAndTextures ();
+
         //Debugger.Launch();
+    }
+
+    private void RedirectorBananaTextAndTextures() {
+        if ( _configuration._config_bananaType == Config.EConfBananaType.Stress ) {
+            _redirector.AddRedirect( _dataPath + @"\mf2\data\item\itm\item_1c.itm", _modPath + @$"\ManualRedirector\Resources\data\mf2\data\item\itm\str-item_1c.itm" );
+            _redirector.AddRedirect( _dataPath + @"\mf2\data\obj\msg_farm_en.obj", _modPath + @$"\ManualRedirector\Resources\data\mf2\data\obj\str-msg_farm_en.obj" );
+        }
+
+        if ( _configuration._config_bananaType == Config.EConfBananaType.Mixed ) {
+            _redirector.AddRedirect( _dataPath + @"\mf2\data\item\itm\item_1c.itm", _modPath + @$"\ManualRedirector\Resources\data\mf2\data\item\itm\mix-item_1c.itm" );
+            _redirector.AddRedirect( _dataPath + @"\mf2\data\obj\msg_farm_en.obj", _modPath + @$"\ManualRedirector\Resources\data\mf2\data\obj\mix-msg_farm_en.obj" );
+        }
+
+        if ( _configuration._config_bananaType == Config.EConfBananaType.Fatigue ) {
+            _logger.WriteLine( _dataPath + @"\mf2\data\item\itm\item_1c.itm" + " TO " + _modPath + @$"\ManualRedirector\Resources\data\mf2\data\item\itm\fat-item_1c.itm", Color.Yellow );
+            _redirector.AddRedirect( _dataPath + @"\mf2\data\item\itm\item_1c.itm", _modPath + @$"\ManualRedirector\Resources\data\mf2\data\item\itm\fat-item_1c.itm" );
+            _redirector.AddRedirect( _dataPath + @"\mf2\data\obj\msg_farm_en.obj", _modPath + @$"\ManualRedirector\Resources\data\mf2\data\obj\fat-msg_farm_en.obj" );
+        }
     }
 
     private void MonsterChanged ( IMonsterChange mon ) {
@@ -160,6 +194,12 @@ public class Mod : ModBase // <= Do not Remove.
 
         if ( !_itemHandleMagicBananas ) { return; }
 
+        /*
+         * "Stress Banana: +10 Fear/Spoil, -1 Form, -10 Stress\n" +
+         * "Mixed Banana: -10 Fear, +10 Spoil, -15 Fatigue, -5 Stress\n" +
+         * "Fatigue Banana: -10 Fear/Spoil, +1 Form, -30 Fatigue")]
+         */
+
         if ( _configuration._config_bananaType == Config.EConfBananaType.Stress ) {
             _monsterCurrent.Fatigue =               _monsterSnapshot.Fatigue;
             _monsterCurrent.Stress = (sbyte)        Math.Clamp( _monsterSnapshot.Stress - 10, 0, sbyte.MaxValue );
@@ -168,11 +208,7 @@ public class Mod : ModBase // <= Do not Remove.
             _monsterCurrent.FormRaw = (sbyte)       Math.Clamp( _monsterSnapshot.FormRaw - 1, -100, 100 );
         }
 
-        /*
-        "Stress Banana: +10 Fear/Spoil, -1 Form, -10 Stress\n" +
-        "Mixed Banana: -10 Fear, +10 Spoil, -15 Fatigue, -5 Stress\n" +
-        "Fatigue Banana: -10 Fear/Spoil, +1 Form, -30 Fatigue")]
-        */
+
 
         else if ( _configuration._config_bananaType == Config.EConfBananaType.Mixed ) {
             _monsterCurrent.Fatigue = (byte)        Math.Clamp( _monsterSnapshot.Fatigue - 15, 0, byte.MaxValue );
@@ -189,7 +225,6 @@ public class Mod : ModBase // <= Do not Remove.
             _monsterCurrent.LoyalFear = (byte)      Math.Clamp( _monsterSnapshot.LoyalFear - 10, 0, 100 );
             _monsterCurrent.FormRaw = (sbyte)       Math.Clamp( _monsterSnapshot.FormRaw + 1, -100, 100 );
         }
-
 
         _itemHandleMagicBananas = false;
     }
