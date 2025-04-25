@@ -13,6 +13,7 @@ using Reloaded.Hooks.Definitions.X86;
 using CallingConventions = Reloaded.Hooks.Definitions.X86.CallingConventions;
 using System.Diagnostics;
 using System.Drawing;
+using System.Formats.Asn1;
 
 [HookDef( BaseGame.Mr2, Region.Us,
 "55 8B EC 8B 45 ?? 56 8B F1 3D E7 03 00 00 77 ?? 8B 56 ?? 66 8B 52 ?? 66 89 15 ?? ?? ?? ?? 66 8B D0 8B 4E ?? 66 2B 51 ?? 66 89 15 ?? ?? ?? ?? 8B 4E ?? 5E 66 89 41 ?? 5D C2 04 00 33 C0 5E 5D C2 04 00" )]
@@ -62,6 +63,8 @@ public delegate void LH_TournamentLifeIndex ( nuint self ); // This function isn
 public delegate void LH_ErrantryStatGains ( int value );
 
 
+
+
 namespace MRDX.Game.DynamicTournaments
 {
 
@@ -95,6 +98,14 @@ namespace MRDX.Game.DynamicTournaments
         public int _tournamentStatBonus = 5; // A Number between 0 and X, 0-X is added to the stat gains.
 
         public bool _errantryEntered = false;
+
+        public byte _itemGiveHookCount = 0;
+        public byte _itemIdGiven = 0;
+        public byte _itemOriginalIdGiven = 0;
+        public bool _itemGivenSuccess = false;
+
+        public bool _itemHandleMagicBananas = false;
+        public byte[] _magicBanana_preStats = new byte[ 5 ];
 
         public LearningTesting ( IHooks hooks, nuint gameAddress ) {
             _address_game = gameAddress;
@@ -151,6 +162,11 @@ namespace MRDX.Game.DynamicTournaments
                 _currentWeek = currentWeek; 
                 _tournamentEntered = false;
                 _errantryEntered = false;
+            }
+
+            if ( _itemGiveHookCount < 6 ) { _itemGiveHookCount++; }
+            if ( _itemGiveHookCount >= 5 ) {
+                //if ( _itemHandleMagicBananas ) { StaticBananas(); _itemGiveHookCount = 0; }
             }
             
         }
@@ -238,7 +254,75 @@ namespace MRDX.Game.DynamicTournaments
             _hook_errantryStatGains!.OriginalFunction( value );
         }
 
-        private uint ApplyTournamentBonus(uint value) {
+
+
+        private void SetupHookItemUsed ( int p1, uint p2, uint p3 ) {
+            Debug.WriteLine( "IU: " + p1 + ", " + p2 + ", " + p3 );
+
+            uint addrItemId = (uint) p1 + 76;
+            Memory.Instance.SafeRead( addrItemId, out _itemOriginalIdGiven );
+
+            // TODO: TESTING PURPOSES ONLY INFINITE FEEDING!
+            Memory.Instance.SafeWrite( _address_monsterdata + 0xf6, 0 );
+
+            Memory.Instance.SafeRead( _address_monsterdata + 0xf6, out _itemGivenSuccess ); // Location of "Item already given this week" flag
+            _itemGivenSuccess = !_itemGivenSuccess;
+
+            if ( _itemOriginalIdGiven == 7 ) {
+                Memory.Instance.SafeWrite( addrItemId, 28 );
+            }
+
+            if ( _itemOriginalIdGiven == 28 ) { // Magic Bananas
+                if ( _itemGivenSuccess ) {
+                    _itemHandleMagicBananas = true;
+
+                    Memory.Instance.SafeRead( _address_monsterdata + 0x1f, out _magicBanana_preStats[ 0 ] ); // Monster Fatigue
+                    Memory.Instance.SafeRead( _address_monsterdata + 0x23, out _magicBanana_preStats[ 1 ] ); // Monster Stress
+                    Memory.Instance.SafeRead( _address_monsterdata + 0x24, out _magicBanana_preStats[ 2 ] ); // Monster Spoil
+                    Memory.Instance.SafeRead( _address_monsterdata + 0x25, out _magicBanana_preStats[ 3 ] ); // Monster Fear
+                    Memory.Instance.SafeRead( _address_monsterdata + 0x26, out _magicBanana_preStats[ 4 ] ); // Monster Form
+
+                }
+            }
+
+            /*Memory.Instance.SafeRead( (uint) p1, out uint locationa );
+            Memory.Instance.SafeRead( (uint) p3, out uint locationx );
+            Memory.Instance.SafeRead( (uint) p1 + 8, out uint locationb );
+            Memory.Instance.SafeRead( (uint) p3 + 8, out uint locationy );
+
+            Debug.WriteLine( locationa + " ||| " + locationb + " ||| " + locationx + " ||| " + locationy );
+
+            Memory.Instance.SafeRead( (uint) locationa + 76, out byte ba );
+            Memory.Instance.SafeRead( (uint) locationx + 76, out byte bx );
+            Memory.Instance.SafeRead( (uint) locationb + 76, out byte bb );
+            Memory.Instance.SafeRead( (uint) locationy + 76, out byte by );
+            Memory.Instance.SafeRead( (uint) p1 + 76, out byte bz );
+
+            Debug.WriteLine( ba + " ||| " + bx + " ||| " + bb + " ||| " + by + " ||| " + bz);*/
+            //Memory.Instance.SafeRead( _address_game + 0x1f33a17c, out byte itemId );
+            //Debug.WriteLine( "ITEM?! " + itemId );
+
+            //_hook_itemUsed!.OriginalFunction( p1, p2, p3 );
+
+            _itemGiveHookCount = 0;
+        }
+
+        private void StaticBananas () {
+            if (!_itemHandleMagicBananas) { return; }
+
+            
+            Memory.Instance.SafeWrite( _address_monsterdata + 0x1f, _magicBanana_preStats[ 0 ] ); // Monster Fatigue
+            Memory.Instance.SafeWrite( _address_monsterdata + 0x23, Math.Clamp(_magicBanana_preStats[ 1 ] - 10, 0, 100) ); // Monster Stress
+            Memory.Instance.SafeWrite( _address_monsterdata + 0x24, Math.Clamp( _magicBanana_preStats[ 2 ] + 10, 0, 100 ) ); // Monster Spoil
+            Memory.Instance.SafeWrite( _address_monsterdata + 0x25, Math.Clamp( _magicBanana_preStats[ 3 ] + 10, 0, 100 ) ); // Monster Fear
+            //Memory.Instance.SafeWrite( _address_monsterdata + 0x26, Math.Clamp( _magicBanana_preStats[ 4 ] - 1, 0, 100 ) ); // Monster Form TODO: Form is weird and non-linear. Maths later
+            Memory.Instance.SafeWrite( _address_monsterdata + 0x1f, _magicBanana_preStats[ 4 ] ); // Monster Form - NOT REALISTIC
+
+            _itemHandleMagicBananas = false;
+        }
+
+
+         private uint ApplyTournamentBonus ( uint value ) {
             if ( !_tournamentEntered || _tournamentStatBonus <= 0 ) { return value; }
             value = (uint) ( value + ( Random.Shared.Next() % _tournamentStatBonus ) );
             value = Math.Clamp( value, 1, 999 );

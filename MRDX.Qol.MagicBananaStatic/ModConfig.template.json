@@ -1,0 +1,34 @@
+{
+    "ModId": "MRDX.Qol.MagicBananaStatic",
+    "ModName": "Magic Bananas - No More Randomness",
+    "ModAuthor": "ArchbishopDave",
+    "ModVersion": "{{ MOD_VERSION }}",
+    "ModDescription": "Makes Magic Bananas less magical. They will always give the effect you desire!",
+    "ModDll": "MRDX.Qol.MagicBananaStatic.dll",
+    "ModIcon": "Preview.png",
+    "ModR2RManagedDll32": "x86/MRDX.Qol.MagicBananaStatic.dll",
+    "ModR2RManagedDll64": "x64/MRDX.Qol.MagicBananaStatic.dll",
+    "ModNativeDll32": "",
+    "ModNativeDll64": "",
+    "IsLibrary": false,
+    "ReleaseMetadataFileName": "MRDX.Qol.MagicBananaStatic.ReleaseMetadata.json",
+    "PluginData": {
+        "GitHubRelease": {
+            "UserName": "ranchercommunity",
+            "RepositoryName": "mrdx_reloaded",
+            "UseReleaseTag": false,
+            "AssetFileName": "Mod.zip"
+        }
+    },
+    "IsUniversalMod": false,
+    "ModDependencies": [
+        "reloaded.sharedlib.hooks",
+        "MRDX.Base.Mod",
+        "MRDX.Base.ExtractDataBin"
+    ],
+    "OptionalDependencies": [],
+    "SupportedAppId": [
+        "mf2.exe"
+    ],
+    "ProjectUrl": "https://github.com/ranchercommunity/mrdx_reloaded"
+}
