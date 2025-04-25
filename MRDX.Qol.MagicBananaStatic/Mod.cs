@@ -103,7 +103,7 @@ public class Mod : ModBase // <= Do not Remove.
         _monsterCurrent = iGame.Monster;
         iGame.OnMonsterChanged += MonsterChanged;
 
-        Debugger.Launch();
+        //Debugger.Launch();
     }
 
     private void MonsterChanged ( IMonsterChange mon ) {
@@ -157,21 +157,38 @@ public class Mod : ModBase // <= Do not Remove.
     }
 
     private void StaticBananas () {
+
         if ( !_itemHandleMagicBananas ) { return; }
 
         if ( _configuration._config_bananaType == Config.EConfBananaType.Stress ) {
-            _monsterCurrent.Fatigue = _monsterSnapshot.Fatigue;
-            _monsterCurrent.Stress = (sbyte) ( _monsterSnapshot.Stress - 10 );
-            _monsterCurrent.LoyalSpoil = (byte) ( _monsterSnapshot.LoyalSpoil + 10 );
-            _monsterCurrent.LoyalFear = (byte) ( _monsterSnapshot.LoyalFear + 10 );
-            _monsterCurrent.FormRaw = (sbyte) ( _monsterSnapshot.FormRaw - 1 );
+            _monsterCurrent.Fatigue =               _monsterSnapshot.Fatigue;
+            _monsterCurrent.Stress = (sbyte)        Math.Clamp( _monsterSnapshot.Stress - 10, 0, sbyte.MaxValue );
+            _monsterCurrent.LoyalSpoil = (byte)     Math.Clamp( _monsterSnapshot.LoyalSpoil + 10, 0, 100 );
+            _monsterCurrent.LoyalFear = (byte)      Math.Clamp( _monsterSnapshot.LoyalFear + 10, 0, 100 );
+            _monsterCurrent.FormRaw = (sbyte)       Math.Clamp( _monsterSnapshot.FormRaw - 1, -100, 100 );
         }
-        /*Memory.Instance.SafeWrite( _address_monsterdata + 0x1f, _magicBanana_preStats[ 0 ] ); // Monster Fatigue
-        Memory.Instance.SafeWrite( _address_monsterdata + 0x23, Math.Clamp( _magicBanana_preStats[ 1 ] - 10, 0, 100 ) ); // Monster Stress
-        Memory.Instance.SafeWrite( _address_monsterdata + 0x24, Math.Clamp( _magicBanana_preStats[ 2 ] + 10, 0, 100 ) ); // Monster Spoil
-        Memory.Instance.SafeWrite( _address_monsterdata + 0x25, Math.Clamp( _magicBanana_preStats[ 3 ] + 10, 0, 100 ) ); // Monster Fear
-        //Memory.Instance.SafeWrite( _address_monsterdata + 0x26, Math.Clamp( _magicBanana_preStats[ 4 ] - 1, 0, 100 ) ); // Monster Form TODO: Form is weird and non-linear. Maths later
-        Memory.Instance.SafeWrite( _address_monsterdata + 0x1f, _magicBanana_preStats[ 4 ] ); // Monster Form - NOT REALISTIC*/
+
+        /*
+        "Stress Banana: +10 Fear/Spoil, -1 Form, -10 Stress\n" +
+        "Mixed Banana: -10 Fear, +10 Spoil, -15 Fatigue, -5 Stress\n" +
+        "Fatigue Banana: -10 Fear/Spoil, +1 Form, -30 Fatigue")]
+        */
+
+        else if ( _configuration._config_bananaType == Config.EConfBananaType.Mixed ) {
+            _monsterCurrent.Fatigue = (byte)        Math.Clamp( _monsterSnapshot.Fatigue - 15, 0, byte.MaxValue );
+            _monsterCurrent.Stress = (sbyte)        Math.Clamp( _monsterSnapshot.Stress - 5, 0, sbyte.MaxValue );
+            _monsterCurrent.LoyalSpoil = (byte)     Math.Clamp( _monsterSnapshot.LoyalSpoil + 10, 0, 100 );
+            _monsterCurrent.LoyalFear = (byte)      Math.Clamp( _monsterSnapshot.LoyalFear - 10, 0, 100 );
+            _monsterCurrent.FormRaw = (sbyte)       _monsterSnapshot.FormRaw;
+        }
+
+        else if ( _configuration._config_bananaType == Config.EConfBananaType.Fatigue ) {
+            _monsterCurrent.Fatigue = (byte)        Math.Clamp( _monsterSnapshot.Fatigue - 30, 0, byte.MaxValue );
+            _monsterCurrent.Stress = (sbyte)        _monsterSnapshot.Stress;
+            _monsterCurrent.LoyalSpoil = (byte)     Math.Clamp( _monsterSnapshot.LoyalSpoil - 10, 0, 100 );
+            _monsterCurrent.LoyalFear = (byte)      Math.Clamp( _monsterSnapshot.LoyalFear - 10, 0, 100 );
+            _monsterCurrent.FormRaw = (sbyte)       Math.Clamp( _monsterSnapshot.FormRaw + 1, -100, 100 );
+        }
 
 
         _itemHandleMagicBananas = false;
