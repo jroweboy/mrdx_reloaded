@@ -24,6 +24,7 @@ $AllProjects = @(
     @("MRDX.Graphics.Widescreen", "1.2.4", $false),
     @("MRDX.Qol.BattleTimer", "1.0.4", $false),
     @("MRDX.Qol.FastForward", "1.3.6", $false),
+    @("MRDX.Qol.MagicBananaStatic", "0.1.0", $false),
     @("MRDX.Qol.SkipDrillAnim", "1.3.2", $false),
     @("MRDX.Qol.TurboInput", "1.0.6", $false),
     @("MRDX.Ui.RawTechValues", "1.0.9", $false)
