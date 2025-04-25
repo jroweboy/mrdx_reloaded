@@ -168,7 +168,7 @@ public class Mod : ModBase // <= Do not Remove.
         // TODO: TESTING PURPOSES ONLY INFINITE FEEDING!
         //Memory.Instance.SafeWrite( _address_monsterdata + 0xf6, 0 );
 
-        _monsterCurrent.ItemUsed = false;
+        //_monsterCurrent.ItemUsed = false;
 
         //Memory.Instance.SafeRead( _address_monsterdata + 0xf6, out _itemGivenSuccess ); // Location of "Item already given this week" flag
         _itemGivenSuccess = !_monsterCurrent.ItemUsed;
