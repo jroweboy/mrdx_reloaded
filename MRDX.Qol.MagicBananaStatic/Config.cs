@@ -17,6 +17,14 @@ public class Config : Configurable<Config>
 
     public enum EConfBananaType { Stress, Mixed, Fatigue }
 
+    [DisplayName( "Banana Coloration" )]
+    [Description( "Enables gentle coloration reminders of the selected banana type from this mod.\n" +
+    "Stress Banana: These bananas are not looking so ripe.\n" +
+    "Mixed Banana: Your regular yellow bananas. Just the way you remember them.\n" +
+    "Fatigue Banana: These banans may be past their ripeness." )]
+    [DefaultValue( true )]
+    public bool _conifg_bananaColors { get; set; } = true;
+
     /*
     [DisplayName( "String" )]
     [Description( "This is a string." )]

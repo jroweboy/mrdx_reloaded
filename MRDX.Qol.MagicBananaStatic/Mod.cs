@@ -123,6 +123,8 @@ public class Mod : ModBase // <= Do not Remove.
     }
 
     private void RedirectorBananaTextAndTextures() {
+        if ( !_configuration._conifg_bananaColors ) { return; }
+
         if ( _configuration._config_bananaType == Config.EConfBananaType.Stress ) {
             _redirector.AddRedirect( _dataPath + @"\mf2\data\item\itm\item_1c.itm", _modPath + @$"\ManualRedirector\Resources\data\mf2\data\item\itm\str-item_1c.itm" );
             _redirector.AddRedirect( _dataPath + @"\mf2\data\obj\msg_farm_en.obj", _modPath + @$"\ManualRedirector\Resources\data\mf2\data\obj\str-msg_farm_en.obj" );
