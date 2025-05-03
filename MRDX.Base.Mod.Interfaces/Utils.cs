@@ -68,6 +68,18 @@ public static class Utils
             $"Unable to find signature for Hook func {typeof(T)} with Game {game} and Region {region}\n   Make sure you define a hook signature!");
     }
 
+    public static TValue GetOrAdd<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key,
+        Func<TKey, TValue> valueFactory)
+    {
+        ArgumentNullException.ThrowIfNull(dictionary);
+        ArgumentNullException.ThrowIfNull(valueFactory);
+
+        if (dictionary.TryGetValue(key, out var value)) return value;
+        value = valueFactory.Invoke(key);
+        dictionary.Add(key, value);
+        return value;
+    }
+
     public class OneTimeEvent<T>
     {
         private readonly Lock _lock = new();

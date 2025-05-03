@@ -446,7 +446,11 @@ public interface IBattleMonster : IBattleMonsterData
 
     byte Guts { get; set; }
 
-    IList<IMonsterTechnique> TechData { get; }
+    byte Loyalty { get; set; }
+
+    bool InFoolery { get; set; }
+
+    List<IMonsterTechnique> TechData { get; }
 }
 
 public static class StatFlagUtil

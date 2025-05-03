@@ -294,7 +294,8 @@ public enum TechRange : byte
     Short = 1,
     Medium = 2,
     Long = 3,
-    Count
+    OutOfRange = 4,
+    Count = 4
 }
 
 public enum TechNature : byte

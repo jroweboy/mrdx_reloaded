@@ -1,6 +1,6 @@
 {
   "ModId": "MRDX.Base.BattleSimulator",
-  "ModName": "MR2 Battle Simulator",
+  "ModName": "Battle Simulator",
   "ModAuthor": "jroweboy",
   "ModVersion": "{{ MOD_VERSION }}",
   "ModDescription": "Runs simplified battle simulations for AI v AI combat",

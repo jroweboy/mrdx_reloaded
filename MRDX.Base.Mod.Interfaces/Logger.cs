@@ -20,14 +20,14 @@ public static class Logger
     private static readonly Dictionary<string, LogLevel> LogLevels = new();
     private static ILogger? _logger;
 
-    public static LogLevel GlobalLogLevel { get; set; } = LogLevel.Error;
+    public static LogLevel GlobalLogLevel { get; set; } = LogLevel.Trace;
 
     public static ILogger? LoggerInternal
     {
         get => _logger;
         set
         {
-            GlobalLogLevel = Debugger.IsAttached ? LogLevel.Trace : LogLevel.Info;
+            GlobalLogLevel = Debugger.IsAttached ? LogLevel.Trace : LogLevel.Trace;
             _logger = value;
         }
     }

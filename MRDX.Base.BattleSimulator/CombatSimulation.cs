@@ -8,23 +8,28 @@ public enum Attacker
     Right
 }
 
+public enum RecoilType
+{
+    MissSelf,
+    HitSelf
+}
+
 public record struct CombatResult
 {
     public int CritChance;
     public Range<int> Damage;
     public int HitChance;
-    public int Withering;
+    public Range<int> Withering;
 }
 
 public class CombatSimulation(IBattleMonster left, IBattleMonster right)
 {
-    public Range Damage(Attacker user, IMonsterTechnique tech)
-    {
-        var attacker = user == Attacker.Left ? left : right;
-        var defender = user == Attacker.Left ? right : left;
+    private const double LevelDifferential = 12.5;
+    private const double CorrectionFactor = 4.0;
 
-        const double d = 12.5;
-        const double f = 4;
+    public Range<int> Damage(Attacker user, IMonsterTechnique tech)
+    {
+        var (attacker, defender) = user == Attacker.Left ? (left, right) : (right, left);
 
         int apow = tech.Scaling == TechType.Power ? attacker.Power : attacker.Intelligence;
         int dpow = tech.Scaling == TechType.Power ? defender.Power : defender.Intelligence;
@@ -34,22 +39,28 @@ public class CombatSimulation(IBattleMonster left, IBattleMonster right)
         if (dpow == 999) dpow = 1000;
         if (ddef == 999) ddef = 1000;
 
-        apow = (int)Math.Floor(Math.Round(apow / d * 10000) / 10000);
-        ddef = (int)Math.Floor(Math.Round(Math.Floor(Math.Round((2d * ddef + dpow) / 3 * 10000) / 10000) / d * 10000) /
-                               10000);
+        apow = (int)Math.Floor(Math.Round(apow / LevelDifferential * 10000) / 10000);
+        ddef = (int)Math.Floor(
+            Math.Round(Math.Floor(Math.Round((2d * ddef + dpow) / 3 * 10000) / 10000) / LevelDifferential * 10000) /
+            10000);
 
         var baseDmg =
-            Math.Floor(Math.Round(Math.Floor(Math.Round((2 * f + apow) * tech.Force / 3 * 10000) / 10000) / f * 10000) /
-                       10000);
+            Math.Floor(
+                Math.Round(Math.Floor(Math.Round((2 * CorrectionFactor + apow) * tech.Force / 3 * 10000) / 10000) /
+                    CorrectionFactor * 10000) /
+                10000);
         var adj = Math.Floor(
-            Math.Round((100 * f + Math.Floor(Math.Round(10d * (apow - ddef) * 100000) / 100000)) / f * 10000) / 10000);
+            Math.Round((100 * CorrectionFactor + Math.Floor(Math.Round(10d * (apow - ddef) * 100000) / 100000)) /
+                CorrectionFactor * 10000) / 10000);
 
         var dmg = Math.Floor(Math.Round(baseDmg * adj * 100) / 10000);
 
         var min = Math.Floor(
-            Math.Round(Math.Floor(Math.Round((1 * f + apow) * tech.Force / 20 * 10000) / 10000) / f * 10000) / 10000);
+            Math.Round(Math.Floor(Math.Round((1 * CorrectionFactor + apow) * tech.Force / 20 * 10000) / 10000) /
+                CorrectionFactor * 10000) / 10000);
         var max = Math.Floor(
-            Math.Round(Math.Floor(Math.Round(3 * (1 * f + apow) * tech.Force / 4 * 10000) / 10000) / f * 10000) /
+            Math.Round(Math.Floor(Math.Round(3 * (1 * CorrectionFactor + apow) * tech.Force / 4 * 10000) / 10000) /
+                CorrectionFactor * 10000) /
             10000);
 
         dmg = Math.Clamp(dmg, min, max);
@@ -92,13 +103,12 @@ public class CombatSimulation(IBattleMonster left, IBattleMonster right)
         var lo = (int)Math.Clamp(dmg - 5, 1, 999);
         var hi = (int)Math.Clamp(dmg + 5, 1, 999);
 
-        return new Range(lo, hi);
+        return new Range<int>(lo, hi);
     }
 
     public int CritChance(Attacker user, IMonsterTechnique tech)
     {
-        var attacker = user == Attacker.Left ? left : right;
-        var defender = user == Attacker.Left ? right : left;
+        var (attacker, defender) = user == Attacker.Left ? (left, right) : (right, left);
 
         int c = tech.Sharpness;
         if (attacker.Nature < 0) // Bad natured monsters
@@ -125,46 +135,161 @@ public class CombatSimulation(IBattleMonster left, IBattleMonster right)
         return c;
     }
 
-    // public static int CalcHitChance(Attacker user, IMonsterTechnique tech)
-    // {
-    //     // Calculate base hit contribution from TEC and guts
-    //     var atkGutsComponent = Math.Round(atkGuts / (14.0 - Math.Floor(atkRate / 2.0)) * 10000) / 10000;
-    //     var defGutsComponent = Math.Round(defGuts / (14.0 - Math.Floor(defRate / 2.0)) * 10000) / 10000;
-    //
-    //     var c = tec + Math.Floor(atkGutsComponent) - Math.Floor(defGutsComponent);
-    //
-    //     if (isDX)
-    //     {
-    //         c += Math.Floor(Math.Round((atkSki * 8 - defAdjS * 8 + 5000) * 100) / 10000);
-    //     }
-    //     else
-    //     {
-    //         var normAtkSki = (int)Math.Floor(Math.Round(atkSki / 50.0 * 10000) / 10000);
-    //         var normDefSpd = (int)Math.Floor(Math.Round(defAdjS / 50.0 * 10000) / 10000);
-    //         c += 50 + Math.Floor(Math.Round((normAtkSki - normDefSpd) * 4 * 10000) / 10000);
-    //     }
-    //
-    //     // Count hit modifiers
-    //     var h = 0;
-    //     if (defFool) h++; // Foolery
-    //     if (atkBsp == 3) h++; // Will
-    //     if (defBsp == 1) h++; // Anger
-    //     if (defBsp == 7) h--; // Ease
-    //
-    //     if (h > 0)
-    //     {
-    //         double i = h + 1;
-    //         c = 100 - Math.Pow(100 - c, i) / Math.Pow(100, h);
-    //     }
-    //     else if (h < 0)
-    //     {
-    //         c = Math.Pow(c, 2) / 100;
-    //     }
-    //
-    //     // Clamp the hit chance
-    //     if (c > 99) c = 99;
-    //     else if (c < 1) c = 1;
-    //
-    //     return (int)Math.Floor(c); // You can format it as $"{(int)Math.Floor(c)}%" if needed
-    // }
+    public int CalcHitChance(Attacker user, IMonsterTechnique tech)
+    {
+        var (attacker, defender) = user == Attacker.Left ? (left, right) : (right, left);
+        // Calculate base hit contribution from TEC and guts
+        var atkGutsComponent = Math.Round(attacker.Guts / (14.0 - Math.Floor(attacker.GutsRate / 2.0)) * 10000) / 10000;
+        var defGutsComponent = Math.Round(defender.Guts / (14.0 - Math.Floor(defender.GutsRate / 2.0)) * 10000) / 10000;
+
+        var hitChance = tech.HitPercent + Math.Floor(atkGutsComponent) - Math.Floor(defGutsComponent);
+
+        hitChance +=
+            Math.Floor(Math.Round((attacker.Skill * 8.0 - defender.AdjustedSpeed * 8.0 + 5000) * 100) / 10000.0);
+
+        // Count hit modifiers
+        var hitModifier = 0;
+        if (defender.InFoolery) hitModifier++; // Foolery
+        if (attacker.ActiveBattleSpecial.HasFlag(BattleSpecials.Will)) hitModifier++; // Will
+        if (defender.ActiveBattleSpecial.HasFlag(BattleSpecials.Anger)) hitModifier++; // Anger
+        if (defender.ActiveBattleSpecial.HasFlag(BattleSpecials.Ease)) hitModifier--; // Ease
+
+        switch (hitModifier)
+        {
+            case > 0:
+            {
+                double i = hitModifier + 1;
+                hitChance = 100 - Math.Pow(100 - hitChance, i) / Math.Pow(100, hitModifier);
+                break;
+            }
+            case < 0:
+                hitChance = Math.Pow(hitChance, 2) / 100;
+                break;
+        }
+
+        // Clamp the hit chance
+        hitChance = Math.Clamp(hitChance, 1, 99);
+        return (int)Math.Floor(hitChance);
+    }
+
+    public Range<int> CalcWithering(Attacker user, IMonsterTechnique tech)
+    {
+        var (attacker, defender) = user == Attacker.Left ? (left, right) : (right, left);
+
+        int w = tech.Withering;
+        // Apply battle specials for attacker
+        w = attacker.ActiveBattleSpecial switch
+        {
+            BattleSpecials.Anger or BattleSpecials.Fury =>
+                w * 2,
+            BattleSpecials.Real =>
+                (int)Math.Floor(w * 1.5),
+            _ => w
+        };
+
+        if (attacker.InactiveBattleSpecial.HasFlag(BattleSpecials.Real))
+            w = (int)Math.Floor(w / 2.0);
+
+        // Apply battle specials for defender
+        if (defender.ActiveBattleSpecial.HasFlag(BattleSpecials.Real))
+            w = (int)Math.Floor(w * 0.65625);
+        if (defender.InactiveBattleSpecial.HasFlag(BattleSpecials.Real))
+            w *= 2;
+
+        // Add in RNG range
+        return new Range<int>(Math.Clamp(w - 5, 0, 99), Math.Clamp(w + 5, 0, 99));
+    }
+
+    private int CalcRecoil(Attacker user, IMonsterTechnique tech, RecoilType recoilType)
+    {
+        var (attacker, defender) = user == Attacker.Left ? (left, right) : (right, left);
+        var pow = attacker.Power == 999 ? 1000 : attacker.Power;
+        var def = defender.AdjustedDefense == 999 ? 1000 : defender.AdjustedDefense;
+        pow = (int)Math.Floor(Math.Round(pow / LevelDifferential * 10000) / 10000);
+        def = (int)Math.Floor(Math.Round(def / LevelDifferential * 10000) / 10000);
+
+        var pct = recoilType == RecoilType.HitSelf ? tech.ForceHitSelf : tech.ForceMissSelf;
+
+        var dmg = Math.Floor(
+            Math.Floor(Math.Round(Math.Floor(Math.Round(pct * (2.0 * CorrectionFactor + pow) / 3 * 10000) / 10000) /
+                CorrectionFactor * 10000) / 10000) *
+            Math.Round((10.0 * (pow - def) + 100 * CorrectionFactor) / CorrectionFactor * 100) / 10000);
+        dmg = attacker.ActiveBattleSpecial switch
+        {
+            BattleSpecials.Power or BattleSpecials.Fury =>
+                dmg * 2,
+            BattleSpecials.Real =>
+                dmg * 1.5,
+            BattleSpecials.Guard =>
+                Math.Ceiling(dmg / 2.0),
+            _ => dmg
+        };
+        if (attacker.InactiveBattleSpecial.HasFlag(BattleSpecials.Real))
+            dmg = Math.Ceiling(dmg / 2.0);
+
+        return Math.Clamp((int)Math.Floor(dmg), 1, attacker.Hp - 1);
+    }
+
+    private int CalcLifeSteal(Attacker user, IMonsterTechnique tech)
+    {
+        var (attacker, defender) = user == Attacker.Left ? (left, right) : (right, left);
+        if (tech.LifeSteal == 255)
+            return 100;
+        if (tech.LifeSteal == 0)
+            return 0;
+        int apow = tech.Scaling == TechType.Power ? attacker.Power : attacker.Intelligence;
+        int dpow = tech.Scaling == TechType.Power ? defender.Power : defender.Intelligence;
+
+        // DX special case
+        if (apow == 999) apow = 1000;
+        if (dpow == 999) dpow = 1000;
+
+        // Normalize levels
+        apow = (int)Math.Floor(Math.Round(apow / LevelDifferential * 10000) / 10000);
+        dpow = (int)Math.Floor(Math.Round(dpow / LevelDifferential * 10000) / 10000);
+
+        var re = (int)Math.Floor(
+            Math.Round((tech.LifeSteal * CorrectionFactor + apow - dpow) / CorrectionFactor * 10000) / 10000);
+        if (re > 100) re = 100;
+
+        return re;
+    }
+
+    private int CalcGutsSteal(Attacker user, IMonsterTechnique tech)
+    {
+        var (attacker, defender) = user == Attacker.Left ? (left, right) : (right, left);
+
+        if (tech.GutsSteal == 255)
+            return 100;
+        if (tech.GutsSteal == 0)
+            return 0;
+        var atkInt = attacker.Intelligence;
+        var defInt = defender.Intelligence;
+        if (atkInt == 999) atkInt = 1000;
+        if (defInt == 999) defInt = 1000;
+
+        // Normalize intelligence levels
+        var aint = (int)Math.Floor(Math.Round(atkInt / LevelDifferential * 10000) / 10000);
+        var dint = (int)Math.Floor(Math.Round(defInt / LevelDifferential * 10000) / 10000);
+
+        var m = (int)Math.Floor(
+            Math.Round((tech.GutsSteal * CorrectionFactor + (aint - dint)) / CorrectionFactor * 10000) / 10000);
+        if (m > 100) m = 100;
+
+        return m;
+    }
+
+    private int GutsCost(Attacker user, IMonsterTechnique tech)
+    {
+        var (attacker, defender) = user == Attacker.Left ? (left, right) : (right, left);
+        // Adjust guts cost based on battle special
+        var g = (int)tech.GutsCost;
+        g = attacker.ActiveBattleSpecial switch
+        {
+            BattleSpecials.Ease => (int)Math.Ceiling(g * 0.65625),
+            BattleSpecials.Will => g * 2,
+            _ => g
+        };
+        return g;
+    }
 }

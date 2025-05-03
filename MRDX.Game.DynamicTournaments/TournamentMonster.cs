@@ -33,7 +33,15 @@ public class TournamentMonster : BattleMonsterData
     public TournamentMonster(Config config, IBattleMonsterData m) : base(m)
     {
         Logger.Info("Creating monster from game data.", Color.Lime);
-        BreedInfo = MonsterBreed.GetBreed(m.GenusMain, m.GenusSub)!;
+        try
+        {
+            BreedInfo = MonsterBreed.GetBreed(m.GenusMain, m.GenusSub)!;
+        }
+        catch (Exception e)
+        {
+            Logger.Error(e.Message);
+            // Debugger.Launch();
+        }
 
         var lifespanmin = config.LifespanMin;
         // Configuration File

@@ -14,6 +14,9 @@
              If you set this to true, trimming will be enabled when you publish the mod.
              Test trimming with: `BuildLinked.ps1` in PowerShell. -->
         <ReloadedILLink>false</ReloadedILLink>
+        <Version Condition="'$(Version)' == ''">9.9.9.9</Version>
+        <AssemblyVersion Condition="'$(AssemblyVersion)' == ''">9.9.9.9</AssemblyVersion>
+        <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
     </PropertyGroup>
 
     <ItemGroup>
@@ -26,7 +29,7 @@
     <Import Project="Reloaded.Checks.targets" />
 
     <ItemGroup>
-        <None Remove="ModConfig.json" />
+        <None Update="ModConfig.json" CopyToOutputDirectory="Always" />
         <None Remove="Publish.ps1" />
         <None Remove="BuildLinked.ps1" />
         <None Remove="Reloaded.Trimming.targets" />
@@ -42,10 +45,19 @@
     <ItemGroup>
         <PackageReference Include="Reloaded.Mod.Interfaces" Version="2.4.0" ExcludeAssets="runtime" />
         <PackageReference Include="Reloaded.SharedLib.Hooks" Version="1.16.3" />
+        <PackageReference Include="Reloaded.Universal.Redirector.Interfaces" Version="1.1.0" />
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\MRDX.Base.ExtractDataBin.Interface\MRDX.Base.ExtractDataBin.Interface.csproj" />
         <ProjectReference Include="..\MRDX.Base.Mod.Interfaces\MRDX.Base.Mod.Interfaces.csproj" />
     </ItemGroup>
 
+    <Target Name="Replace" BeforeTargets="BeforeBuild;BeforeRebuild">
+        <PropertyGroup>
+            <InputFile>ModConfig.template.json</InputFile>
+            <OutputFile>ModConfig.json</OutputFile>
+        </PropertyGroup>
+        <WriteLinesToFile File="$(OutputFile)" Lines="$([System.IO.File]::ReadAllText($(InputFile)).Replace('{{ MOD_VERSION }}','$(Version)'))" Overwrite="true" />
+    </Target>
 </Project>
