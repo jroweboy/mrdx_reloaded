@@ -130,7 +130,7 @@ internal class SimulatedMonster : BattleMonsterData, IBattleMonster
     public bool InFoolery { get; set; }
     public List<IMonsterTechnique> TechData { get; }
 
-    private TechRange GetTechRange(int distanceBetweenMonsters)
+    public TechRange GetTechRange(int distanceBetweenMonsters)
     {
         return distanceBetweenMonsters switch
         {
@@ -290,53 +290,72 @@ public class BattleSimulation(IBattleMonsterData leftData, IBattleMonsterData ri
     private int _rightDistanceFromEdge;
     private int _timer;
 
-    public async Task<BattleResult> Battle(Random rng, int numberOfSecondsInMatch = 60)
+    public Task<BattleResult> Battle(Random rng, int numberOfSecondsInMatch = 60)
     {
-        _timer = 30 * numberOfSecondsInMatch; // 30 Ticks per second and 60 seconds in a match.
-        while (_timer > 0)
-        {
-            await Step(rng);
-            _timer--;
-        }
+        return Task.Run(() =>
+            {
+                _timer = 30 * numberOfSecondsInMatch; // 30 Ticks per second and 60 seconds in a match.
+                ChangeStrategy(rng, AiSide.Left);
+                if (_right.StratTimer > 0)
+                    ChangeStrategy(rng, AiSide.Right);
+                while (_timer > 0)
+                {
+                    Step(rng);
+                    _timer--;
+                }
 
-        return new BattleResult
-        {
-            Timer = _timer
-        };
+                return new BattleResult
+                {
+                    Timer = _timer
+                };
+            }
+        );
     }
 
-    private async Task Step(Random rng)
+    private void Step(Random rng)
     {
         _distanceBetweenMonsters = _right.ArenaPosition - _left.ArenaPosition - _right.ArenaLength - _left.ArenaLength -
                                    DEAD_ZONE;
         _leftDistanceFromEdge = 3000 + _left.ArenaPosition;
         _rightDistanceFromEdge = 3000 - _right.ArenaPosition;
-        // If the timer for either monster has expired, choose the next strategy
-        // Choose a new strategy for the monsters
-        if (_left is { Strategy: AiStrategy.Execute, StratTimer: > 0 })
-        {
-            // Left is attacking so keep the right side paused
-            _left.StratTimer--;
-        }
-        else if (_right is { Strategy: AiStrategy.Execute, StratTimer: > 0 })
-        {
-            _right.StratTimer--;
-        }
-        else
-        {
-            _left.StratTimer--;
-            _right.StratTimer--;
 
-            if (_left.StratTimer <= 0)
+        _left.RunStrategyTick(_distanceBetweenMonsters);
+        if (_left is { StratTimer: 0, StunTimer: 0 })
+        {
+            ChangeStrategy(rng, AiSide.Left);
+            if (_left.Strategy == AiStrategy.Execute)
             {
+                // check what attack we are using.
+                var range = _left.GetTechRange(_distanceBetweenMonsters);
+
+                var tech = _left.SelectedTechnique[range]!;
+                
+                Logger.Trace($"{_left.Name} is attacking with {tech.Name}");
+                var combatResult = new CombatSimulation(_left, _right).Simulate(Attacker.Left, tech);
+                Logger.Trace($"Combat stats: {combatResult}");
+                if (rng.Next(0, 100) < combatResult.HitChance)
+                {
+                    var damage = rng.Next(combatResult.Damage.Min, combatResult.Damage.Max);
+                    Logger.Trace($"{_left.Name} hit for {damage} damage!");
+                    
+                }
+                else
+                {
+                    Logger.Trace($"{_left.Name} missed!");
+                }
             }
         }
+
+        _right.RunStrategyTick(_distanceBetweenMonsters);
+        if (_right is { StratTimer: 0, StunTimer: 0 })
+            ChangeStrategy(rng, AiSide.Right);
     }
 
     private void ChangeStrategy(Random rng, AiSide side)
     {
         var (self, other) = side == AiSide.Left ? (_left, _right) : (_right, _left);
         var distanceFromEdge = side == AiSide.Left ? _leftDistanceFromEdge : _rightDistanceFromEdge;
+        var otherDistanceFromEdge = side == AiSide.Left ? _rightDistanceFromEdge : _leftDistanceFromEdge;
         var leftStrats = self.GetStrategies(rng, _distanceBetweenMonsters, distanceFromEdge, other);
         var strat = rng.GetItems(leftStrats.ToArray(), 1)[0];
         self.Strategy = strat;
@@ -372,9 +391,16 @@ public class BattleSimulation(IBattleMonsterData leftData, IBattleMonsterData ri
                 break;
             }
             case AiStrategy.Execute:
+                self.StratTimer = 30;
+                other.StunTimer = 30;
+                break;
             case AiStrategy.Pushback:
-            default:
-                throw new ArgumentOutOfRangeException();
+            {
+                var pushbackTicks = otherDistanceFromEdge / 25;
+                self.StratTimer = pushbackTicks;
+                other.StunTimer = pushbackTicks;
+                break;
+            }
         }
     }
 }

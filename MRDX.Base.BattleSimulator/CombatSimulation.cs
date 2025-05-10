@@ -20,12 +20,31 @@ public record struct CombatResult
     public Range<int> Damage;
     public int HitChance;
     public Range<int> Withering;
+    public int HitRecoil;
+    public int MissRecoil;
+    public int LifeSteal;
+    public int GutsSteal;
 }
 
 public class CombatSimulation(IBattleMonster left, IBattleMonster right)
 {
     private const double LevelDifferential = 12.5;
     private const double CorrectionFactor = 4.0;
+
+    public CombatResult Simulate(Attacker user, IMonsterTechnique tech)
+    {
+        return new CombatResult
+        {
+            Damage = Damage(user, tech),
+            CritChance = CritChance(user, tech),
+            HitChance = CalcHitChance(user, tech),
+            Withering = CalcWithering(user, tech),
+            HitRecoil = CalcRecoil(user, tech, RecoilType.HitSelf),
+            MissRecoil = CalcRecoil(user, tech, RecoilType.MissSelf),
+            LifeSteal = CalcLifeSteal(user, tech),
+            GutsSteal = CalcGutsSteal(user, tech),
+        };
+    }
 
     public Range<int> Damage(Attacker user, IMonsterTechnique tech)
     {
